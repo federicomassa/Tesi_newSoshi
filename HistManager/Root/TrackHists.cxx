@@ -2,12 +2,25 @@
 #include "xAODTruth/TruthParticleContainer.h"
 #include "xAODTruth/TruthVertex.h"
 #include <HistManager/TrackHelper.h>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <exception>
+#include <cstdlib>
 
 const bool debug = false;
 
 void PrintMessage(const char* message) {
   if (debug)
     std::cout << message << std::endl;
+}
+
+void Assert(const std::string& message, bool condition) {
+  if (condition) return;
+  else {
+    const std::string errStr = "ERROR:\t";
+    throw (errStr + message);
+  }
 }
 
 TrackHists::TrackHists(TString name) {
@@ -45,90 +58,43 @@ void TrackHists::BookHists() {
   m_biasD0  = declare1D(m_name, "biasD0",  "#sigma(d_{0}) [mm]",         100,    -0.2,   0.2); 
   m_biasZ0  = declare1D(m_name, "biasZ0",  "#sigma(z_{0}) [mm]",         100,    -0.8,   0.8); 
 
-  m_biasPt_bin1  = declare1D(m_name, "biasPt_bin1",  "#sigma(p_{T})(|#eta|<0.2) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin2  = declare1D(m_name, "biasPt_bin2",  "#sigma(p_{T})(|#eta|<0.4) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin3  = declare1D(m_name, "biasPt_bin3",  "#sigma(p_{T})(|#eta|<0.6) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin4  = declare1D(m_name, "biasPt_bin4",  "#sigma(p_{T})(|#eta|<0.8) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin5  = declare1D(m_name, "biasPt_bin5",  "#sigma(p_{T})(|#eta|<1.0) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin6  = declare1D(m_name, "biasPt_bin6",  "#sigma(p_{T})(|#eta|<1.2) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin7  = declare1D(m_name, "biasPt_bin7",  "#sigma(p_{T})(|#eta|<1.4) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin8  = declare1D(m_name, "biasPt_bin8",  "#sigma(p_{T})(|#eta|<1.6) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin9  = declare1D(m_name, "biasPt_bin9",  "#sigma(p_{T})(|#eta|<1.8) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin10 = declare1D(m_name, "biasPt_bin10", "#sigma(p_{T})(|#eta|<2.0) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin11 = declare1D(m_name, "biasPt_bin11", "#sigma(p_{T})(|#eta|<2.2) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin12 = declare1D(m_name, "biasPt_bin12", "#sigma(p_{T})(|#eta|<2.4) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin13 = declare1D(m_name, "biasPt_bin13", "#sigma(p_{T})(|#eta|<2.6) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin14 = declare1D(m_name, "biasPt_bin14", "#sigma(p_{T})(|#eta|<2.8) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin15 = declare1D(m_name, "biasPt_bin15", "#sigma(p_{T})(|#eta|<3.0) [MeV]", 100,-8000.0,8000.0); 
-  m_biasPt_bin16 = declare1D(m_name, "biasPt_bin16", "#sigma(p_{T})(|#eta|<3.2) [MeV]", 100,-8000.0,8000.0); 
+  for (int i = 0; i < m_etaVectorSize; i++) {
 
-  m_biasQPt_bin1  = declare1D(m_name, "biasQPt_bin1",  "#sigma(q/p_{T})(|#eta|<0.2) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin2  = declare1D(m_name, "biasQPt_bin2",  "#sigma(q/p_{T})(|#eta|<0.4) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin3  = declare1D(m_name, "biasQPt_bin3",  "#sigma(q/p_{T})(|#eta|<0.6) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin4  = declare1D(m_name, "biasQPt_bin4",  "#sigma(q/p_{T})(|#eta|<0.8) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin5  = declare1D(m_name, "biasQPt_bin5",  "#sigma(q/p_{T})(|#eta|<1.0) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin6  = declare1D(m_name, "biasQPt_bin6",  "#sigma(q/p_{T})(|#eta|<1.2) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin7  = declare1D(m_name, "biasQPt_bin7",  "#sigma(q/p_{T})(|#eta|<1.4) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin8  = declare1D(m_name, "biasQPt_bin8",  "#sigma(q/p_{T})(|#eta|<1.6) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin9  = declare1D(m_name, "biasQPt_bin9",  "#sigma(q/p_{T})(|#eta|<1.8) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin10 = declare1D(m_name, "biasQPt_bin10", "#sigma(q/p_{T})(|#eta|<2.0) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin11 = declare1D(m_name, "biasQPt_bin11", "#sigma(q/p_{T})(|#eta|<2.2) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin12 = declare1D(m_name, "biasQPt_bin12", "#sigma(q/p_{T})(|#eta|<2.4) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin13 = declare1D(m_name, "biasQPt_bin13", "#sigma(q/p_{T})(|#eta|<2.6) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin14 = declare1D(m_name, "biasQPt_bin14", "#sigma(q/p_{T})(|#eta|<2.8) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin15 = declare1D(m_name, "biasQPt_bin15", "#sigma(q/p_{T})(|#eta|<3.0) [MeV^{-1}]", 100,-0.2, 0.2); 
-  m_biasQPt_bin16 = declare1D(m_name, "biasQPt_bin16", "#sigma(q/p_{T})(|#eta|<3.2) [MeV^{-1}]", 100,-0.2, 0.2); 
+    std::stringstream ss;
 
-  m_biasPhi_bin1  = declare1D(m_name, "biasPhi_bin1",  "#sigma(#phi)(|#eta|<0.2)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin2  = declare1D(m_name, "biasPhi_bin2",  "#sigma(#phi)(|#eta|<0.4)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin3  = declare1D(m_name, "biasPhi_bin3",  "#sigma(#phi)(|#eta|<0.6)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin4  = declare1D(m_name, "biasPhi_bin4",  "#sigma(#phi)(|#eta|<0.8)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin5  = declare1D(m_name, "biasPhi_bin5",  "#sigma(#phi)(|#eta|<1.0)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin6  = declare1D(m_name, "biasPhi_bin6",  "#sigma(#phi)(|#eta|<1.2)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin7  = declare1D(m_name, "biasPhi_bin7",  "#sigma(#phi)(|#eta|<1.4)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin8  = declare1D(m_name, "biasPhi_bin8",  "#sigma(#phi)(|#eta|<1.6)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin9  = declare1D(m_name, "biasPhi_bin9",  "#sigma(#phi)(|#eta|<1.8)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin10 = declare1D(m_name, "biasPhi_bin10", "#sigma(#phi)(|#eta|<2.0)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin11 = declare1D(m_name, "biasPhi_bin11", "#sigma(#phi)(|#eta|<2.2)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin12 = declare1D(m_name, "biasPhi_bin12", "#sigma(#phi)(|#eta|<2.4)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin13 = declare1D(m_name, "biasPhi_bin13", "#sigma(#phi)(|#eta|<2.6)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin14 = declare1D(m_name, "biasPhi_bin14", "#sigma(#phi)(|#eta|<2.8)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin15 = declare1D(m_name, "biasPhi_bin15", "#sigma(#phi)(|#eta|<3.0)", 100, -2.5e-3, 2.5e-3); 
-  m_biasPhi_bin16 = declare1D(m_name, "biasPhi_bin16", "#sigma(#phi)(|#eta|<3.2)", 100, -2.5e-3, 2.5e-3); 
+    const std::string PtTitle = "#sigma(p_{T})(|#eta| < ";
+    const std::string QPtTitle = "#sigma(q/p_{T})(|#eta| < ";
+    const std::string PhiTitle = "#sigma(#phi)(|#eta| < ";
+    const std::string D0Title = "#sigma(D0)(|#eta| < ";
+    const std::string Z0Title = "#sigma(Z0)(|#eta| < ";
 
-  m_biasD0_bin1  = declare1D(m_name, "biasD0_bin1",  "#sigma(d_{0})(|#eta|<0.2) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin2  = declare1D(m_name, "biasD0_bin2",  "#sigma(d_{0})(|#eta|<0.4) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin3  = declare1D(m_name, "biasD0_bin3",  "#sigma(d_{0})(|#eta|<0.6) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin4  = declare1D(m_name, "biasD0_bin4",  "#sigma(d_{0})(|#eta|<0.8) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin5  = declare1D(m_name, "biasD0_bin5",  "#sigma(d_{0})(|#eta|<1.0) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin6  = declare1D(m_name, "biasD0_bin6",  "#sigma(d_{0})(|#eta|<1.2) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin7  = declare1D(m_name, "biasD0_bin7",  "#sigma(d_{0})(|#eta|<1.4) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin8  = declare1D(m_name, "biasD0_bin8",  "#sigma(d_{0})(|#eta|<1.6) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin9  = declare1D(m_name, "biasD0_bin9",  "#sigma(d_{0})(|#eta|<1.8) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin10 = declare1D(m_name, "biasD0_bin10", "#sigma(d_{0})(|#eta|<2.0) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin11 = declare1D(m_name, "biasD0_bin11", "#sigma(d_{0})(|#eta|<2.2) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin12 = declare1D(m_name, "biasD0_bin12", "#sigma(d_{0})(|#eta|<2.4) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin13 = declare1D(m_name, "biasD0_bin13", "#sigma(d_{0})(|#eta|<2.6) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin14 = declare1D(m_name, "biasD0_bin14", "#sigma(d_{0})(|#eta|<2.8) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin15 = declare1D(m_name, "biasD0_bin15", "#sigma(d_{0})(|#eta|<3.0) [mm]",	 100,   -0.2,   0.2); 
-  m_biasD0_bin16 = declare1D(m_name, "biasD0_bin16", "#sigma(d_{0})(|#eta|<3.2) [mm]",	 100,   -0.2,   0.2); 
+    const std::string PtUnits = "[MeV]";
+    const std::string D0Units = "[mm]";
+    const std::string Z0Units = "[mm]";
 
-  m_biasZ0_bin1  = declare1D(m_name, "biasZ0_bin1",  "#sigma(z_{0})(|#eta|<0.2) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin2  = declare1D(m_name, "biasZ0_bin2",  "#sigma(z_{0})(|#eta|<0.4) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin3  = declare1D(m_name, "biasZ0_bin3",  "#sigma(z_{0})(|#eta|<0.6) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin4  = declare1D(m_name, "biasZ0_bin4",  "#sigma(z_{0})(|#eta|<0.8) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin5  = declare1D(m_name, "biasZ0_bin5",  "#sigma(z_{0})(|#eta|<1.0) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin6  = declare1D(m_name, "biasZ0_bin6",  "#sigma(z_{0})(|#eta|<1.2) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin7  = declare1D(m_name, "biasZ0_bin7",  "#sigma(z_{0})(|#eta|<1.4) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin8  = declare1D(m_name, "biasZ0_bin8",  "#sigma(z_{0})(|#eta|<1.6) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin9  = declare1D(m_name, "biasZ0_bin9",  "#sigma(z_{0})(|#eta|<1.8) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin10 = declare1D(m_name, "biasZ0_bin10", "#sigma(z_{0})(|#eta|<2.0) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin11 = declare1D(m_name, "biasZ0_bin11", "#sigma(z_{0})(|#eta|<2.2) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin12 = declare1D(m_name, "biasZ0_bin12", "#sigma(z_{0})(|#eta|<2.4) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin13 = declare1D(m_name, "biasZ0_bin13", "#sigma(z_{0})(|#eta|<2.6) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin14 = declare1D(m_name, "biasZ0_bin14", "#sigma(z_{0})(|#eta|<2.8) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin15 = declare1D(m_name, "biasZ0_bin15", "#sigma(z_{0})(|#eta|<3.0) [mm]",  100,   -0.8,   0.8); 
-  m_biasZ0_bin16 = declare1D(m_name, "biasZ0_bin16", "#sigma(z_{0})(|#eta|<3.2) [mm]",  100,   -0.8,   0.8); 
+    const std::string PtName = "biasPt_bin";
+    const std::string QPtName = "biasQPt_bin";
+    const std::string PhiName = "biasPhi_bin";
+    const std::string D0Name = "biasD0_bin";
+    const std::string Z0Name = "biasZ0_bin";
+
+    std::string count = "";
+    std::string etaLimit = "";
+
+    ss << i+1;
+    ss >> count;
+    ss.clear();
+
+    ss << 0.2*double(i+1);
+    ss >> etaLimit;
+    ss.clear();
+
+    m_biasPt_abseta.push_back(declare1D(m_name, (PtName + count).c_str(),  (PtTitle + etaLimit + ") " + PtUnits).c_str(), 100,-8000.0,8000.0));
+    m_biasQPt_abseta.push_back(declare1D(m_name, (QPtName + count).c_str(),  (QPtTitle + etaLimit + ")").c_str(), 100,-0.2,0.2));
+    m_biasPhi_abseta.push_back(declare1D(m_name, (PhiName + count).c_str(),  (PhiTitle + etaLimit + ")").c_str(), 100,-2.5e-3,2.5e-3));
+    m_biasD0_abseta.push_back(declare1D(m_name, (D0Name + count).c_str(),  (D0Title + etaLimit + ") " + D0Units).c_str(), 100,-0.5,0.5));
+    m_biasZ0_abseta.push_back(declare1D(m_name, (Z0Name + count).c_str(),  (Z0Title + etaLimit + ") " + Z0Units).c_str(), 100,-0.8,0.8));
+  }
 
   /* track parameterization */
   m_qoverp      = declare1D(m_name, "qoverp",      "#frac{q}{p} [GeV]", 200,  -2e-3,   2e-3); 
@@ -429,151 +395,52 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
     m_biasD0  -> Fill(sigD0,weight);
     m_biasZ0  -> Fill(sigZ0,weight);
 
-    if (TMath::Abs(trk->eta())<0.2) {
-      m_biasPt_bin1  -> Fill(sigPt,weight);
-      m_biasQPt_bin1 -> Fill(sigQPt,weight);
-      m_biasPhi_bin1 -> Fill(sigPhi,weight);
-      m_biasD0_bin1  -> Fill(sigD0,weight);
-      m_biasZ0_bin1  -> Fill(sigZ0,weight);
+    //Bin number of X_vs_eta plots in which this track will fall into
+    try {
+      const int etaBinId = TMath::FloorNint(TMath::Abs(trk->eta())/m_etaMax * double(m_etaVectorSize));
+    Assert("etaBinId out of bounds", etaBinId < m_etaVectorSize && etaBinId >= 0);
+    m_biasPt_abseta[etaBinId]  -> Fill(sigPt,  weight);
+    m_biasQPt_abseta[etaBinId] -> Fill(sigQPt, weight);
+    m_biasPhi_abseta[etaBinId] -> Fill(sigPhi, weight);
+    m_biasD0_abseta[etaBinId]  -> Fill(sigD0,  weight);
+    m_biasZ0_abseta[etaBinId]  -> Fill(sigZ0,  weight);
     }
-    else if (TMath::Abs(trk->eta())<0.4) {
-      m_biasPt_bin2  -> Fill(sigPt,weight);
-      m_biasQPt_bin2 -> Fill(sigQPt,weight);
-      m_biasPhi_bin2 -> Fill(sigPhi,weight);
-      m_biasD0_bin2  -> Fill(sigD0,weight);
-      m_biasZ0_bin2  -> Fill(sigZ0,weight);
-    }
-    else if (TMath::Abs(trk->eta())<0.6) {
-      m_biasPt_bin3  -> Fill(sigPt,weight);
-      m_biasQPt_bin3 -> Fill(sigQPt,weight);
-      m_biasPhi_bin3 -> Fill(sigPhi,weight);
-      m_biasD0_bin3  -> Fill(sigD0,weight);
-      m_biasZ0_bin3  -> Fill(sigZ0,weight);
-    }
-    else if (TMath::Abs(trk->eta())<0.8) {
-      m_biasPt_bin4  -> Fill(sigPt,weight);
-      m_biasQPt_bin4 -> Fill(sigQPt,weight);
-      m_biasPhi_bin4 -> Fill(sigPhi,weight);
-      m_biasD0_bin4  -> Fill(sigD0,weight);
-      m_biasZ0_bin4  -> Fill(sigZ0,weight);
-    }
-    else if (TMath::Abs(trk->eta())<1.0) {
-      m_biasPt_bin5  -> Fill(sigPt,weight);
-      m_biasQPt_bin5 -> Fill(sigQPt,weight);
-      m_biasPhi_bin5 -> Fill(sigPhi,weight);
-      m_biasD0_bin5  -> Fill(sigD0,weight);
-      m_biasZ0_bin5  -> Fill(sigZ0,weight);
-    }
-    else if (TMath::Abs(trk->eta())<1.2) {
-      m_biasPt_bin6  -> Fill(sigPt,weight);
-      m_biasQPt_bin6 -> Fill(sigQPt,weight);
-      m_biasPhi_bin6 -> Fill(sigPhi,weight);
-      m_biasD0_bin6  -> Fill(sigD0,weight);
-      m_biasZ0_bin6  -> Fill(sigZ0,weight);
-    }
-    else if (TMath::Abs(trk->eta())<1.4) {
-      m_biasPt_bin7  -> Fill(sigPt,weight);
-      m_biasQPt_bin7 -> Fill(sigQPt,weight);
-      m_biasPhi_bin7 -> Fill(sigPhi,weight);
-      m_biasD0_bin7  -> Fill(sigD0,weight);
-      m_biasZ0_bin7  -> Fill(sigZ0,weight);
-    }
-    else if (TMath::Abs(trk->eta())<1.6) {
-      m_biasPt_bin8  -> Fill(sigPt,weight);
-      m_biasQPt_bin8 -> Fill(sigQPt,weight);
-      m_biasPhi_bin8 -> Fill(sigPhi,weight);
-      m_biasD0_bin8  -> Fill(sigD0,weight);
-      m_biasZ0_bin8  -> Fill(sigZ0,weight);
-    }
-    else if (TMath::Abs(trk->eta())<1.8) {
-      m_biasPt_bin9  -> Fill(sigPt,weight);
-      m_biasQPt_bin9 -> Fill(sigQPt,weight);
-      m_biasPhi_bin9 -> Fill(sigPhi,weight);
-      m_biasD0_bin9  -> Fill(sigD0,weight);
-      m_biasZ0_bin9  -> Fill(sigZ0,weight);
-    }
-    else if (TMath::Abs(trk->eta())<2.0) {
-      m_biasPt_bin10  -> Fill(sigPt,weight);
-      m_biasQPt_bin10 -> Fill(sigQPt,weight);
-      m_biasPhi_bin10 -> Fill(sigPhi,weight);
-      m_biasD0_bin10  -> Fill(sigD0,weight);
-      m_biasZ0_bin10  -> Fill(sigZ0,weight);
-    }
-    else if (TMath::Abs(trk->eta())<2.2) {
-      m_biasPt_bin11  -> Fill(sigPt,weight);
-      m_biasQPt_bin11 -> Fill(sigQPt,weight);
-      m_biasPhi_bin11 -> Fill(sigPhi,weight);
-      m_biasD0_bin11  -> Fill(sigD0,weight);
-      m_biasZ0_bin11  -> Fill(sigZ0,weight);
-    }
-    else if (TMath::Abs(trk->eta())<2.4) {
-      m_biasPt_bin12  -> Fill(sigPt,weight);
-      m_biasQPt_bin12 -> Fill(sigQPt,weight);
-      m_biasPhi_bin12 -> Fill(sigPhi,weight);
-      m_biasD0_bin12  -> Fill(sigD0,weight);
-      m_biasZ0_bin12  -> Fill(sigZ0,weight);
-    }
-    else if (TMath::Abs(trk->eta())<2.6) {
-      m_biasPt_bin13  -> Fill(sigPt,weight);
-      m_biasQPt_bin13 -> Fill(sigQPt,weight);
-      m_biasPhi_bin13 -> Fill(sigPhi,weight);
-      m_biasD0_bin13  -> Fill(sigD0,weight);
-      m_biasZ0_bin13  -> Fill(sigZ0,weight);
-    }
-    else if (TMath::Abs(trk->eta())<2.8) {
-      m_biasPt_bin14  -> Fill(sigPt,weight);
-      m_biasQPt_bin14 -> Fill(sigQPt,weight);
-      m_biasPhi_bin14 -> Fill(sigPhi,weight);
-      m_biasD0_bin14  -> Fill(sigD0,weight);
-      m_biasZ0_bin14  -> Fill(sigZ0,weight);
-    }
-    else if (TMath::Abs(trk->eta())<3.0) {
-      m_biasPt_bin15  -> Fill(sigPt,weight);
-      m_biasQPt_bin15 -> Fill(sigQPt,weight);
-      m_biasPhi_bin15 -> Fill(sigPhi,weight);
-      m_biasD0_bin15  -> Fill(sigD0,weight);
-      m_biasZ0_bin15  -> Fill(sigZ0,weight);
-    }
-    else if (TMath::Abs(trk->eta())<3.2) {
-      m_biasPt_bin16  -> Fill(sigPt,weight);
-      m_biasQPt_bin16 -> Fill(sigQPt,weight);
-      m_biasPhi_bin16 -> Fill(sigPhi,weight);
-      m_biasD0_bin16  -> Fill(sigD0,weight);
-      m_biasZ0_bin16  -> Fill(sigZ0,weight);
+    catch (std::string& errMsg) {
+      std::cerr << errMsg << std::endl;
+      exit(EXIT_FAILURE);
     }
 
-  }
-
-  if (trk->isAvailable<float>("matchedDR")) {
-    bool passCut = false;
-
-    float mindR = trk->auxdata<float>("matchedDR");
-    float prob = xAOD::TrackHelper::truthMatchProb(trk);
-    m_truthMatchProb -> Fill(prob,weight);
-
-    PrintMessage("Before passCut...");
-    //  passCut=true;
-//    if (nSiHits>8) { passCut=true; }
-//    if (nSiHits>9) { passCut=true; }
-    if (nSiHits>10) { passCut=true; }
-
-    if (passCut) {
-      if (prob>0.95) {
-        m_abseta   -> Fill(TMath::Abs(truthParticle->eta()),weight);
-        m_matchingDR -> Fill(mindR,weight);
-        if (mindR<0.01) { m_abseta_dr001 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-        if (mindR<0.02) { m_abseta_dr002 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-        if (mindR<0.03) { m_abseta_dr003 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-        if (mindR<0.04) { m_abseta_dr004 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-        if (mindR<0.05) { m_abseta_dr005 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-        if (mindR<0.06) { m_abseta_dr006 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-        if (mindR<0.07) { m_abseta_dr007 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-        if (mindR<0.08) { m_abseta_dr008 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-        if (mindR<0.09) { m_abseta_dr009 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+    
+    if (trk->isAvailable<float>("matchedDR")) {
+      bool passCut = false;
+      
+      float mindR = trk->auxdata<float>("matchedDR");
+      float prob = xAOD::TrackHelper::truthMatchProb(trk);
+      m_truthMatchProb -> Fill(prob,weight);
+      
+      PrintMessage("Before passCut...");
+      //  passCut=true;
+      //    if (nSiHits>8) { passCut=true; }
+      //    if (nSiHits>9) { passCut=true; }
+      if (nSiHits>10) { passCut=true; }
+      
+      if (passCut) {
+	if (prob>0.95) {
+	  m_abseta   -> Fill(TMath::Abs(truthParticle->eta()),weight);
+	  m_matchingDR -> Fill(mindR,weight);
+	  if (mindR<0.01) { m_abseta_dr001 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.02) { m_abseta_dr002 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.03) { m_abseta_dr003 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.04) { m_abseta_dr004 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.05) { m_abseta_dr005 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.06) { m_abseta_dr006 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.07) { m_abseta_dr007 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.08) { m_abseta_dr008 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.09) { m_abseta_dr009 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	}
       }
     }
   }
-
   // Cluster study
   // m_IBLCharge           -> Fill(trk->auxdata<float>("IBLCharge"),weight); 
   // m_IBLHitSize          -> Fill(trk->auxdata<int>("IBLHitSize"),weight); 

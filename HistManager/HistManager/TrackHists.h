@@ -1,9 +1,11 @@
 #ifndef HistManager_TrackHists_H
 #define HistManager_TrackHists_H
 
+#include <TMath.h>
 #include "HistManager/ManageHists.h"
 #include "HistManager/TrackHelper.h"
 #include <set>
+#include <vector>
 
 #ifndef __MAKECINT__
 #include "xAODTracking/TrackParticle.h"
@@ -36,13 +38,12 @@ class TrackHists : public ManageHists {
 #endif // not __MAKECINT__
 
   private:
-
+    const double m_etaMax = 5.0;
+    const int m_etaVectorSize = TMath::Nint(m_etaMax)*5;
     TString m_name;
     TString m_label;
     bool m_isPseudo;
     mutable std::set<int> m_usedBarcodes; //!
-
-  public:
 
     TH1F* m_muValue;
     TH1F* m_lumibk;
@@ -65,90 +66,11 @@ class TrackHists : public ManageHists {
     TH1F* m_biasD0; //!
     TH1F* m_biasZ0; //!
 
-    TH1F* m_biasPt_bin1; //!
-    TH1F* m_biasPt_bin2; //!
-    TH1F* m_biasPt_bin3; //!
-    TH1F* m_biasPt_bin4; //!
-    TH1F* m_biasPt_bin5; //!
-    TH1F* m_biasPt_bin6; //!
-    TH1F* m_biasPt_bin7; //!
-    TH1F* m_biasPt_bin8; //!
-    TH1F* m_biasPt_bin9; //!
-    TH1F* m_biasPt_bin10; //!
-    TH1F* m_biasPt_bin11; //!
-    TH1F* m_biasPt_bin12; //!
-    TH1F* m_biasPt_bin13; //!
-    TH1F* m_biasPt_bin14; //!
-    TH1F* m_biasPt_bin15; //!
-    TH1F* m_biasPt_bin16; //!
-
-    TH1F* m_biasQPt_bin1; //!
-    TH1F* m_biasQPt_bin2; //!
-    TH1F* m_biasQPt_bin3; //!
-    TH1F* m_biasQPt_bin4; //!
-    TH1F* m_biasQPt_bin5; //!
-    TH1F* m_biasQPt_bin6; //!
-    TH1F* m_biasQPt_bin7; //!
-    TH1F* m_biasQPt_bin8; //!
-    TH1F* m_biasQPt_bin9; //!
-    TH1F* m_biasQPt_bin10; //!
-    TH1F* m_biasQPt_bin11; //!
-    TH1F* m_biasQPt_bin12; //!
-    TH1F* m_biasQPt_bin13; //!
-    TH1F* m_biasQPt_bin14; //!
-    TH1F* m_biasQPt_bin15; //!
-    TH1F* m_biasQPt_bin16; //!
-
-    TH1F* m_biasPhi_bin1; //!
-    TH1F* m_biasPhi_bin2; //!
-    TH1F* m_biasPhi_bin3; //!
-    TH1F* m_biasPhi_bin4; //!
-    TH1F* m_biasPhi_bin5; //!
-    TH1F* m_biasPhi_bin6; //!
-    TH1F* m_biasPhi_bin7; //!
-    TH1F* m_biasPhi_bin8; //!
-    TH1F* m_biasPhi_bin9; //!
-    TH1F* m_biasPhi_bin10; //!
-    TH1F* m_biasPhi_bin11; //!
-    TH1F* m_biasPhi_bin12; //!
-    TH1F* m_biasPhi_bin13; //!
-    TH1F* m_biasPhi_bin14; //!
-    TH1F* m_biasPhi_bin15; //!
-    TH1F* m_biasPhi_bin16; //!
-
-    TH1F* m_biasD0_bin1; //!
-    TH1F* m_biasD0_bin2; //!
-    TH1F* m_biasD0_bin3; //!
-    TH1F* m_biasD0_bin4; //!
-    TH1F* m_biasD0_bin5; //!
-    TH1F* m_biasD0_bin6; //!
-    TH1F* m_biasD0_bin7; //!
-    TH1F* m_biasD0_bin8; //!
-    TH1F* m_biasD0_bin9; //!
-    TH1F* m_biasD0_bin10; //!
-    TH1F* m_biasD0_bin11; //!
-    TH1F* m_biasD0_bin12; //!
-    TH1F* m_biasD0_bin13; //!
-    TH1F* m_biasD0_bin14; //!
-    TH1F* m_biasD0_bin15; //!
-    TH1F* m_biasD0_bin16; //!
-
-    TH1F* m_biasZ0_bin1; //!
-    TH1F* m_biasZ0_bin2; //!
-    TH1F* m_biasZ0_bin3; //!
-    TH1F* m_biasZ0_bin4; //!
-    TH1F* m_biasZ0_bin5; //!
-    TH1F* m_biasZ0_bin6; //!
-    TH1F* m_biasZ0_bin7; //!
-    TH1F* m_biasZ0_bin8; //!
-    TH1F* m_biasZ0_bin9; //!
-    TH1F* m_biasZ0_bin10; //!
-    TH1F* m_biasZ0_bin11; //!
-    TH1F* m_biasZ0_bin12; //!
-    TH1F* m_biasZ0_bin13; //!
-    TH1F* m_biasZ0_bin14; //!
-    TH1F* m_biasZ0_bin15; //!
-    TH1F* m_biasZ0_bin16; //!
+    std::vector<TH1F*> m_biasPt_abseta; //!
+    std::vector<TH1F*> m_biasQPt_abseta; //!
+    std::vector<TH1F*> m_biasPhi_abseta; //!
+    std::vector<TH1F*> m_biasD0_abseta; //!
+    std::vector<TH1F*> m_biasZ0_abseta; //!
 
     /* track parameterization */
     TH1F* m_qoverp; //!     
