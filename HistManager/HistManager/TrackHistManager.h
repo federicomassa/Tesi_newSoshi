@@ -8,6 +8,7 @@
 #endif // not __MAKECINT__
 
 #include <iostream>
+#include <vector>
 
 class TrackHistManager {
 
@@ -32,8 +33,6 @@ class TrackHistManager {
     bool m_doDups;
     bool m_splitOnHits;
 
-  public:
-
     TrackHists* m_all;          //!
     TrackHists* m_primary;      //!
     TrackHists* m_primary_dup;  //!
@@ -46,6 +45,13 @@ class TrackHistManager {
     TrackHists* m_primary_bhitSplit; //!
     TrackHists* m_primary_bhitMerge; //!
 
+    std::vector<TrackHists*> m_histList;
+
+ public:
+    const std::vector<TrackHists*>& GetList() const {
+      return m_histList;
+    }
+    TString GetName() {return m_name;}
 };
 
 #endif //HistManager_TrackHistManager_H

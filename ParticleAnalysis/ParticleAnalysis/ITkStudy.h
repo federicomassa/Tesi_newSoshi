@@ -16,7 +16,7 @@
 #include <HistManager/EventHists.h>
 #include <HistManager/VertexHists.h>
 #include <HistManager/ClusterHistManager.h>
-
+#include <HistManager/RunHistManager.h>
 
 #ifndef __MAKECINT__
 #include "xAODTruth/TruthParticle.h"
@@ -48,7 +48,7 @@ public:
   ClusterHists*     clusHist_all; //!
   VertexHists*      vtxHist_secondary; //!
   EventHists*       eventHist_all; //!
-
+  RunHistManager*   runHist_reco; //!
 // Everything in the header file  that refers to the xAOD edm needs 
 #ifndef __MAKECINT__
 	

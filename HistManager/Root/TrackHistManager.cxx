@@ -44,26 +44,43 @@ TrackHistManager::~TrackHistManager() {}
 void TrackHistManager::Init(EL::Worker* wk) {
 
   std::cout << "Init TrackHistManager " << m_name << std::endl;
+
+  //Now initialize the worker and add TrackHists objects to vector, needed for RunHistManager
+
   m_all           -> Init( wk );
+  m_histList       . push_back(m_all);
   if(m_doPrimary) {
     m_primary       -> Init( wk );
+    m_histList       . push_back(m_primary);
   }
   if(m_doSecondary) { 
     m_secondary     -> Init( wk );
+    m_histList       . push_back(m_secondary);
   }
   if(m_doFake) {   
     m_fake          -> Init( wk );
     m_true          -> Init( wk );
+
+    m_histList       . push_back(m_fake);
+    m_histList       . push_back(m_true);
   }
   if( (m_doPrimary && m_doSecondary) && m_doDups) {
     m_primary_dup   -> Init( wk );
     m_secondary_dup -> Init( wk );
+
+    m_histList       . push_back(m_primary_dup);
+    m_histList       . push_back(m_secondary_dup);
   }
   if( (m_doPrimary) && m_splitOnHits) {
     m_primary_bhit         -> Init( wk );
     m_primary_bhitShare    -> Init( wk );
     m_primary_bhitSplit    -> Init( wk );
     m_primary_bhitMerge    -> Init( wk );
+
+    m_histList              . push_back(m_primary_bhit);
+    m_histList              . push_back(m_primary_bhitShare);
+    m_histList              . push_back(m_primary_bhitSplit);
+    m_histList              . push_back(m_primary_bhitMerge);
   }
 
 } // BookHists

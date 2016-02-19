@@ -24,6 +24,7 @@ void Assert(const std::string& message, bool condition) {
 }
 
 TrackHists::TrackHists(TString name) {
+  m_baseName = name;
   m_name = "TrackHist_" + name;
   m_label = "Track "; // don't forget the space
   m_isPseudo = false;

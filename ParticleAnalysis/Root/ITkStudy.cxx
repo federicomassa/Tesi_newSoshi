@@ -12,6 +12,7 @@
 #include <EventLoop/StatusCode.h>
 #include <EventLoop/Worker.h>
 #include <ParticleAnalysis/ITkStudy.h>
+#include <HistManager/RunHists.h>
 #include <HistManager/EventFeaturesInterface.h>
 #include <HistManager/TrackHelper.h>
 
@@ -82,6 +83,7 @@ EL::StatusCode ITkStudy::histInitialize() {
   clusHist_all      = new ClusterHists("SiliconAll");
   vtxHist_secondary = new VertexHists("Vertex");
   eventHist_all     = new EventHists("all");
+  runHist_reco      = new RunHistManager(trkHist_reco);
 
   trkHist_all       -> Init(wk());
   truHist_stable    -> Init(wk());
@@ -89,6 +91,7 @@ EL::StatusCode ITkStudy::histInitialize() {
   clusHist_all      -> Init(wk());
   vtxHist_secondary -> Init(wk());
   eventHist_all     -> Init(wk());
+  runHist_reco      -> Init(wk());
 
   return EL::StatusCode::SUCCESS;
 }
@@ -469,6 +472,7 @@ EL::StatusCode ITkStudy::finalize() {
 }
 
 EL::StatusCode ITkStudy::histFinalize() {
+  runHist_reco->FillHists(1.0);
   return EL::StatusCode::SUCCESS;
 }
 

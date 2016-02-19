@@ -12,7 +12,7 @@
 #endif // not __MAKECINT__
 
 class TrackHists : public ManageHists {
-
+  friend class RunHists;
   public:
 
     TrackHists(TString name);
@@ -36,11 +36,13 @@ class TrackHists : public ManageHists {
     }
 
 #endif // not __MAKECINT__
-
-  private:
+ public:
+    TString GetName() const {return m_baseName;}
+ private:
     const double m_etaMax = 5.0;
     const int m_etaVectorSize = TMath::Nint(m_etaMax)*5;
     TString m_name;
+    TString m_baseName;
     TString m_label;
     bool m_isPseudo;
     mutable std::set<int> m_usedBarcodes; //!
