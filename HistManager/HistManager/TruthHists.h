@@ -9,6 +9,8 @@
 
 class TruthHists : public ManageHists {
 
+  friend class RunHists;
+  
  public:
 
   TruthHists(TString name);

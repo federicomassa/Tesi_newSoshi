@@ -31,10 +31,10 @@ void TruthHists::BookHists() {
   /* track parameterization */
   m_pt 			     = declare1D(m_name, "pt", 	 "p_{T} [GeV]", 	200,  0.0,     2000.0 ); 
   m_eta			     = declare1D(m_name, "eta",	 "#eta", 			  100,	 -5.0,     5.0    ); 
-  m_abseta       = declare1D(m_name, "abseta", "|#eta|",    25,   0.0,     5.0); 
+  m_abseta                   = declare1D(m_name, "abseta", "|#eta|",    25,   0.0,     5.0); 
   m_d0 			     = declare1D(m_name, "d0", 	 "d_{0}",		    120, -0.09,    0.09   ); 
   m_z0 			     = declare1D(m_name, "z0", 	 "z_{0}",		    120, -300.0,   300.0  ); 
-  m_phi			     = declare1D(m_name, "phi",	 "#phi", 			  70,	 -3.5,     3.5    ); 
+  m_phi			     = declare1D(m_name, "phi",	 "#phi", 			  64,	 -3.2,     3.2    ); 
 
 } // BookHists
 

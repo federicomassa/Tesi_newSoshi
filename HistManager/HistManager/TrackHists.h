@@ -13,6 +13,7 @@
 
 class TrackHists : public ManageHists {
   friend class RunHists;
+  friend class RunHistManager;
   public:
 
     TrackHists(TString name);
@@ -40,7 +41,8 @@ class TrackHists : public ManageHists {
     TString GetName() const {return m_baseName;}
  private:
     const double m_etaMax = 5.0;
-    const int m_etaVectorSize = TMath::Nint(m_etaMax)*5;
+    const double m_etaInterval = 0.2;
+    const int m_etaVectorSize = TMath::Nint(m_etaMax/m_etaInterval);
     TString m_name;
     TString m_baseName;
     TString m_label;
@@ -78,7 +80,8 @@ class TrackHists : public ManageHists {
     TH1F* m_qoverp; //!     
     TH1F* m_pt; //!       
     TH1F* m_ptnarrow; //!       
-    TH1F* m_eta; //!        
+    TH1F* m_eta; //!   
+    TH1F* m_abseta; //!
     TH1F* m_phi; //!        
     TH1F* m_d0; //!       
     TH1F* m_z0; //!       
@@ -139,16 +142,16 @@ class TrackHists : public ManageHists {
 
     TH1F* m_truthMatchProb; //!
     TH1F* m_matchingDR; //!
-    TH1F* m_abseta; //!
-    TH1F* m_abseta_dr001; //!
-    TH1F* m_abseta_dr002; //!
-    TH1F* m_abseta_dr003; //!
-    TH1F* m_abseta_dr004; //!
-    TH1F* m_abseta_dr005; //!
-    TH1F* m_abseta_dr006; //!
-    TH1F* m_abseta_dr007; //!
-    TH1F* m_abseta_dr008; //!
-    TH1F* m_abseta_dr009; //!
+    TH1F* m_truthAbseta; //!
+    TH1F* m_truthAbseta_dr001; //!
+    TH1F* m_truthAbseta_dr002; //!
+    TH1F* m_truthAbseta_dr003; //!
+    TH1F* m_truthAbseta_dr004; //!
+    TH1F* m_truthAbseta_dr005; //!
+    TH1F* m_truthAbseta_dr006; //!
+    TH1F* m_truthAbseta_dr007; //!
+    TH1F* m_truthAbseta_dr008; //!
+    TH1F* m_truthAbseta_dr009; //!
 
     // Cluster study
     TH1F* m_IBLCharge; //!

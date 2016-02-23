@@ -51,7 +51,7 @@ class TrackHistManager {
     const std::vector<TrackHists*>& GetList() const {
       return m_histList;
     }
-    TString GetName() {return m_name;}
+    TString GetName() const {return m_name;}
 };
 
 #endif //HistManager_TrackHistManager_H

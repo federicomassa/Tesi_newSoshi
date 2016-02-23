@@ -5,6 +5,7 @@
 #include "TH1F.h"
 #include "TH2F.h"
 #include "TH3F.h"
+#include "TGraphErrors.h"
 #include <EventLoop/Worker.h>
 
 class ManageHists{
@@ -19,6 +20,7 @@ class ManageHists{
 
     TH1F* declare1D(TString cat, TString name, TString xaxis, Int_t xbins, Float_t xlow, Float_t xhigh);
     TH1F* declare1D(TString cat, TString name, TString xaxis, Int_t xbins, Double_t* xbinVec);
+    TGraphErrors* declareGraphErrors(TString cat, TString name, TString xaxis, TString yaxis);
 
     TH2F* declare2D(TString cat, TString name, TString xaxis, TString yaxis, Int_t xbins, Float_t xlow, Float_t xhigh, Int_t ybins, Float_t ylow, Float_t yhigh);
     TH2F* declare2D(TString cat, TString name, TString xaxis, TString yaxis, Int_t xbins, Double_t* xbinVec, Int_t ybins, Float_t ylow, Float_t yhigh);

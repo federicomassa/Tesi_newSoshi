@@ -3,11 +3,12 @@
 
 #include "HistManager/ManageHists.h"
 #include "HistManager/TrackHists.h"
+#include "HistManager/TruthHists.h"
 
 class RunHists : public ManageHists {
 
  public:
- RunHists(const TrackHists* const);
+  RunHists(const TrackHists* const, const TruthHists* const);
   ~RunHists();
 
   void BookHists();
@@ -19,7 +20,22 @@ class RunHists : public ManageHists {
   TString m_name;
   TString m_label;
   const TrackHists* const m_trackHist;
-  TH1F* m_testHist; //!
+  const TruthHists* const m_truthHist;
+  TGraphErrors* m_sysPt_abseta; //!
+  TGraphErrors* m_sysQPt_abseta; //!
+  TGraphErrors* m_sysPhi_abseta; //!
+  TGraphErrors* m_sysD0_abseta; //!
+  TGraphErrors* m_sysZ0_abseta; //!
+
+  TGraphErrors* m_sigPt_abseta; //!
+  TGraphErrors* m_sigQPt_abseta; //!
+  TGraphErrors* m_sigPhi_abseta; //!
+  TGraphErrors* m_sigD0_abseta; //!
+  TGraphErrors* m_sigZ0_abseta; //!
+
+  TGraphErrors* m_eff_abseta; //!
+  TGraphErrors* m_eff_phi; //!
+
 };
 
-#endif
+#endif // end HistManager_RunHists_h

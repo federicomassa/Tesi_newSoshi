@@ -2,6 +2,7 @@
 #include "xAODTruth/TruthParticleContainer.h"
 #include "xAODTruth/TruthVertex.h"
 #include <HistManager/TrackHelper.h>
+#include <HistManager/assert.h>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -15,20 +16,12 @@ void PrintMessage(const char* message) {
     std::cout << message << std::endl;
 }
 
-void Assert(const std::string& message, bool condition) {
-  if (condition) return;
-  else {
-    const std::string errStr = "ERROR:\t";
-    throw (errStr + message);
-  }
-}
-
 TrackHists::TrackHists(TString name) {
   m_baseName = name;
   m_name = "TrackHist_" + name;
   m_label = "Track "; // don't forget the space
   m_isPseudo = false;
-  if (m_name.Contains("pseudo")) { m_label = "Pseduotrack "; m_isPseudo = true; }
+  if (m_name.Contains("pseudo")) { m_label = "Pseudotrack "; m_isPseudo = true; }
 }
 
 TrackHists::~TrackHists() {}
@@ -53,7 +46,7 @@ void TrackHists::BookHists() {
   m_truthZ0       = declare1D(m_name, "truthZ0",       "Truth z_{0} [mm]",  100, -200.0,  200.0); 
 
   m_biasPt  = declare1D(m_name, "biasPt",  "#sigma(p_{T}) [MeV]",        100, -8000.0,8000.0); 
-  m_biasQPt = declare1D(m_name, "biasQPt", "p_{T} x #sigma(q/p_{T}) [MeV^{-1}]", 100,    -0.2,   0.2); 
+  m_biasQPt = declare1D(m_name, "biasQPt", "p_{T}^{truth} x #sigma(q/p_{T})", 100,    -0.2,   0.2); 
   m_biasEta = declare1D(m_name, "biasEta", "#sigma(#eta)", 			         100,   -2e-3,  2e-3); 
   m_biasPhi = declare1D(m_name, "biasPhi", "#sigma(#phi)", 			         100,	  -1.0e-3,  1.0e-3); 
   m_biasD0  = declare1D(m_name, "biasD0",  "#sigma(d_{0}) [mm]",         100,    -0.2,   0.2); 
@@ -101,7 +94,8 @@ void TrackHists::BookHists() {
   m_qoverp      = declare1D(m_name, "qoverp",      "#frac{q}{p} [GeV]", 200,  -2e-3,   2e-3); 
   m_pt          = declare1D(m_name, "pt",          "p_{T} [GeV]",       200,    0.0, 2000.0); 
   m_ptnarrow    = declare1D(m_name, "ptnarrow",    "p_{T} [GeV]",       200,    0.0,   50.0); 
-  m_eta         = declare1D(m_name, "eta",         "#eta",               100,   -5.0,    5.0); 
+  m_eta         = declare1D(m_name, "eta",         "#eta",               50,   -5.0,    5.0); 
+  m_abseta      = declare1D(m_name, "abseta",      "#eta",               25,    0.0,    5.0); 
   m_phi         = declare1D(m_name, "phi",         "#phi",               64,   -3.2,    3.2); 
   m_d0          = declare1D(m_name, "d0",          "d_{0} [mm]",        100,   -0.2,    0.2); 
   m_z0          = declare1D(m_name, "z0",          "z_{0} [mm]",        100, -200.0,  200.0); 
@@ -165,16 +159,16 @@ void TrackHists::BookHists() {
 
   m_matchingDR = declare1D(m_name, "matchingDR", "#Delta R", 100, 0.0, 0.1); 
 
-  m_abseta       = declare1D(m_name, "abseta",        "|#eta|", 25, 0.0, 5.0); 
-  m_abseta_dr001 = declare1D(m_name, "abseta_dr001", "|#eta|", 25, 0.0, 5.0); 
-  m_abseta_dr002 = declare1D(m_name, "abseta_dr002", "|#eta|", 25, 0.0, 5.0); 
-  m_abseta_dr003 = declare1D(m_name, "abseta_dr003", "|#eta|", 25, 0.0, 5.0); 
-  m_abseta_dr004 = declare1D(m_name, "abseta_dr004", "|#eta|", 25, 0.0, 5.0); 
-  m_abseta_dr005 = declare1D(m_name, "abseta_dr005", "|#eta|", 25, 0.0, 5.0); 
-  m_abseta_dr006 = declare1D(m_name, "abseta_dr006", "|#eta|", 25, 0.0, 5.0); 
-  m_abseta_dr007 = declare1D(m_name, "abseta_dr007", "|#eta|", 25, 0.0, 5.0); 
-  m_abseta_dr008 = declare1D(m_name, "abseta_dr008", "|#eta|", 25, 0.0, 5.0); 
-  m_abseta_dr009 = declare1D(m_name, "abseta_dr009", "|#eta|", 25, 0.0, 5.0); 
+  m_truthAbseta       = declare1D(m_name, "truthAbseta",       "|#eta|", 25, 0.0, 5.0); 
+  m_truthAbseta_dr001 = declare1D(m_name, "truthAbseta_dr001", "|#eta|", 25, 0.0, 5.0); 
+  m_truthAbseta_dr002 = declare1D(m_name, "truthAbseta_dr002", "|#eta|", 25, 0.0, 5.0); 
+  m_truthAbseta_dr003 = declare1D(m_name, "truthAbseta_dr003", "|#eta|", 25, 0.0, 5.0); 
+  m_truthAbseta_dr004 = declare1D(m_name, "truthAbseta_dr004", "|#eta|", 25, 0.0, 5.0); 
+  m_truthAbseta_dr005 = declare1D(m_name, "truthAbseta_dr005", "|#eta|", 25, 0.0, 5.0); 
+  m_truthAbseta_dr006 = declare1D(m_name, "truthAbseta_dr006", "|#eta|", 25, 0.0, 5.0); 
+  m_truthAbseta_dr007 = declare1D(m_name, "truthAbseta_dr007", "|#eta|", 25, 0.0, 5.0); 
+  m_truthAbseta_dr008 = declare1D(m_name, "truthAbseta_dr008", "|#eta|", 25, 0.0, 5.0); 
+  m_truthAbseta_dr009 = declare1D(m_name, "truthAbseta_dr009", "|#eta|", 25, 0.0, 5.0); 
 
 
   // Cluster study
@@ -250,6 +244,7 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
   m_pt           ->Fill(trk->pt()*1e-3,weight); 
   m_ptnarrow     ->Fill(trk->pt()*1e-3,weight); 
   m_eta          ->Fill(trk->eta(),weight); 
+  m_abseta       ->Fill(TMath::Abs(trk->eta()),weight); 
   m_d0           ->Fill(trk->d0(),weight); 
   m_z0           ->Fill(trk->z0(),weight); 
   m_phi          ->Fill(trk->phi(),weight); 
@@ -377,10 +372,11 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
     m_truthPt       -> Fill(truthParticle->pt()*1e-3,weight);
     m_truthPtnarrow -> Fill(truthParticle->pt()*1e-3,weight);
     m_truthEta      -> Fill(truthParticle->eta(),weight);
+    m_truthAbseta   -> Fill(TMath::Abs(truthParticle->eta()),weight);
     m_truthPhi      -> Fill(truthParticle->phi(),weight);
     m_truthD0       -> Fill(truthd0,weight);
     m_truthZ0       -> Fill(truthz0,weight);
-
+    
     float sigPt  = trk->pt()-truthParticle->pt();
     float sigQPt = (trk->charge()/trk->pt()-truthParticle->charge()/truthParticle->pt())*truthParticle->pt();
     float sigEta = trk->eta()-truthParticle->eta();
@@ -397,19 +393,13 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
     m_biasZ0  -> Fill(sigZ0,weight);
 
     //Bin number of X_vs_eta plots in which this track will fall into
-    try {
-      const int etaBinId = TMath::FloorNint(TMath::Abs(trk->eta())/m_etaMax * double(m_etaVectorSize));
+    const int etaBinId = TMath::FloorNint(TMath::Abs(trk->eta())/m_etaMax * double(m_etaVectorSize));
     Assert("etaBinId out of bounds", etaBinId < m_etaVectorSize && etaBinId >= 0);
     m_biasPt_abseta[etaBinId]  -> Fill(sigPt,  weight);
     m_biasQPt_abseta[etaBinId] -> Fill(sigQPt, weight);
     m_biasPhi_abseta[etaBinId] -> Fill(sigPhi, weight);
     m_biasD0_abseta[etaBinId]  -> Fill(sigD0,  weight);
     m_biasZ0_abseta[etaBinId]  -> Fill(sigZ0,  weight);
-    }
-    catch (std::string& errMsg) {
-      std::cerr << errMsg << std::endl;
-      exit(EXIT_FAILURE);
-    }
 
     
     if (trk->isAvailable<float>("matchedDR")) {
@@ -426,21 +416,24 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
       if (nSiHits>10) { passCut=true; }
       
       if (passCut) {
-	if (prob>0.95) {
-	  m_abseta   -> Fill(TMath::Abs(truthParticle->eta()),weight);
+	if (prob>0.95) { // !!!!!!!!! TODO: check !!!!!!!!!!!!!!
 	  m_matchingDR -> Fill(mindR,weight);
-	  if (mindR<0.01) { m_abseta_dr001 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.02) { m_abseta_dr002 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.03) { m_abseta_dr003 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.04) { m_abseta_dr004 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.05) { m_abseta_dr005 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.06) { m_abseta_dr006 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.07) { m_abseta_dr007 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.08) { m_abseta_dr008 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.09) { m_abseta_dr009 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.01) { m_truthAbseta_dr001 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.02) { m_truthAbseta_dr002 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.03) { m_truthAbseta_dr003 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.04) { m_truthAbseta_dr004 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.05) { m_truthAbseta_dr005 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.06) { m_truthAbseta_dr006 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.07) { m_truthAbseta_dr007 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.08) { m_truthAbseta_dr008 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	  if (mindR<0.09) { m_truthAbseta_dr009 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
 	}
       }
     }
+  }
+
+  else {
+    std::cout << "TrackHists::FillHists()\t No truth particle retrieved, not filling this track" << std::endl;
   }
   // Cluster study
   // m_IBLCharge           -> Fill(trk->auxdata<float>("IBLCharge"),weight); 

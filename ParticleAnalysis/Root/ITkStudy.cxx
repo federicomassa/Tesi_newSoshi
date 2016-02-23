@@ -79,11 +79,11 @@ EL::StatusCode ITkStudy::histInitialize() {
   // recoTracks histograms
   trkHist_all       = new TrackHists("TrackAll"); //every track, no cuts here
   truHist_stable    = new TruthHists("stable"); //Filled for every truth hs particle, no cuts
-  trkHist_reco      = new TrackHistManager("reco",true,true,true,true,true); //every track that matches the hs
+  trkHist_reco      = new TrackHistManager("reco",true,true,true,true,true); //every track that matches the hs + mindRmatched < 0.1
   clusHist_all      = new ClusterHists("SiliconAll");
   vtxHist_secondary = new VertexHists("Vertex");
   eventHist_all     = new EventHists("all");
-  runHist_reco      = new RunHistManager(trkHist_reco);
+  runHist_reco      = new RunHistManager(trkHist_reco, truHist_stable);
 
   trkHist_all       -> Init(wk());
   truHist_stable    -> Init(wk());
@@ -116,7 +116,7 @@ EL::StatusCode ITkStudy::initialize() {
 
 EL::StatusCode ITkStudy::execute() {
   // print every 100 events, so we know where we are:
-  if(m_eventCounter % 1 == 0) {
+  if(m_eventCounter % 1000 == 0) {
     Info("execute()", "Event number = %i", m_eventCounter );
   }
 
@@ -432,6 +432,7 @@ EL::StatusCode ITkStudy::execute() {
   if (mindRMatched<0.1) {
     trkHist_reco->FillHists( (*itkTrk_itr_matched), 1.0 );
   }
+
 
   // Fill all pixel clusters
   xAOD::TrackMeasurementValidationContainer::const_iterator pixCluster_itr = pixClustersOrig->begin();

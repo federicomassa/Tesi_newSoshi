@@ -1,0 +1,14 @@
+#ifndef ASSERT_H
+#define ASSERT_H
+
+#include <string>
+
+void Assert(const std::string& message, bool condition) {
+  if (condition) return;
+  else {
+    const std::string errStr = "ERROR:\t";
+    throw (errStr + message);
+  }
+}
+
+#endif //ASSERT_H

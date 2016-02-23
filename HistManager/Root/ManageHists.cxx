@@ -40,6 +40,17 @@ TH1F* ManageHists::declare1D(TString cat, TString name, TString xaxis, Int_t xbi
   return tmp;
 }; // declare1D
 
+//TGraphErrors
+//must add points manually
+TGraphErrors* ManageHists::declareGraphErrors(TString cat, TString name, TString xaxis, TString yaxis) {
+  TGraphErrors* tmp = new TGraphErrors();
+  tmp->SetNameTitle(TString(cat+"__"+name),name);
+  tmp->GetXaxis()->SetTitle(xaxis);
+  tmp->GetYaxis()->SetTitle(yaxis);
+  m_wk->addOutput(tmp);
+  return tmp;
+}; // declareGraphErrors
+
 
 
 TH2F* ManageHists::declare2D(TString cat, TString name, TString xaxis, TString yaxis, Int_t xbins, Float_t xlow, Float_t xhigh, Int_t ybins, Float_t ylow, Float_t yhigh) {
