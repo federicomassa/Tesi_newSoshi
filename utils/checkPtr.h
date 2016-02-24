@@ -1,8 +1,15 @@
 #include <iostream>
+#include <string>
 
 void CheckPtr(void* ptr) {
-  if (ptr == 0) {
-    std::cout << "ERROR: null pointer exception" << std::endl;
+  try {
+    if (ptr == NULL) {
+      const std::string error = "ERROR:\t null pointer exception";
+      throw error;
+    }
+  }
+  catch(std::string& e) {
+    std::cout << e << std::endl;
     exit(EXIT_FAILURE);
   }
 }

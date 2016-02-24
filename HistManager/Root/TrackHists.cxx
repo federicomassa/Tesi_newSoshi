@@ -40,6 +40,7 @@ void TrackHists::BookHists() {
   m_truthPt       = declare1D(m_name, "truthPt",       "Truth p_{T} [GeV]", 200,    0.0, 2000.0); 
   m_truthPtnarrow = declare1D(m_name, "truthPtnarrow", "Truth p_{T} [GeV]", 200,    0.0,   50.0); 
   m_truthEta      = declare1D(m_name, "truthEta",      "Truth #eta",         100,   -5.0,    5.0); 
+  m_truthAbseta   = declare1D(m_name, "truthAbseta",       "|#eta|", 25, 0.0, 5.0); 
   m_truthPhi      = declare1D(m_name, "truthPhi",      "Truth #phi",         64,   -3.2,    3.2); 
   m_truthD0       = declare1D(m_name, "truthD0",       "Truth d_{0} [mm]",	100,   -0.1,    0.1); 
   m_truthD0_wide  = declare1D(m_name, "truthD0_wide",  "Truth d_{0} [mm]",  100,   -2.0,    2.0); 
@@ -159,7 +160,6 @@ void TrackHists::BookHists() {
 
   m_matchingDR = declare1D(m_name, "matchingDR", "#Delta R", 100, 0.0, 0.1); 
 
-  m_truthAbseta       = declare1D(m_name, "truthAbseta",       "|#eta|", 25, 0.0, 5.0); 
   m_truthAbseta_dr001 = declare1D(m_name, "truthAbseta_dr001", "|#eta|", 25, 0.0, 5.0); 
   m_truthAbseta_dr002 = declare1D(m_name, "truthAbseta_dr002", "|#eta|", 25, 0.0, 5.0); 
   m_truthAbseta_dr003 = declare1D(m_name, "truthAbseta_dr003", "|#eta|", 25, 0.0, 5.0); 

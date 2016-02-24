@@ -48,6 +48,10 @@ TGraphErrors* RunHistManager::declareGraphErrors(TString cat, TString name, TStr
 
 
 void RunHistManager::BookHists() {
+  
+  std::cout << "Creating histograms for RunHistManager_" + m_name << std::endl;
+
+
   m_fakeProb_abseta = declareGraphErrors("RunHistManager", "fakeProb_abseta", "|#eta|", "Fake probability");
 }
 
@@ -93,7 +97,7 @@ void RunHistManager::FillHists(float weight) const {
    
     double fakeProb = num/den;
     
-    m_fakeProb_abseta->SetPoint(i, etaInterval + double(i)*etaInterval, fakeProb);
+    m_fakeProb_abseta->SetPoint(i, etaInterval/2.0 + double(i)*etaInterval, fakeProb);
     m_fakeProb_abseta->SetPointError(i, etaInterval/2.0, TMath::Sqrt(fakeProb*(1-fakeProb)/den));
   }
 

@@ -93,20 +93,20 @@ void RunHists::FillHists(float weight) const {
 
   // ==================================== Efficiency ========================================== //
   // NOTE: bins doesn't follow usual ROOT convention, they are centered, so bin(0) does not contain any info
-
+  // Efficiency(x in I) = P(track is reconstructed, including fakes | truth has x in I)
   //check if hist of abseta in truth and track hists are compatible
   Assert("Track and Truth abseta histograms are incompatible", 
-	 m_trackHist->m_abseta->GetXaxis()->GetBinWidth(1) == m_truthHist->m_abseta->GetXaxis()->GetBinWidth(1) &&
-	 m_trackHist->m_abseta->GetXaxis()->GetBinWidth(1) == m_etaInterval &&
-	 m_trackHist->m_abseta->GetXaxis()->GetXmin() == m_truthHist->m_abseta->GetXaxis()->GetXmin() &&
-	 TMath::Abs(m_trackHist->m_abseta->GetXaxis()->GetXmin()) < 1e-9 &&
-	 m_trackHist->m_abseta->GetXaxis()->GetXmax() == m_truthHist->m_abseta->GetXaxis()->GetXmax()
+	 m_trackHist->m_truthAbseta->GetXaxis()->GetBinWidth(1) == m_truthHist->m_abseta->GetXaxis()->GetBinWidth(1) &&
+	 m_trackHist->m_truthAbseta->GetXaxis()->GetBinWidth(1) == m_etaInterval &&
+	 m_trackHist->m_truthAbseta->GetXaxis()->GetXmin() == m_truthHist->m_abseta->GetXaxis()->GetXmin() &&
+	 TMath::Abs(m_trackHist->m_truthAbseta->GetXaxis()->GetXmin()) < 1e-9 &&
+	 m_trackHist->m_truthAbseta->GetXaxis()->GetXmax() == m_truthHist->m_abseta->GetXaxis()->GetXmax()
 	 );
 
-  int nBins = TMath::Nint((m_trackHist->m_abseta->GetXaxis()->GetXmax() - m_trackHist->m_abseta->GetXaxis()->GetXmin())/m_etaInterval);
+  int nBins = TMath::Nint((m_trackHist->m_truthAbseta->GetXaxis()->GetXmax() - m_trackHist->m_truthAbseta->GetXaxis()->GetXmin())/m_etaInterval);
 
   for (int i = 0; i < nBins; i++) {
-    Double_t num = m_trackHist->m_abseta->GetBinContent(i+1);
+    Double_t num = m_trackHist->m_truthAbseta->GetBinContent(i+1);
     Double_t den = m_truthHist->m_abseta->GetBinContent(i+1);
     Double_t eff = 0.0;
 
@@ -125,16 +125,16 @@ void RunHists::FillHists(float weight) const {
 
 //check if hist of phi in truth and track hists are compatible
   Assert("Track and Truth phi histograms are incompatible", 
-	 m_trackHist->m_phi->GetXaxis()->GetBinWidth(1) == m_truthHist->m_phi->GetXaxis()->GetBinWidth(1) &&
-	 m_trackHist->m_phi->GetXaxis()->GetXmin() == m_truthHist->m_phi->GetXaxis()->GetXmin() &&
-	 m_trackHist->m_phi->GetXaxis()->GetXmax() == m_truthHist->m_phi->GetXaxis()->GetXmax()
+	 m_trackHist->m_truthPhi->GetXaxis()->GetBinWidth(1) == m_truthHist->m_phi->GetXaxis()->GetBinWidth(1) &&
+	 m_trackHist->m_truthPhi->GetXaxis()->GetXmin() == m_truthHist->m_phi->GetXaxis()->GetXmin() &&
+	 m_trackHist->m_truthPhi->GetXaxis()->GetXmax() == m_truthHist->m_phi->GetXaxis()->GetXmax()
 	 );
-  const double m_phiInterval = m_trackHist->m_phi->GetXaxis()->GetBinWidth(0);
+  const double m_phiInterval = m_trackHist->m_truthPhi->GetXaxis()->GetBinWidth(0);
 
-  nBins = TMath::Nint((m_trackHist->m_phi->GetXaxis()->GetXmax() - m_trackHist->m_phi->GetXaxis()->GetXmin())/m_phiInterval);
+  nBins = TMath::Nint((m_trackHist->m_truthPhi->GetXaxis()->GetXmax() - m_trackHist->m_truthPhi->GetXaxis()->GetXmin())/m_phiInterval);
 
   for (int i = 0; i < nBins; i++) {
-    Double_t num = m_trackHist->m_phi->GetBinContent(i+1);
+    Double_t num = m_trackHist->m_truthPhi->GetBinContent(i+1);
     Double_t den = m_truthHist->m_phi->GetBinContent(i+1);
     Double_t eff = 0.0;
 
@@ -145,7 +145,7 @@ void RunHists::FillHists(float weight) const {
       den = 1.0;
 	}
 
-    m_eff_phi->SetPoint      (i, m_trackHist->m_phi->GetXaxis()->GetXmin() + m_phiInterval*double(i), eff);
+    m_eff_phi->SetPoint      (i, m_trackHist->m_truthPhi->GetXaxis()->GetXmin() + m_phiInterval*double(i), eff);
     m_eff_phi->SetPointError (i, m_phiInterval/2.0, TMath::Sqrt(eff*(1-eff)/den));
     
   }
