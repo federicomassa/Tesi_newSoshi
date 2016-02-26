@@ -1,3 +1,6 @@
+#ifndef ASSERT_H
+#define ASSERT_H
+
 #include <string>
 #include <iostream>
 
@@ -15,3 +18,4 @@ void Assert(const std::string& message, bool condition) {
   }
 }
 
+#endif

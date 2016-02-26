@@ -93,7 +93,12 @@ void RunHists::FillHists(float weight) const {
 
   // ==================================== Efficiency ========================================== //
   // NOTE: bins doesn't follow usual ROOT convention, they are centered, so bin(0) does not contain any info
-  // Efficiency(x in I) = P(track is reconstructed, including fakes | truth has x in I)
+  // Efficiency(x in I) = P(track is reconstructed| truth has x in I).. criteria for reconstruction is specified by which
+  //                                                                    TrackHist_reco_? we choose..
+  //                                                                    classical efficiency would be
+  //                                                                    reco_true/truth_stable
+  //                                                                    chosen when plotting
+
   //check if hist of abseta in truth and track hists are compatible
   Assert("Track and Truth abseta histograms are incompatible", 
 	 m_trackHist->m_truthAbseta->GetXaxis()->GetBinWidth(1) == m_truthHist->m_abseta->GetXaxis()->GetBinWidth(1) &&

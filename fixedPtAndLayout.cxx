@@ -21,7 +21,7 @@ void PrintMessage(const std::string& message) {
 }
 
 
-void fixedPtAndPileup(const string& particle_lowercase, const double& pt_MeV, const string& layout) {
+void fixedPtAndLayout(const string& particle_lowercase, const double& pt_MeV, const string& layout) {
 
   PrintMessage("Init");
 
@@ -467,7 +467,7 @@ void fixedPtAndPileup(const string& particle_lowercase, const double& pt_MeV, co
 
   std::vector<TGraphErrors*> eff_abseta;
   for (unsigned int i = 0; i < pileup.size(); i++) {
-    eff_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__eff_abseta")));
+    eff_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_true__eff_abseta")));
     CheckPtr(eff_abseta[i]);
   }
 
@@ -503,7 +503,7 @@ void fixedPtAndPileup(const string& particle_lowercase, const double& pt_MeV, co
 
   std::vector<TGraphErrors*> eff_phi;
   for (unsigned int i = 0; i < pileup.size(); i++) {
-    eff_phi.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__eff_phi")));
+    eff_phi.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_true__eff_phi")));
     CheckPtr(eff_phi[i]);
   }
 

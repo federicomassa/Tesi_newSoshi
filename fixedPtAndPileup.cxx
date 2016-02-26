@@ -1,4 +1,5 @@
 #include <TCanvas.h>
+#include <TH1F.h>
 #include <TGraphErrors.h>
 #include <TMultiGraph.h>
 #include <TFile.h>
@@ -448,10 +449,11 @@ void fixedPtAndPileup(const string& particle, const double& pt, const int& pileu
   /////// DRAW EFFICIENCY /////
   
   // =============== eff vs eta ================ //
+  // we choose classical definition of efficiency, see comments to RunHists.cxx
 
   std::vector<TGraphErrors*> eff_abseta;
   for (unsigned int i = 0; i < Layouts.size(); i++) {
-    eff_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__eff_abseta")));
+    eff_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_true__eff_abseta")));
     CheckPtr(eff_abseta[i]);
   }
 
@@ -487,7 +489,7 @@ void fixedPtAndPileup(const string& particle, const double& pt, const int& pileu
 
   std::vector<TGraphErrors*> eff_phi;
   for (unsigned int i = 0; i < Layouts.size(); i++) {
-    eff_phi.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__eff_phi")));
+    eff_phi.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_true__eff_phi")));
     CheckPtr(eff_phi[i]);
   }
 
@@ -555,6 +557,35 @@ void fixedPtAndPileup(const string& particle, const double& pt, const int& pileu
   leg_fakeProb_abseta  -> Draw();
   
   canv_fakeProb_abseta -> Print(("Plots/Mixed/" + particle_lower + pt_str + "pu" + pileup_str + "layouts_fakeProb_abseta.png").c_str(), "png");
+
+  ///////////////////////////// DRAW EVENT HISTS /////////////////////////////////
+
+  // 
+    std::vector<TH1F*> nRecoTracks;
+  for (unsigned int i = 0; i < Layouts.size(); i++) {
+    nRecoTracks.push_back(dynamic_cast<TH1F*>(inFiles[i]->Get("TrackHists_reco_all__nRecoTracks")));
+    CheckPtr(nRecoTracks[i]);
+  }
+
+  TCanvas* canv_nRecoTracks = new TCanvas();
+  
+  for (unsigned int i = 0; i < Layouts.size(); i++) {
+    nRecoTracks[i]     -> SetLineColor(colors[i]);
+    nRecoTracks[i]     -> SetMarkerStyle(markerStyle[i]);
+    nRecoTracks[i]     -> SetMarkerColor(colors[i]);
+  }
+  
+  
+
+  
+  TLegend* leg_nRecoTracks = new TLegend(0.15,0.85,0.35,0.55);
+  for (unsigned int i = 0; i < Layouts.size(); i++) 
+    leg_nRecoTracks->AddEntry(nRecoTracks[i], (particle_lower + pt_str + "pu" + pileup_str + ": " + Layouts[i]).c_str(), "lp");
+  
+  leg_nRecoTracks  -> SetFillColor(0);
+  leg_nRecoTracks  -> Draw();
+  
+  canv_nRecoTracks -> Print(("Plots/Mixed/" + particle_lower + pt_str + "pu" + pileup_str + "layouts_nRecoTracks.png").c_str(), "png");
 
   
 }
