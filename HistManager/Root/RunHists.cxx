@@ -1,7 +1,11 @@
+#include "HistManager/GaussFitter.h"
 #include "HistManager/RunHists.h"
 #include "HistManager/TrackHistManager.h"
 #include "HistManager/TrackHists.h"
 #include "HistManager/assert.h"
+#include "HistManager/PrintMessage.h"
+
+const Verbosity verbosity_level = Verbosity::ERROR;
 
 RunHists::RunHists(const TrackHists* const trackHist, const TruthHists* const truthHist) : 
   m_trackHist(trackHist),
@@ -43,53 +47,69 @@ void RunHists::FillHists(float weight) const {
 
   for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasPt_abseta.begin(); itr != m_trackHist->m_biasPt_abseta.end(); itr++) {
     int index = itr - m_trackHist->m_biasPt_abseta.begin();
-    m_sysPt_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetMean());
-    m_sysPt_abseta->SetPointError(index,m_etaInterval/2.0,(*itr)->GetMeanError());
 
-    m_sigPt_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetRMS());
-    m_sigPt_abseta->SetPointError(index,m_etaInterval/2.0,(*itr)->GetRMSError());
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysPt_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysPt_abseta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigPt_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigPt_abseta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
 
   }
 
   for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasQPt_abseta.begin(); itr != m_trackHist->m_biasQPt_abseta.end(); itr++) {
     int index = itr - m_trackHist->m_biasQPt_abseta.begin();
-    m_sysQPt_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetMean());
-    m_sysQPt_abseta->SetPointError(index,m_etaInterval/2.0,(*itr)->GetMeanError());
 
-    m_sigQPt_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetRMS());
-    m_sigQPt_abseta->SetPointError(index,m_etaInterval/2.0,(*itr)->GetRMSError());
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysQPt_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysQPt_abseta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigQPt_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigQPt_abseta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
 
   }
-  
+
   for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasPhi_abseta.begin(); itr != m_trackHist->m_biasPhi_abseta.end(); itr++) {
     int index = itr - m_trackHist->m_biasPhi_abseta.begin();
-    m_sysPhi_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetMean());
-    m_sysPhi_abseta->SetPointError(index,m_etaInterval/2.0,(*itr)->GetMeanError());
-    
-    m_sigPhi_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetRMS());
-    m_sigPhi_abseta->SetPointError(index,m_etaInterval/2.0,(*itr)->GetRMSError());
-    
+
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysPhi_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysPhi_abseta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigPhi_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigPhi_abseta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
+
   }
-  
+
   for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasD0_abseta.begin(); itr != m_trackHist->m_biasD0_abseta.end(); itr++) {
     int index = itr - m_trackHist->m_biasD0_abseta.begin();
-    m_sysD0_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetMean());
-    m_sysD0_abseta->SetPointError(index,m_etaInterval/2.0,(*itr)->GetMeanError());
 
-    m_sigD0_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetRMS());
-    m_sigD0_abseta->SetPointError(index,m_etaInterval/2.0,(*itr)->GetRMSError());
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysD0_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysD0_abseta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigD0_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigD0_abseta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
 
   }
 
   for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasZ0_abseta.begin(); itr != m_trackHist->m_biasZ0_abseta.end(); itr++) {
     int index = itr - m_trackHist->m_biasZ0_abseta.begin();
-    m_sysZ0_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetMean());
-    m_sysZ0_abseta->SetPointError(index,m_etaInterval/2.0,(*itr)->GetMeanError());
 
-    m_sigZ0_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetRMS());
-    m_sigZ0_abseta->SetPointError(index,m_etaInterval/2.0,(*itr)->GetRMSError());
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysZ0_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysZ0_abseta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigZ0_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigZ0_abseta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
 
   }
+
 
   // ==================================== Efficiency ========================================== //
   // NOTE: bins doesn't follow usual ROOT convention, they are centered, so bin(0) does not contain any info

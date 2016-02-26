@@ -84,11 +84,11 @@ void TrackHists::BookHists() {
     ss >> etaLimit;
     ss.clear();
 
-    m_biasPt_abseta.push_back(declare1D(m_name, (PtName + count).c_str(),  (PtTitle + etaLimit + ") " + PtUnits).c_str(), 100,-8000.0,8000.0));
-    m_biasQPt_abseta.push_back(declare1D(m_name, (QPtName + count).c_str(),  (QPtTitle + etaLimit + ")").c_str(), 100,-0.2,0.2));
-    m_biasPhi_abseta.push_back(declare1D(m_name, (PhiName + count).c_str(),  (PhiTitle + etaLimit + ")").c_str(), 100,-2.5e-3,2.5e-3));
-    m_biasD0_abseta.push_back(declare1D(m_name, (D0Name + count).c_str(),  (D0Title + etaLimit + ") " + D0Units).c_str(), 100,-0.5,0.5));
-    m_biasZ0_abseta.push_back(declare1D(m_name, (Z0Name + count).c_str(),  (Z0Title + etaLimit + ") " + Z0Units).c_str(), 100,-0.8,0.8));
+    m_biasPt_abseta.push_back(declare1D(m_name, (PtName + count).c_str(),  (PtTitle + etaLimit + ") " + PtUnits).c_str(), 200,-16000.0,16000.0));
+    m_biasQPt_abseta.push_back(declare1D(m_name, (QPtName + count).c_str(),  (QPtTitle + etaLimit + ")").c_str(), 200,-0.4,0.4));
+    m_biasPhi_abseta.push_back(declare1D(m_name, (PhiName + count).c_str(),  (PhiTitle + etaLimit + ")").c_str(), 200,-5e-3,5e-3));
+    m_biasD0_abseta.push_back(declare1D(m_name, (D0Name + count).c_str(),  (D0Title + etaLimit + ") " + D0Units).c_str(), 200,-1.0,1.0));
+    m_biasZ0_abseta.push_back(declare1D(m_name, (Z0Name + count).c_str(),  (Z0Title + etaLimit + ") " + Z0Units).c_str(), 200,-1.6,1.6));
   }
 
   /* track parameterization */

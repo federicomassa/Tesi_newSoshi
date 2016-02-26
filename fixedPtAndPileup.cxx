@@ -563,7 +563,7 @@ void fixedPtAndPileup(const string& particle, const double& pt, const int& pileu
   // 
     std::vector<TH1F*> nRecoTracks;
   for (unsigned int i = 0; i < Layouts.size(); i++) {
-    nRecoTracks.push_back(dynamic_cast<TH1F*>(inFiles[i]->Get("TrackHists_reco_all__nRecoTracks")));
+    nRecoTracks.push_back(dynamic_cast<TH1F*>(inFiles[i]->Get("EventHist_all__nRecotrk")));
     CheckPtr(nRecoTracks[i]);
   }
 
