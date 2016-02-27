@@ -23,13 +23,13 @@ void RunHists::BookHists() {
 
   std::cout << "Creating histograms for " << m_name << std::endl;
   m_sysPt_abseta   = declareGraphErrors(m_name, "sysPt_abseta", "|#eta|", "#Delta(p_{T}) bias [MeV]"); 
-  m_sysQPt_abseta  = declareGraphErrors(m_name, "sysQPt_abseta", "|#eta|", "p_{T}^{truth} x #Delta(q/p_{T}) bias"); //check if q/pt x pt
+  m_sysQPt_abseta  = declareGraphErrors(m_name, "sysQPt_abseta", "|#eta|", "p_{T}^{truth} x #Delta(q/p_{T}) bias");
   m_sysPhi_abseta  = declareGraphErrors(m_name, "sysPhi_abseta", "|#eta|", "#Delta(#phi) bias"); 
   m_sysD0_abseta   = declareGraphErrors(m_name, "sysD0_abseta", "|#eta|", "#Delta(D0) bias [mm]"); 
   m_sysZ0_abseta   = declareGraphErrors(m_name, "sysZ0_abseta", "|#eta|", "#Delta(Z0) bias [mm]"); 
 
   m_sigPt_abseta   = declareGraphErrors(m_name, "sigPt_abseta", "|#eta|", "#sigma(p_{T}) [MeV]"); 
-  m_sigQPt_abseta  = declareGraphErrors(m_name, "sigQPt_abseta", "|#eta|", "p_{T}^{truth} x #sigma(q/p_{T})"); //check if q/pt x pt
+  m_sigQPt_abseta  = declareGraphErrors(m_name, "sigQPt_abseta", "|#eta|", "p_{T}^{truth} x #sigma(q/p_{T})");
   m_sigPhi_abseta  = declareGraphErrors(m_name, "sigPhi_abseta", "|#eta|", "#sigma(#phi)"); 
   m_sigD0_abseta   = declareGraphErrors(m_name, "sigD0_abseta", "|#eta|", "#sigma(D0) [mm]"); 
   m_sigZ0_abseta   = declareGraphErrors(m_name, "sigZ0_abseta", "|#eta|", "#sigma(Z0) [mm]"); 
