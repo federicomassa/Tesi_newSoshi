@@ -109,7 +109,10 @@ EL::StatusCode ITkStudy::initialize() {
   m_event = wk()->xaodEvent();
 
   Info("initialize()", "Number of events = %lli", m_event->getEntries() ); // print long long int
-	m_eventCounter=0;
+  m_eventCounter=0;
+  
+  m_trkHist_reco_ptCut = 3000.0; //MeV
+  m_trkHist_reco_hitsCut = 10; //Si hits
 	
   return EL::StatusCode::SUCCESS;
 }
@@ -429,7 +432,10 @@ EL::StatusCode ITkStudy::execute() {
   }
 //  if (mindRMatched<0.02) {
 
-  if (mindRMatched<0.1) {
+  uint8_t getInt(0);
+  if (mindRMatched<0.1 && 
+      (*itkTrk_itr_matched)->pt() > m_trkHist_reco_ptCut &&
+      xAOD::TrackHelper::numberOfSiHits(*itkTrk_itr_matched) > m_trkHist_reco_hitsCut) {
     trkHist_reco->FillHists( (*itkTrk_itr_matched), 1.0 );
   }
 

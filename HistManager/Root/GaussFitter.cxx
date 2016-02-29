@@ -183,7 +183,7 @@ Double_t GaussFitter::GetMean() const {
 Double_t GaussFitter::GetSigma() const {
   if (m_fitFunc != NULL) {
     if (m_fitFunc->GetParameter("Sigma") != TMath::QuietNaN() && m_fitStatus == 0) 
-      return m_fitFunc->GetParameter("Sigma"); 
+      return TMath::Abs(m_fitFunc->GetParameter("Sigma")); 
     else 
       return 0.0;
       }

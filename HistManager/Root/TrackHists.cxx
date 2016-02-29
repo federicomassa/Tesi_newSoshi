@@ -41,7 +41,7 @@ void TrackHists::BookHists() {
   m_truthPtnarrow = declare1D(m_name, "truthPtnarrow", "Truth p_{T} [GeV]", 200,    0.0,   50.0); 
   m_truthEta      = declare1D(m_name, "truthEta",      "Truth #eta",         100,   -5.0,    5.0); 
   m_truthAbseta   = declare1D(m_name, "truthAbseta",       "|#eta|", 25, 0.0, 5.0); 
-  m_truthPhi      = declare1D(m_name, "truthPhi",      "Truth #phi",         64,   -3.2,    3.2); 
+  m_truthPhi      = declare1D(m_name, "truthPhi",      "Truth #phi",         32,   -3.2,    3.2); 
   m_truthD0       = declare1D(m_name, "truthD0",       "Truth d_{0} [mm]",	100,   -0.1,    0.1); 
   m_truthD0_wide  = declare1D(m_name, "truthD0_wide",  "Truth d_{0} [mm]",  100,   -2.0,    2.0); 
   m_truthZ0       = declare1D(m_name, "truthZ0",       "Truth z_{0} [mm]",  100, -200.0,  200.0); 
@@ -88,7 +88,7 @@ void TrackHists::BookHists() {
     m_biasQPt_abseta.push_back(declare1D(m_name, (QPtName + count).c_str(),  (QPtTitle + etaLimit + ")").c_str(), 200,-0.4,0.4));
     m_biasPhi_abseta.push_back(declare1D(m_name, (PhiName + count).c_str(),  (PhiTitle + etaLimit + ")").c_str(), 200,-5e-3,5e-3));
     m_biasD0_abseta.push_back(declare1D(m_name, (D0Name + count).c_str(),  (D0Title + etaLimit + ") " + D0Units).c_str(), 200,-1.0,1.0));
-    m_biasZ0_abseta.push_back(declare1D(m_name, (Z0Name + count).c_str(),  (Z0Title + etaLimit + ") " + Z0Units).c_str(), 200,-1.6,1.6));
+    m_biasZ0_abseta.push_back(declare1D(m_name, (Z0Name + count).c_str(),  (Z0Title + etaLimit + ") " + Z0Units).c_str(), 200,-200.0,200.0));
   }
 
   /* track parameterization */
@@ -97,7 +97,7 @@ void TrackHists::BookHists() {
   m_ptnarrow    = declare1D(m_name, "ptnarrow",    "p_{T} [GeV]",       200,    0.0,   50.0); 
   m_eta         = declare1D(m_name, "eta",         "#eta",               50,   -5.0,    5.0); 
   m_abseta      = declare1D(m_name, "abseta",      "#eta",               25,    0.0,    5.0); 
-  m_phi         = declare1D(m_name, "phi",         "#phi",               64,   -3.2,    3.2); 
+  m_phi         = declare1D(m_name, "phi",         "#phi",               32,   -3.2,    3.2); 
   m_d0          = declare1D(m_name, "d0",          "d_{0} [mm]",        100,   -0.2,    0.2); 
   m_z0          = declare1D(m_name, "z0",          "z_{0} [mm]",        100, -200.0,  200.0); 
   m_z0Corr1     = declare1D(m_name, "z0Corr1",     "z_{0} at PV [mm]",   80,   -8.0,    8.0); 
@@ -121,9 +121,9 @@ void TrackHists::BookHists() {
   m_nSCTHits = declare1D(m_name, "nSCTHits", "N SCT Hits",	   25, -0.5, 24.5); 
   m_nSiHits  = declare1D(m_name, "nSiHits",  "N Silicon Hits", 30, -0.5, 29.5);
 
-  m_eta_nPixHits = declare2D(m_name, "eta_nPixHits", "|#eta|", "N Pixel Hits",   50, 0, 5.0, 16, -0.5, 15.5); 
-  m_eta_nSCTHits = declare2D(m_name, "eta_nSCTHits", "|#eta|", "N SCT Hits",	   50, 0, 5.0, 25, -0.5, 24.5); 
-  m_eta_nSiHits  = declare2D(m_name, "eta_nSiHits",  "|#eta|", "N Silicon Hits", 50, 0, 5.0, 30, -0.5, 29.5);
+  m_eta_nPixHits = declare2D(m_name, "eta_nPixHits", "|#eta|", "N Pixel Hits",   25, 0, 5.0, 25, -0.5, 24.5); 
+  m_eta_nSCTHits = declare2D(m_name, "eta_nSCTHits", "|#eta|", "N SCT Hits",	   25, 0, 5.0, 20, -0.5, 19.5); 
+  m_eta_nSiHits  = declare2D(m_name, "eta_nSiHits",  "|#eta|", "N Silicon Hits", 25, 0, 5.0, 30, -0.5, 29.5);
 
   m_nGangedPix         = declare1D(m_name, "nGangedPix",         m_label + "N Pixel Ganged Hits",     8, -0.5,  7.5); 
   m_nGangedPixFF       = declare1D(m_name, "nGangedPixFF",       m_label + "N Pixel Ganged FF Hits",  6, -0.5,  5.5); 

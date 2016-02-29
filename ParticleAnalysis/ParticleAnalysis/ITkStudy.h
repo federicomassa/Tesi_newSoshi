@@ -75,6 +75,10 @@ public:
 private:
   int m_idTarget,m_EnergyTarget;
 
+  //Reconstruction cuts
+  double m_trkHist_reco_ptCut;
+  int m_trkHist_reco_hitsCut;
+
   // this is needed to distribute the algorithm to the workers
   ClassDef(ITkStudy, 1);
 };
