@@ -20,7 +20,7 @@ GaussFitter::GaussFitter(TH1F* h, const Verbosity& verbosity_level = Verbosity::
   Assert("Histogram pointer is null", h != NULL);
   Assert("Histogram range not properly set", h->GetXaxis()->GetXmin() < h->GetXaxis()->GetXmax());
   m_iterationNumber = 0;
-  m_fitFunc = new TF1("fitFunc", "[0]*TMath::Exp(-(x-[1])*(x-[1])/(2*[2]*[2]))", h->GetXaxis()->GetXmin(), h->GetXaxis()->GetXmax());
+  m_fitFunc = new TF1("fitFunc", "gaus", h->GetXaxis()->GetXmin(), h->GetXaxis()->GetXmax());
   m_fitFunc->SetParName(0, "Amplitude");
   m_fitFunc->SetParName(1, "Mean");
   m_fitFunc->SetParName(2, "Sigma");
@@ -40,7 +40,7 @@ TF1* GaussFitter::Fit() {
   ss >> iterationNumber;
   PrintMessage("GaussFitter::Fit()\tFitting histogram... iteration " + iterationNumber, Verbosity::DEBUG, m_verbosityLevel);
 
-  if (m_fitHist->GetEntries() == 0) 
+  if (m_fitHist->GetEffectiveEntries() == 0) 
     {
       PrintMessage("GaussFitter::Fit()\tHistogram is empty. Returning null pointer", Verbosity::WARNING, m_verbosityLevel);
       return NULL;
@@ -49,7 +49,7 @@ TF1* GaussFitter::Fit() {
   if (m_iterationNumber == 1) {
     //Initial parameters are taken directly from histogram
     m_mean = m_fitHist->GetMean();
-    m_amplitude = m_fitHist->GetBinContent(m_fitHist->FindBin(m_mean));
+    m_amplitude = m_fitHist->GetMaximum();
     m_sigma = m_fitHist->GetRMS();
   }
   else {
@@ -62,20 +62,27 @@ TF1* GaussFitter::Fit() {
       m_sigma = m_fitFunc->GetParameter("Sigma");
     }
     else {
-      PrintMessage("GaussFitter::Fit()\tWARNING\tFitting did not end successfully", Verbosity::WARNING, m_verbosityLevel);
+      PrintMessage("GaussFitter::Fit()\tERROR\tFitting did not end successfully", Verbosity::ERROR, m_verbosityLevel);
     }
   }
   
   m_fitFunc -> SetRange(m_mean - 4*m_sigma, m_mean + 4*m_sigma);
-  m_fitFunc -> SetParameter(0, m_amplitude);
-  m_fitFunc -> SetParameter(1, m_mean);
-  m_fitFunc -> SetParameter(2, m_sigma);
+
+  if (m_iterationNumber >= 2) {
+    if (m_amplitude > 0)
+      m_fitFunc -> SetParameter(0, m_amplitude);
+    else
+      m_fitFunc -> SetParameter(0, m_fitHist->GetMaximum());
+    
+    m_fitFunc -> SetParameter(1, m_mean);
+    m_fitFunc -> SetParameter(2, m_sigma);
+  }
 
   m_fitResult = m_fitHist -> Fit(m_fitFunc, "RSNQ");
   m_fitStatus = m_fitResult;
 
   if (m_fitStatus != 0) {
-    PrintMessage("GaussFitter::Fit()\tWARNING\tFit not successful. Returning null", Verbosity::WARNING, m_verbosityLevel);
+    PrintMessage("GaussFitter::Fit()\tERROR\tFit not successful. Returning null", Verbosity::ERROR, m_verbosityLevel);
     return NULL;
   }
 
@@ -88,7 +95,7 @@ TF1* GaussFitter::Fit() {
     if (m_iterationNumber < m_maxIterationNumber)
       return Fit();
     else {
-      PrintMessage("GaussFitter::Fit()\tReached maximum number of iterations", Verbosity::INFO, m_verbosityLevel);
+      PrintMessage("GaussFitter::Fit()\tReached maximum number of iterations", Verbosity::WARNING, m_verbosityLevel);
       return m_fitFunc;
     }
   }

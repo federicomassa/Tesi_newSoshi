@@ -40,7 +40,7 @@ class TrackHists : public ManageHists {
  public:
     TString GetName() const {return m_baseName;}
  private:
-    const double m_etaMax = 5.0;
+    const double m_etaMax = 4.0;
     const double m_etaInterval = 0.2;
     const int m_etaVectorSize = TMath::Nint(m_etaMax/m_etaInterval);
     TString m_name;
@@ -72,9 +72,24 @@ class TrackHists : public ManageHists {
 
     std::vector<TH1F*> m_biasPt_abseta; //!
     std::vector<TH1F*> m_biasQPt_abseta; //!
+    std::vector<TH1F*> m_biasEta_abseta; //!
     std::vector<TH1F*> m_biasPhi_abseta; //!
     std::vector<TH1F*> m_biasD0_abseta; //!
     std::vector<TH1F*> m_biasZ0_abseta; //!
+
+    std::vector<TH1F*> m_biasPt_poseta; //!
+    std::vector<TH1F*> m_biasQPt_poseta; //!
+    std::vector<TH1F*> m_biasEta_poseta; //!
+    std::vector<TH1F*> m_biasPhi_poseta; //!
+    std::vector<TH1F*> m_biasD0_poseta; //!
+    std::vector<TH1F*> m_biasZ0_poseta; //!
+
+    std::vector<TH1F*> m_biasPt_negeta; //!
+    std::vector<TH1F*> m_biasQPt_negeta; //!
+    std::vector<TH1F*> m_biasEta_negeta; //!
+    std::vector<TH1F*> m_biasPhi_negeta; //!
+    std::vector<TH1F*> m_biasD0_negeta; //!
+    std::vector<TH1F*> m_biasZ0_negeta; //!
 
     /* track parameterization */
     TH1F* m_qoverp; //!     
@@ -133,6 +148,7 @@ class TrackHists : public ManageHists {
     TH1F* m_nTRTHTHits; //! 
 
     TH1F* m_chiSqPerDof; //!
+    TH1F* m_Dof; //!
     TH1F* m_nOutliers; //!
     TH1F* m_stdDevChi2OS; //!
     TH1F* m_eProbComb; //!

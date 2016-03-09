@@ -29,6 +29,7 @@ class EventFeatures {
     float photonDecayR;
     unsigned int  nTruth;
     unsigned int  nChargedTruth;
+    unsigned int  nPrimaryChargedTruth;
     unsigned int  nNeutralTruth;
     unsigned int  nTruth1GeV;
     unsigned int  nChargedTruth1GeV;
@@ -61,6 +62,7 @@ class EventFeatures {
       photonDecayR = -100.0;
       nTruth = -1;
       nChargedTruth = -1;
+      nPrimaryChargedTruth = -1;
       nNeutralTruth = -1;
       nTruth1GeV = -1;
       nChargedTruth1GeV = -1;

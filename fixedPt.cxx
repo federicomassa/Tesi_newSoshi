@@ -106,6 +106,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
   Layouts.push_back("InclBrl4");
 
   vector<string> Pileup;
+  Pileup.push_back("10");
   Pileup.push_back("50");
   Pileup.push_back("140");
 
@@ -178,7 +179,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
   
     mg_sigPt_abseta     -> Draw("APE");
     mg_sigPt_abseta     -> GetYaxis() -> SetTitleOffset(1.2);
-    //mg_sigPt_abseta     -> GetYaxis() -> SetRangeUser(0.0,4500.0);
+    //    mg_sigPt_abseta     -> GetYaxis() -> SetRangeUser(0.0,4500.0);
     mg_sigPt_abseta     -> GetXaxis() -> SetRangeUser(0.0,4.0);
   
     TLegend* leg_sigPt_abseta = new TLegend(0.15,0.85,0.35,0.55);
@@ -189,6 +190,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     leg_sigPt_abseta  -> Draw();
   
     canv_sigPt_abseta -> Print((imagePath + "sigPt_abseta.png").c_str(), "png");
+    //    delete canv_sigPt_abseta;
   
     // =============== sigma qpt vs eta ================ //
 
@@ -215,7 +217,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
   
     mg_sigQPt_abseta     -> Draw("APE");
     mg_sigQPt_abseta     -> GetYaxis() -> SetTitleOffset(1.2);
-    mg_sigQPt_abseta     -> GetYaxis() -> SetRangeUser(0.0,1.5);
+    mg_sigQPt_abseta     -> GetYaxis() -> SetRangeUser(0.0,1.0);
     mg_sigQPt_abseta     -> GetXaxis() -> SetRangeUser(0.0,4.0);
   
     TLegend* leg_sigQPt_abseta = new TLegend(0.15,0.85,0.35,0.55);
@@ -226,6 +228,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     leg_sigQPt_abseta  -> Draw();
   
     canv_sigQPt_abseta -> Print((imagePath + "sigQPt_abseta.png").c_str(), "png");
+    //    delete canv_sigQPt_abseta;
   
 
     // =============== sigma phi vs eta ================ //
@@ -253,7 +256,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
   
     mg_sigPhi_abseta     -> Draw("APE");
     mg_sigPhi_abseta     -> GetYaxis() -> SetTitleOffset(1.2);
-    //  mg_sigPhi_abseta     -> GetYaxis() -> SetRangeUser(0.0,0.0014);
+    //    mg_sigPhi_abseta     -> GetYaxis() -> SetRangeUser(0.0,0.0014);
     mg_sigPhi_abseta     -> GetXaxis() -> SetRangeUser(0.0,4.0);
 
     TLegend* leg_sigPhi_abseta = new TLegend(0.15,0.85,0.35,0.55);
@@ -264,6 +267,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     leg_sigPhi_abseta  -> Draw();
   
     canv_sigPhi_abseta -> Print((imagePath + "sigPhi_abseta.png").c_str(), "png");
+    //    delete canv_sigPhi_abseta;
   
     // =============== sigma d0 vs eta ================ //
 
@@ -290,7 +294,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
   
     mg_sigD0_abseta     -> Draw("APE");
     mg_sigD0_abseta     -> GetYaxis() -> SetTitleOffset(1.2);
-    //  mg_sigD0_abseta     -> GetYaxis() -> SetRangeUser(0.0,0.11);
+    //    mg_sigD0_abseta     -> GetYaxis() -> SetRangeUser(0.0,0.11);
     mg_sigD0_abseta     -> GetXaxis() -> SetRangeUser(0.0,4.0);
   
     TLegend* leg_sigD0_abseta = new TLegend(0.15,0.85,0.35,0.55);
@@ -301,6 +305,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     leg_sigD0_abseta  -> Draw();
   
     canv_sigD0_abseta -> Print((imagePath + "sigD0_abseta.png").c_str(), "png");
+    //    delete canv_sigD0_abseta;
   
     // =============== sigma Z0 vs eta ================ //
 
@@ -338,6 +343,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     leg_sigZ0_abseta  -> Draw();
   
     canv_sigZ0_abseta -> Print((imagePath + "sigZ0_abseta.png").c_str(), "png");
+    //    delete canv_sigZ0_abseta;
   }  
 
   if (doBiasPlots) {
@@ -380,6 +386,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     leg_sysPt_abseta  -> Draw();
   
     canv_sysPt_abseta -> Print((imagePath + "sysPt_abseta.png").c_str(), "png");
+    //    delete canv_sysPt_abseta;
   
     // =============== sys qpt vs eta ================ //
 
@@ -418,6 +425,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     leg_sysQPt_abseta  -> Draw();
   
     canv_sysQPt_abseta -> Print((imagePath + "sysQPt_abseta.png").c_str(), "png");
+    //    delete canv_sysQPt_abseta;
   
 
     // =============== sys phi vs eta ================ //
@@ -447,7 +455,8 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     mg_sysPhi_abseta     -> Draw("APE");
     mg_sysPhi_abseta     -> GetYaxis() -> SetTitleOffset(1.2);
     //  mg_sysPhi_abseta     -> GetYaxis() -> SetRangeUser(-0.13e-3,0.06e-3);
-  
+    mg_sysPhi_abseta     -> GetXaxis() -> SetRangeUser(0.0,4.0);
+
     TLegend* leg_sysPhi_abseta = new TLegend(0.15,0.85,0.35,0.65);
     for (unsigned int i = 0; i < IterVariable->size(); i++) 
       leg_sysPhi_abseta->AddEntry(sysPhi_abseta[i], (legendLabel + IterVariable->at(i)).c_str(), "lp");
@@ -456,6 +465,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     leg_sysPhi_abseta  -> Draw();
   
     canv_sysPhi_abseta -> Print((imagePath + "sysPhi_abseta.png").c_str(), "png");
+    //    delete canv_sysPhi_abseta;
   
     // =============== sys d0 vs eta ================ //
 
@@ -494,6 +504,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     leg_sysD0_abseta  -> Draw();
   
     canv_sysD0_abseta -> Print((imagePath + "sysD0_abseta.png").c_str(), "png");
+    //    delete canv_sysD0_abseta;
   
     // =============== sys Z0 vs eta ================ //
 
@@ -531,6 +542,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     leg_sysZ0_abseta  -> Draw();
   
     canv_sysZ0_abseta -> Print((imagePath + "sysZ0_abseta.png").c_str(), "png");
+    //    delete canv_sysZ0_abseta;
 
   }
 
@@ -563,7 +575,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
   
     mg_eff_abseta     -> Draw("APE");
     mg_eff_abseta     -> GetYaxis() -> SetTitleOffset(1.2);
-    mg_eff_abseta     -> GetYaxis() -> SetRangeUser(0.92,1.0);
+    mg_eff_abseta     -> GetYaxis() -> SetRangeUser(0.90,1.0);
     mg_eff_abseta     -> GetXaxis() -> SetRangeUser(0.0,4.0);  
 
     TLegend* leg_eff_abseta = new TLegend(0.15,0.30,0.30,0.15);
@@ -574,6 +586,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     leg_eff_abseta  -> Draw();
   
     canv_eff_abseta -> Print((imagePath + "eff_abseta.png").c_str(), "png");
+    //    delete canv_eff_abseta;
 
     // =============== eff vs phi ================ //
 
@@ -601,9 +614,9 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     mg_eff_phi     -> Draw("APE");
     mg_eff_phi     -> GetYaxis() -> SetTitleOffset(1.2);
     //  mg_eff_phi     -> GetYaxis() -> SetRangeUser(0.8,0.92);
-    mg_eff_phi     -> GetXaxis() -> SetRangeUser(0.0,4.0);  
+    mg_eff_phi     -> GetXaxis() -> SetRangeUser(-3.2,3.2);  
 
-    TLegend* leg_eff_phi = new TLegend(0.15,0.88,0.35,0.7);
+    TLegend* leg_eff_phi = new TLegend(0.80,0.98,0.98,0.78);
     for (unsigned int i = 0; i < IterVariable->size(); i++) 
       leg_eff_phi->AddEntry(eff_phi[i], (legendLabel + IterVariable->at(i)).c_str(), "lp");
   
@@ -611,6 +624,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     leg_eff_phi  -> Draw();
   
     canv_eff_phi -> Print((imagePath + "eff_phi.png").c_str(), "png");
+    //    delete canv_eff_phi;
 
   }
 
@@ -641,7 +655,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
   
     mg_fakeProb_abseta     -> Draw("APE");
     mg_fakeProb_abseta     -> GetYaxis() -> SetTitleOffset(1.2);
-    mg_fakeProb_abseta     -> GetYaxis() -> SetRangeUser(0.0, 0.01);
+    mg_fakeProb_abseta     -> GetYaxis() -> SetRangeUser(0.0, 0.008);
     mg_fakeProb_abseta     -> GetXaxis() -> SetRangeUser(0.0,4.0);  
 
     TLegend* leg_fakeProb_abseta = new TLegend(0.15,0.85,0.35,0.55);
@@ -652,6 +666,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     leg_fakeProb_abseta  -> Draw();
   
     canv_fakeProb_abseta -> Print((imagePath + "fakeProb_abseta.png").c_str(), "png");
+    //    delete canv_fakeProb_abseta;
   }
 
   if (doEventPlots) {
@@ -678,7 +693,6 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
       nRecoTracks[i]     -> GetXaxis() -> SetRangeUser(-0.5,10.5);
       if (i == 0) {
 	nRecoTracks[i]     -> DrawCopy();
-	nRecoTracks[i]     -> GetXaxis() -> SetRangeUser(0.0,4.0);
       }
       else
 	nRecoTracks[i]     -> DrawCopy("same");
@@ -693,7 +707,46 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     leg_nRecoTracks  -> Draw("same");
     
     canv_nRecoTracks -> Print((imagePath + "nRecoTracks.png").c_str(), "png");
+    //    delete canv_nRecoTracks;
   
+    ////////////////// N charged truth /////////////////
+    // TODO: understand why NchargedTruth does NOT include muons (|pdgId| != 13)
+
+    vector<TH1F*> nChargedTruth;
+    for (unsigned int i = 0; i < IterVariable->size(); i++) {
+      nChargedTruth.push_back(dynamic_cast<TH1F*>(inFiles[i]->Get("EventHist_all__nChargedTruth")));
+      CheckPtr(nChargedTruth[i]);
+    }
+
+    TCanvas* canv_nChargedTruth = new TCanvas();
+  
+    if (IterVariable->size() >= 1)
+      nChargedTruth[0]     -> SetTitle("Number of charged truth in cone / event");
+
+    for (unsigned int i = 0; i < IterVariable->size(); i++) {
+      nChargedTruth[i]     -> SetLineColor(colors[i]);
+      nChargedTruth[i]     -> SetMarkerStyle(markerStyle[i]);
+      nChargedTruth[i]     -> SetMarkerColor(colors[i]);
+      nChargedTruth[i]     -> GetXaxis() -> SetRangeUser(-0.5,100);
+      if (i == 0) {
+	nChargedTruth[i]     -> DrawCopy();
+      }
+      else
+	nChargedTruth[i]     -> DrawCopy("same");
+    }
+  
+    
+    TLegend* leg_nChargedTruth = new TLegend(0.55,0.85,0.75,0.55);
+    for (unsigned int i = 0; i < IterVariable->size(); i++) 
+      leg_nChargedTruth->AddEntry(nChargedTruth[i], (legendLabel + IterVariable->at(i)).c_str(), "lp");
+  
+    leg_nChargedTruth  -> SetFillColor(0);
+    leg_nChargedTruth  -> Draw("same");
+    
+    canv_nChargedTruth -> Print((imagePath + "nChargedTruth.png").c_str(), "png");
+    //    delete canv_nChargedTruth;
+  
+
 
   }
 

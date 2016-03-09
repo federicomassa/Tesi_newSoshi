@@ -43,6 +43,7 @@ void EventHists::BookHists() {
 
   m_nTruth            = declare1D(m_name, "nTruth",            "N Truth in Event",  100, -0.5, 99.5);
   m_nChargedTruth     = declare1D(m_name, "nChargedTruth",     "N ChargedTruth in Event",  100, -0.5, 99.5);
+  m_nPrimaryChargedTruth     = declare1D(m_name, "nPrimaryChargedTruth",     "N Primary Charged Truth in Event",  100, -0.5, 99.5);
   m_nNeutralTruth     = declare1D(m_name, "nNeutralTruth",     "N NeutralTruth in Event",  100, -0.5, 99.5);
   m_nTruth1GeV        = declare1D(m_name, "nTruth1GeV",        "N Truth (p_{T}>1GeV) in Event",  100, -0.5, 99.5);
   m_nChargedTruth1GeV = declare1D(m_name, "nChargedTruth1GeV", "N ChargedTruth (p_{T}>1GeV) in Event",  100, -0.5, 99.5);
@@ -120,6 +121,7 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
 
   m_nTruth        -> Fill(1.0*evt.nTruth,weight);
   m_nChargedTruth -> Fill(1.0*evt.nChargedTruth,weight);
+  m_nPrimaryChargedTruth -> Fill(1.0*evt.nPrimaryChargedTruth,weight);
   m_nNeutralTruth -> Fill(1.0*evt.nNeutralTruth,weight);
   m_nTruth1GeV        -> Fill(1.0*evt.nTruth1GeV,weight);
   m_nChargedTruth1GeV -> Fill(1.0*evt.nChargedTruth1GeV,weight);

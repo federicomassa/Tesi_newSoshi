@@ -22,17 +22,48 @@ RunHists::~RunHists() {
 void RunHists::BookHists() {
 
   std::cout << "Creating histograms for " << m_name << std::endl;
+
   m_sysPt_abseta   = declareGraphErrors(m_name, "sysPt_abseta", "|#eta|", "#Delta(p_{T}) bias [MeV]"); 
   m_sysQPt_abseta  = declareGraphErrors(m_name, "sysQPt_abseta", "|#eta|", "p_{T}^{truth} x #Delta(q/p_{T}) bias");
   m_sysPhi_abseta  = declareGraphErrors(m_name, "sysPhi_abseta", "|#eta|", "#Delta(#phi) bias"); 
   m_sysD0_abseta   = declareGraphErrors(m_name, "sysD0_abseta", "|#eta|", "#Delta(D0) bias [mm]"); 
   m_sysZ0_abseta   = declareGraphErrors(m_name, "sysZ0_abseta", "|#eta|", "#Delta(Z0) bias [mm]"); 
+  m_sysEta_abseta  = declareGraphErrors(m_name, "sysEta_abseta", "|#eta|", "#Delta(#eta) bias");
 
   m_sigPt_abseta   = declareGraphErrors(m_name, "sigPt_abseta", "|#eta|", "#sigma(p_{T}) [MeV]"); 
   m_sigQPt_abseta  = declareGraphErrors(m_name, "sigQPt_abseta", "|#eta|", "p_{T}^{truth} x #sigma(q/p_{T})");
+  m_sigEta_abseta  = declareGraphErrors(m_name, "sigEta_abseta", "|#eta|", "#sigma(#eta)");
   m_sigPhi_abseta  = declareGraphErrors(m_name, "sigPhi_abseta", "|#eta|", "#sigma(#phi)"); 
   m_sigD0_abseta   = declareGraphErrors(m_name, "sigD0_abseta", "|#eta|", "#sigma(D0) [mm]"); 
   m_sigZ0_abseta   = declareGraphErrors(m_name, "sigZ0_abseta", "|#eta|", "#sigma(Z0) [mm]"); 
+
+  m_sysPt_poseta   = declareGraphErrors(m_name, "sysPt_poseta", "|#eta|", "#Delta(p_{T}) bias [MeV]: positive #eta"); 
+  m_sysQPt_poseta  = declareGraphErrors(m_name, "sysQPt_poseta", "|#eta|", "p_{T}^{truth} x #Delta(q/p_{T}) bias: positive #eta");
+  m_sysPhi_poseta  = declareGraphErrors(m_name, "sysPhi_poseta", "|#eta|", "#Delta(#phi) bias: positive #eta"); 
+  m_sysD0_poseta   = declareGraphErrors(m_name, "sysD0_poseta", "|#eta|", "#Delta(D0) bias [mm]: positive #eta"); 
+  m_sysZ0_poseta   = declareGraphErrors(m_name, "sysZ0_poseta", "|#eta|", "#Delta(Z0) bias [mm]: positive #eta"); 
+  m_sysEta_poseta  = declareGraphErrors(m_name, "sysEta_poseta", "|#eta|", "#Delta(#eta) bias: positive #eta");
+
+  m_sigPt_poseta   = declareGraphErrors(m_name, "sigPt_poseta", "|#eta|", "#sigma(p_{T}) [MeV]: positive #eta"); 
+  m_sigQPt_poseta  = declareGraphErrors(m_name, "sigQPt_poseta", "|#eta|", "p_{T}^{truth} x #sigma(q/p_{T}): positive #eta");
+  m_sigEta_poseta  = declareGraphErrors(m_name, "sigEta_poseta", "|#eta|", "#sigma(#eta): positive #eta");
+  m_sigPhi_poseta  = declareGraphErrors(m_name, "sigPhi_poseta", "|#eta|", "#sigma(#phi): positive #eta"); 
+  m_sigD0_poseta   = declareGraphErrors(m_name, "sigD0_poseta", "|#eta|", "#sigma(D0) [mm]: positive #eta"); 
+  m_sigZ0_poseta   = declareGraphErrors(m_name, "sigZ0_poseta", "|#eta|", "#sigma(Z0) [mm]: positive #eta"); 
+
+  m_sysPt_negeta   = declareGraphErrors(m_name, "sysPt_negeta", "|#eta|", "#Delta(p_{T}) bias [MeV]: negative #eta"); 
+  m_sysQPt_negeta  = declareGraphErrors(m_name, "sysQPt_negeta", "|#eta|", "p_{T}^{truth} x #Delta(q/p_{T}) bias: negative #eta");
+  m_sysPhi_negeta  = declareGraphErrors(m_name, "sysPhi_negeta", "|#eta|", "#Delta(#phi) bias: negative #eta"); 
+  m_sysD0_negeta   = declareGraphErrors(m_name, "sysD0_negeta", "|#eta|", "#Delta(D0) bias [mm]: negative #eta"); 
+  m_sysZ0_negeta   = declareGraphErrors(m_name, "sysZ0_negeta", "|#eta|", "#Delta(Z0) bias [mm]: negative #eta"); 
+  m_sysEta_negeta  = declareGraphErrors(m_name, "sysEta_negeta", "|#eta|", "#Delta(#eta) bias: negative #eta");
+
+  m_sigPt_negeta   = declareGraphErrors(m_name, "sigPt_negeta", "|#eta|", "#sigma(p_{T}) [MeV]: negative #eta"); 
+  m_sigQPt_negeta  = declareGraphErrors(m_name, "sigQPt_negeta", "|#eta|", "p_{T}^{truth} x #sigma(q/p_{T}): negative #eta");
+  m_sigEta_negeta  = declareGraphErrors(m_name, "sigEta_negeta", "|#eta|", "#sigma(#eta): negative #eta");
+  m_sigPhi_negeta  = declareGraphErrors(m_name, "sigPhi_negeta", "|#eta|", "#sigma(#phi): negative #eta"); 
+  m_sigD0_negeta   = declareGraphErrors(m_name, "sigD0_negeta", "|#eta|", "#sigma(D0) [mm]: negative #eta"); 
+  m_sigZ0_negeta   = declareGraphErrors(m_name, "sigZ0_negeta", "|#eta|", "#sigma(Z0) [mm]: negative #eta"); 
 
   m_eff_abseta     = declareGraphErrors(m_name, "eff_abseta", "|#eta|", "Efficiency"); 
   m_eff_phi        = declareGraphErrors(m_name, "eff_phi", "#phi", "Efficiency"); 
@@ -68,6 +99,19 @@ void RunHists::FillHists(float weight) const {
 
     m_sigQPt_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
     m_sigQPt_abseta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
+
+  }
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasEta_abseta.begin(); itr != m_trackHist->m_biasEta_abseta.end(); itr++) {
+    int index = itr - m_trackHist->m_biasEta_abseta.begin();
+
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysEta_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysEta_abseta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigEta_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigEta_abseta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
 
   }
 
@@ -107,6 +151,166 @@ void RunHists::FillHists(float weight) const {
 
     m_sigZ0_abseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
     m_sigZ0_abseta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
+
+  }
+
+  // ================================ Systematic bias and Sigma vs eta for positive eta ============================ //
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasPt_poseta.begin(); itr != m_trackHist->m_biasPt_poseta.end(); itr++) {
+    int index = itr - m_trackHist->m_biasPt_poseta.begin();
+
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysPt_poseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysPt_poseta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigPt_poseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigPt_poseta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
+
+  }
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasQPt_poseta.begin(); itr != m_trackHist->m_biasQPt_poseta.end(); itr++) {
+    int index = itr - m_trackHist->m_biasQPt_poseta.begin();
+
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysQPt_poseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysQPt_poseta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigQPt_poseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigQPt_poseta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
+
+  }
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasEta_poseta.begin(); itr != m_trackHist->m_biasEta_poseta.end(); itr++) {
+    int index = itr - m_trackHist->m_biasEta_poseta.begin();
+
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysEta_poseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysEta_poseta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigEta_poseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigEta_poseta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
+
+  }
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasPhi_poseta.begin(); itr != m_trackHist->m_biasPhi_poseta.end(); itr++) {
+    int index = itr - m_trackHist->m_biasPhi_poseta.begin();
+
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysPhi_poseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysPhi_poseta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigPhi_poseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigPhi_poseta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
+
+  }
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasD0_poseta.begin(); itr != m_trackHist->m_biasD0_poseta.end(); itr++) {
+    int index = itr - m_trackHist->m_biasD0_poseta.begin();
+
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysD0_poseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysD0_poseta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigD0_poseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigD0_poseta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
+
+  }
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasZ0_poseta.begin(); itr != m_trackHist->m_biasZ0_poseta.end(); itr++) {
+    int index = itr - m_trackHist->m_biasZ0_poseta.begin();
+
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysZ0_poseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysZ0_poseta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigZ0_poseta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigZ0_poseta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
+
+  }
+
+  // ================================ Systematic bias and Sigma vs eta for negative eta ============================ //
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasPt_negeta.begin(); itr != m_trackHist->m_biasPt_negeta.end(); itr++) {
+    int index = itr - m_trackHist->m_biasPt_negeta.begin();
+
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysPt_negeta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysPt_negeta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigPt_negeta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigPt_negeta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
+
+  }
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasQPt_negeta.begin(); itr != m_trackHist->m_biasQPt_negeta.end(); itr++) {
+    int index = itr - m_trackHist->m_biasQPt_negeta.begin();
+
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysQPt_negeta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysQPt_negeta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigQPt_negeta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigQPt_negeta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
+
+  }
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasEta_negeta.begin(); itr != m_trackHist->m_biasEta_negeta.end(); itr++) {
+    int index = itr - m_trackHist->m_biasEta_negeta.begin();
+
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysEta_negeta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysEta_negeta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigEta_negeta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigEta_negeta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
+
+  }
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasPhi_negeta.begin(); itr != m_trackHist->m_biasPhi_negeta.end(); itr++) {
+    int index = itr - m_trackHist->m_biasPhi_negeta.begin();
+
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysPhi_negeta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysPhi_negeta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigPhi_negeta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigPhi_negeta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
+
+  }
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasD0_negeta.begin(); itr != m_trackHist->m_biasD0_negeta.end(); itr++) {
+    int index = itr - m_trackHist->m_biasD0_negeta.begin();
+
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysD0_negeta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysD0_negeta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigD0_negeta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigD0_negeta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
+
+  }
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_biasZ0_negeta.begin(); itr != m_trackHist->m_biasZ0_negeta.end(); itr++) {
+    int index = itr - m_trackHist->m_biasZ0_negeta.begin();
+
+    GaussFitter fitter(*itr, verbosity_level);
+    fitter.Fit();
+    m_sysZ0_negeta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetMean());
+    m_sysZ0_negeta->SetPointError(index,m_etaInterval/2.0,fitter.GetMeanError());
+
+    m_sigZ0_negeta->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), fitter.GetSigma());
+    m_sigZ0_negeta->SetPointError(index,m_etaInterval/2.0,fitter.GetSigmaError());
 
   }
 

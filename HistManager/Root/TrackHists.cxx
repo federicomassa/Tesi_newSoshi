@@ -39,8 +39,8 @@ void TrackHists::BookHists() {
   m_prodZ         = declare1D(m_name, "prodZ",         "production Z [mm]", 310,    0.0, 3100.0);
   m_truthPt       = declare1D(m_name, "truthPt",       "Truth p_{T} [GeV]", 200,    0.0, 2000.0); 
   m_truthPtnarrow = declare1D(m_name, "truthPtnarrow", "Truth p_{T} [GeV]", 200,    0.0,   50.0); 
-  m_truthEta      = declare1D(m_name, "truthEta",      "Truth #eta",         100,   -5.0,    5.0); 
-  m_truthAbseta   = declare1D(m_name, "truthAbseta",       "|#eta|", 25, 0.0, 5.0); 
+  m_truthEta      = declare1D(m_name, "truthEta",      "Truth #eta",         80,   -4.0,    4.0); 
+  m_truthAbseta   = declare1D(m_name, "truthAbseta",       "|#eta|", 20, 0.0, 4.0); 
   m_truthPhi      = declare1D(m_name, "truthPhi",      "Truth #phi",         32,   -3.2,    3.2); 
   m_truthD0       = declare1D(m_name, "truthD0",       "Truth d_{0} [mm]",	100,   -0.1,    0.1); 
   m_truthD0_wide  = declare1D(m_name, "truthD0_wide",  "Truth d_{0} [mm]",  100,   -2.0,    2.0); 
@@ -57,11 +57,28 @@ void TrackHists::BookHists() {
 
     std::stringstream ss;
 
-    const std::string PtTitle = "#sigma(p_{T})(|#eta| < ";
-    const std::string QPtTitle = "#sigma(q/p_{T})(|#eta| < ";
-    const std::string PhiTitle = "#sigma(#phi)(|#eta| < ";
-    const std::string D0Title = "#sigma(D0)(|#eta| < ";
-    const std::string Z0Title = "#sigma(Z0)(|#eta| < ";
+    std::string count = "";
+    std::string etaLimitDown = "";
+    std::string etaLimitUp = "";
+
+    ss << i+1;
+    ss >> count;
+    ss.clear();
+
+    ss << 0.2*double(i+1);
+    ss >> etaLimitUp;
+    ss.clear();
+
+    ss << 0.2*double(i);
+    ss >> etaLimitDown;
+    ss.clear();
+
+    const std::string PtTitle = "#Delta(p_{T})( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
+    const std::string QPtTitle = "#Delta(q/p_{T}) x p_{T}( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
+    const std::string EtaTitle = "#Delta(#eta)( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
+    const std::string PhiTitle = "#Delta(#phi)( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
+    const std::string D0Title = "#Delta(D0)( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
+    const std::string Z0Title = "#Delta(Z0)( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
 
     const std::string PtUnits = "[MeV]";
     const std::string D0Units = "[mm]";
@@ -69,34 +86,40 @@ void TrackHists::BookHists() {
 
     const std::string PtName = "biasPt_bin";
     const std::string QPtName = "biasQPt_bin";
+    const std::string EtaName = "biasEta_bin";
     const std::string PhiName = "biasPhi_bin";
     const std::string D0Name = "biasD0_bin";
     const std::string Z0Name = "biasZ0_bin";
 
-    std::string count = "";
-    std::string etaLimit = "";
+    m_biasPt_abseta.push_back(declare1D(m_name, (PtName + count).c_str(),  (PtTitle + PtUnits).c_str(), 200,-16000.0,16000.0));
+    m_biasQPt_abseta.push_back(declare1D(m_name, (QPtName + count).c_str(),  (QPtTitle).c_str(), 200,-0.4,0.4));
+    m_biasEta_abseta.push_back(declare1D(m_name, (EtaName + count).c_str(),  (EtaTitle).c_str(), 200,-0.4,0.4));
+    m_biasPhi_abseta.push_back(declare1D(m_name, (PhiName + count).c_str(),  (PhiTitle).c_str(), 200,-5e-3,5e-3));
+    m_biasD0_abseta.push_back(declare1D(m_name, (D0Name + count).c_str(),  (D0Title + D0Units).c_str(), 200,-1.0,1.0));
+    m_biasZ0_abseta.push_back(declare1D(m_name, (Z0Name + count).c_str(),  (Z0Title + Z0Units).c_str(), 200,-200.0,200.0));
 
-    ss << i+1;
-    ss >> count;
-    ss.clear();
-
-    ss << 0.2*double(i+1);
-    ss >> etaLimit;
-    ss.clear();
-
-    m_biasPt_abseta.push_back(declare1D(m_name, (PtName + count).c_str(),  (PtTitle + etaLimit + ") " + PtUnits).c_str(), 200,-16000.0,16000.0));
-    m_biasQPt_abseta.push_back(declare1D(m_name, (QPtName + count).c_str(),  (QPtTitle + etaLimit + ")").c_str(), 200,-0.4,0.4));
-    m_biasPhi_abseta.push_back(declare1D(m_name, (PhiName + count).c_str(),  (PhiTitle + etaLimit + ")").c_str(), 200,-5e-3,5e-3));
-    m_biasD0_abseta.push_back(declare1D(m_name, (D0Name + count).c_str(),  (D0Title + etaLimit + ") " + D0Units).c_str(), 200,-1.0,1.0));
-    m_biasZ0_abseta.push_back(declare1D(m_name, (Z0Name + count).c_str(),  (Z0Title + etaLimit + ") " + Z0Units).c_str(), 200,-200.0,200.0));
+    m_biasPt_poseta.push_back(declare1D(m_name, (PtName + count + "_pos").c_str(),  (PtTitle + PtUnits).c_str(), 200,-16000.0,16000.0));
+    m_biasQPt_poseta.push_back(declare1D(m_name, (QPtName + count + "_pos").c_str(),  (QPtTitle).c_str(), 200,-0.4,0.4));
+    m_biasEta_poseta.push_back(declare1D(m_name, (EtaName + count + "_pos").c_str(),  (EtaTitle).c_str(), 200,-0.4,0.4));
+    m_biasPhi_poseta.push_back(declare1D(m_name, (PhiName + count + "_pos").c_str(),  (PhiTitle).c_str(), 200,-5e-3,5e-3));
+    m_biasD0_poseta.push_back(declare1D(m_name, (D0Name + count + "_pos").c_str(),  (D0Title + D0Units).c_str(), 200,-1.0,1.0));
+    m_biasZ0_poseta.push_back(declare1D(m_name, (Z0Name + count + "_pos").c_str(),  (Z0Title + Z0Units).c_str(), 200,-200.0,200.0));
+ 
+    m_biasPt_negeta.push_back(declare1D(m_name, (PtName + count + "_neg").c_str(),  (PtTitle + PtUnits).c_str(), 200,-16000.0,16000.0));
+    m_biasQPt_negeta.push_back(declare1D(m_name, (QPtName + count + "_neg").c_str(),  (QPtTitle).c_str(), 200,-0.4,0.4));
+    m_biasEta_negeta.push_back(declare1D(m_name, (EtaName + count + "_neg").c_str(),  (EtaTitle).c_str(), 200,-0.4,0.4));
+    m_biasPhi_negeta.push_back(declare1D(m_name, (PhiName + count + "_neg").c_str(),  (PhiTitle).c_str(), 200,-5e-3,5e-3));
+    m_biasD0_negeta.push_back(declare1D(m_name, (D0Name + count + "_neg").c_str(),  (D0Title + D0Units).c_str(), 200,-1.0,1.0));
+    m_biasZ0_negeta.push_back(declare1D(m_name, (Z0Name + count + "_neg").c_str(),  (Z0Title + Z0Units).c_str(), 200,-200.0,200.0));
+ 
   }
 
   /* track parameterization */
   m_qoverp      = declare1D(m_name, "qoverp",      "#frac{q}{p} [GeV]", 200,  -2e-3,   2e-3); 
   m_pt          = declare1D(m_name, "pt",          "p_{T} [GeV]",       200,    0.0, 2000.0); 
   m_ptnarrow    = declare1D(m_name, "ptnarrow",    "p_{T} [GeV]",       200,    0.0,   50.0); 
-  m_eta         = declare1D(m_name, "eta",         "#eta",               50,   -5.0,    5.0); 
-  m_abseta      = declare1D(m_name, "abseta",      "#eta",               25,    0.0,    5.0); 
+  m_eta         = declare1D(m_name, "eta",         "#eta",               40,   -4.0,    4.0); 
+  m_abseta      = declare1D(m_name, "abseta",      "#eta",               20,    0.0,    4.0); 
   m_phi         = declare1D(m_name, "phi",         "#phi",               32,   -3.2,    3.2); 
   m_d0          = declare1D(m_name, "d0",          "d_{0} [mm]",        100,   -0.2,    0.2); 
   m_z0          = declare1D(m_name, "z0",          "z_{0} [mm]",        100, -200.0,  200.0); 
@@ -121,9 +144,9 @@ void TrackHists::BookHists() {
   m_nSCTHits = declare1D(m_name, "nSCTHits", "N SCT Hits",	   25, -0.5, 24.5); 
   m_nSiHits  = declare1D(m_name, "nSiHits",  "N Silicon Hits", 30, -0.5, 29.5);
 
-  m_eta_nPixHits = declare2D(m_name, "eta_nPixHits", "|#eta|", "N Pixel Hits",   25, 0, 5.0, 25, -0.5, 24.5); 
-  m_eta_nSCTHits = declare2D(m_name, "eta_nSCTHits", "|#eta|", "N SCT Hits",	   25, 0, 5.0, 20, -0.5, 19.5); 
-  m_eta_nSiHits  = declare2D(m_name, "eta_nSiHits",  "|#eta|", "N Silicon Hits", 25, 0, 5.0, 30, -0.5, 29.5);
+  m_eta_nPixHits = declare2D(m_name, "eta_nPixHits", "|#eta|", "N Pixel Hits",   20, 0, 4.0, 25, -0.5, 24.5); 
+  m_eta_nSCTHits = declare2D(m_name, "eta_nSCTHits", "|#eta|", "N SCT Hits",	   20, 0, 4.0, 20, -0.5, 19.5); 
+  m_eta_nSiHits  = declare2D(m_name, "eta_nSiHits",  "|#eta|", "N Silicon Hits", 20, 0, 4.0, 30, -0.5, 29.5);
 
   m_nGangedPix         = declare1D(m_name, "nGangedPix",         m_label + "N Pixel Ganged Hits",     8, -0.5,  7.5); 
   m_nGangedPixFF       = declare1D(m_name, "nGangedPixFF",       m_label + "N Pixel Ganged FF Hits",  6, -0.5,  5.5); 
@@ -148,6 +171,7 @@ void TrackHists::BookHists() {
   m_nTRTHTHits   = declare1D(m_name, "nTRTHTHits",   m_label + "N High Threshold TRT Hits", 31, -0.5, 30.5 ); 
 
   m_chiSqPerDof  = declare1D(m_name, "chiSqPerDof",  m_label + "#chi^{2}/DOF", 120,  0.0, 12.0);
+  m_Dof          = declare1D(m_name, "Dof",          m_label + "DOF", 100, 0,100);
   m_nOutliers    = declare1D(m_name, "nOutliers",    m_label + "N Outliers",    20, -0.5, 19.5);
   m_stdDevChi2OS = declare1D(m_name, "stdDevChi2OS", m_label + "100x Std. Dev. #chi^{2} from surface", 100, 0.0, 500.0);
 
@@ -336,6 +360,7 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
 
   PrintMessage("Chisq/dof Properties...");
   m_chiSqPerDof -> Fill(xAOD::TrackHelper::chiSqPerDoF(trk),weight);
+  m_Dof         -> Fill(trk->numberDoF(), weight);
 
   trk->summaryValue(getInt,xAOD::numberOfOutliersOnTrack);   m_nOutliers    -> Fill(getInt,weight);
   trk->summaryValue(getInt,xAOD::standardDeviationOfChi2OS); m_stdDevChi2OS -> Fill(getInt,weight);
@@ -391,17 +416,37 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
     m_biasPhi -> Fill(sigPhi,weight);
     m_biasD0  -> Fill(sigD0,weight);
     m_biasZ0  -> Fill(sigZ0,weight);
-
-    //Bin number of X_vs_eta plots in which this track will fall into
-    const int etaBinId = TMath::FloorNint(TMath::Abs(trk->eta())/m_etaMax * double(m_etaVectorSize));
-    Assert("etaBinId out of bounds", etaBinId < m_etaVectorSize && etaBinId >= 0);
-    m_biasPt_abseta[etaBinId]  -> Fill(sigPt,  weight);
-    m_biasQPt_abseta[etaBinId] -> Fill(sigQPt, weight);
-    m_biasPhi_abseta[etaBinId] -> Fill(sigPhi, weight);
-    m_biasD0_abseta[etaBinId]  -> Fill(sigD0,  weight);
-    m_biasZ0_abseta[etaBinId]  -> Fill(sigZ0,  weight);
-
     
+    //Bin number of X_vs_eta plots in which this track will fall into
+    const int etaBinId = TMath::FloorNint(TMath::Abs(truthParticle->eta())/m_etaMax * double(m_etaVectorSize));
+
+    if (etaBinId < m_etaVectorSize && etaBinId >= 0) { //TODO: check
+      Assert("TrackHists::FillHists()\tetaBinId out of bounds", etaBinId < m_etaVectorSize && etaBinId >= 0);
+      m_biasPt_abseta[etaBinId]  -> Fill(sigPt,  weight);
+      m_biasQPt_abseta[etaBinId] -> Fill(sigQPt, weight);
+      m_biasEta_abseta[etaBinId] -> Fill(sigEta, weight);
+      m_biasPhi_abseta[etaBinId] -> Fill(sigPhi, weight);
+      m_biasD0_abseta[etaBinId]  -> Fill(sigD0,  weight);
+      m_biasZ0_abseta[etaBinId]  -> Fill(sigZ0,  weight);
+      
+      if (truthParticle->eta() < 0) {
+	m_biasPt_negeta[etaBinId]  -> Fill(sigPt,  weight);
+	m_biasQPt_negeta[etaBinId]  -> Fill(sigQPt,  weight);
+	m_biasEta_negeta[etaBinId]  -> Fill(sigEta,  weight);
+	m_biasPhi_negeta[etaBinId]  -> Fill(sigPhi,  weight);
+	m_biasD0_negeta[etaBinId]  -> Fill(sigD0,  weight);
+	m_biasZ0_negeta[etaBinId]  -> Fill(sigZ0,  weight);
+      }
+      else {
+	m_biasPt_poseta[etaBinId]  -> Fill(sigPt,  weight);
+	m_biasQPt_poseta[etaBinId]  -> Fill(sigQPt,  weight);
+	m_biasEta_poseta[etaBinId]  -> Fill(sigEta,  weight);
+	m_biasPhi_poseta[etaBinId]  -> Fill(sigPhi,  weight);
+	m_biasD0_poseta[etaBinId]  -> Fill(sigD0,  weight);
+	m_biasZ0_poseta[etaBinId]  -> Fill(sigZ0,  weight);      
+      }
+    }
+
     if (trk->isAvailable<float>("matchedDR")) {
       bool passCut = false;
       

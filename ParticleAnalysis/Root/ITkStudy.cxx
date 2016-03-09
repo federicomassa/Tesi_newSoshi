@@ -112,7 +112,7 @@ EL::StatusCode ITkStudy::initialize() {
   m_eventCounter=0;
   
   m_trkHist_reco_ptCut = 3000.0; //MeV
-  m_trkHist_reco_hitsCut = 10; //Si hits
+  m_trkHist_reco_hitsCut = 5; //Si hits
 	
   return EL::StatusCode::SUCCESS;
 }
@@ -222,6 +222,7 @@ EL::StatusCode ITkStudy::execute() {
   //---------------------
   int numTruth = 0;
   int numChargedTruth = 0;
+  int numPrimaryChargedTruth = 0;
   int numNeutralTruth = 0;
   int numTruth1GeV = 0;
   int numChargedTruth1GeV = 0;
@@ -250,12 +251,16 @@ EL::StatusCode ITkStudy::execute() {
 
     if (TMath::Abs((*truthPart_itr)->pdgId())!=13) {
       numTruth++;
-      if (TMath::Abs((*truthPart_itr)->charge())==1) { numChargedTruth++; }
+      if (TMath::Abs((*truthPart_itr)->charge())==1) { 
+	numChargedTruth++;
+	if ((*truthPart_itr)->barcode() < 200000)
+	  numPrimaryChargedTruth++; 
+      } //only primary (not interaction)
       if (TMath::Abs((*truthPart_itr)->charge())==0) { numNeutralTruth++; }
 
       if ((*truthPart_itr)->pt()>1000.0) {
         numTruth1GeV++;
-        if (TMath::Abs((*truthPart_itr)->charge())==1) { numChargedTruth1GeV++; }
+        if (TMath::Abs((*truthPart_itr)->charge())==1) {numChargedTruth1GeV++;}
         if (TMath::Abs((*truthPart_itr)->charge())==0) { numNeutralTruth1GeV++; }
       }
     }
@@ -396,6 +401,7 @@ EL::StatusCode ITkStudy::execute() {
 
   eventFeatures.nTruth = numTruth;
   eventFeatures.nChargedTruth = numChargedTruth;
+  eventFeatures.nPrimaryChargedTruth = numPrimaryChargedTruth;
   eventFeatures.nNeutralTruth = numNeutralTruth;
 
   eventFeatures.nTruth1GeV = numTruth1GeV;
@@ -435,7 +441,7 @@ EL::StatusCode ITkStudy::execute() {
   uint8_t getInt(0);
   if (mindRMatched<0.1 && 
       (*itkTrk_itr_matched)->pt() > m_trkHist_reco_ptCut &&
-      xAOD::TrackHelper::numberOfSiHits(*itkTrk_itr_matched) > m_trkHist_reco_hitsCut) {
+      xAOD::TrackHelper::numberOfSiHits(*itkTrk_itr_matched) >= m_trkHist_reco_hitsCut) {
     trkHist_reco->FillHists( (*itkTrk_itr_matched), 1.0 );
   }
 
