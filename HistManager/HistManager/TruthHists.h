@@ -43,6 +43,14 @@ class TruthHists : public ManageHists {
     TH1F* m_z0; //!			  
     TH1F* m_phi; //!			  
 
+    TH1F* m_prodVtx_X; //!
+    TH1F* m_prodVtx_Y; //!
+    TH1F* m_prodVtx_Z; //!
+    TH1F* m_prodVtx_R; //!
+
+    TH1F* m_prodVtx_incoming; //!
+    TH1F* m_prodVtx_outgoing; //!
+
 };
 
 #endif //HistManager_TruthHists_H

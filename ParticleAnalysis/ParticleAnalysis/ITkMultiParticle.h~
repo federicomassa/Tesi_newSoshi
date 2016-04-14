@@ -1,5 +1,5 @@
-#ifndef ParticleAnalysis_ITkStudy_H
-#define ParticleAnalysis_ITkStudy_H
+#ifndef ParticleAnalysis_ITkMultiParticle_H
+#define ParticleAnalysis_ITkMultiParticle_H
 
 // c++ include(s):
 #include <iterator>
@@ -26,7 +26,7 @@
 #endif // not __MAKECINT__
 
 
-class ITkStudy : public EL::Algorithm
+class ITkMultiParticle : public EL::Algorithm
 {
   // put your configuration variables here as public variables.
   // that way they can be set directly from CINT and python.
@@ -56,10 +56,15 @@ public:
 
 
   // this is a standard constructor
-  ITkStudy ();
+  ITkMultiParticle ();
 
   void SetTargetParticleID(int idTarget) { m_idTarget = idTarget; }
-  void SetTargetParticleE(int EnergyTarget) { m_EnergyTarget = EnergyTarget; }
+  void SetPtCut(double ptCut) { m_ptCut = ptCut;}
+  void SetParentMass(double parentMass) {m_parentMass = parentMass;}
+  void SetDecayMass(double decayMass) {m_decayMass = decayMass;}
+  void SetParentMassTolerance(double tolerance) {m_parentMassTolerance = tolerance;}
+  void SetNTarget(int nTarget) {m_nTarget = nTarget;}
+  void SetDRCut(double dRCut) {m_dRCut = dRCut;}
 
   // these are the functions inherited from Algorithm
   virtual EL::StatusCode setupJob (EL::Job& job);
@@ -73,14 +78,14 @@ public:
   virtual EL::StatusCode histFinalize ();
 
 private:
-  int m_idTarget,m_EnergyTarget;
-
+  unsigned int m_idTarget, m_nTarget;
+  double m_ptCut, m_parentMass, m_decayMass, m_parentMassTolerance, m_dRCut;
   //Reconstruction cuts
   double m_trkHist_reco_ptCut;
   int m_trkHist_reco_hitsCut;
 
   // this is needed to distribute the algorithm to the workers
-  ClassDef(ITkStudy, 1);
+  ClassDef(ITkMultiParticle, 1);
 };
 
 #endif

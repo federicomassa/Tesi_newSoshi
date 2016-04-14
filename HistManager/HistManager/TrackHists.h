@@ -98,8 +98,12 @@ class TrackHists : public ManageHists {
     TH1F* m_eta; //!   
     TH1F* m_abseta; //!
     TH1F* m_phi; //!        
-    TH1F* m_d0; //!       
+    TH1F* m_d0; //! 
+    TH1F* m_d0_manual; //!
+    TH2F* m_d0_truthd0; //!
     TH1F* m_z0; //!       
+    TH2F* m_z0_abseta; //!
+    TH2F* m_z0_truthz0; //!
     TH1F* m_z0Corr1; //!       
     TH1F* m_z0Corr2; //!       
 

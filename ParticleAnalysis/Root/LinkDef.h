@@ -3,6 +3,7 @@
 #include <ParticleAnalysis/ITkStudy.h>
 #include <ParticleAnalysis/ClusterAnalysis.h>
 #include <ParticleAnalysis/ZmumuAnalysis.h>
+#include <ParticleAnalysis/ITkMultiParticle.h>
 
 #ifdef __CINT__
 
@@ -19,4 +20,5 @@
 #pragma link C++ class ITkStudy+;
 #pragma link C++ class ClusterAnalysis+;
 #pragma link C++ class ZmumuAnalysis+;
+#pragma link C++ class ITkMultiParticle+;
 #endif

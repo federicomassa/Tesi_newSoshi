@@ -1,6 +1,7 @@
 #include <HistManager/TrackHists.h>
 #include "xAODTruth/TruthParticleContainer.h"
 #include "xAODTruth/TruthVertex.h"
+#include "xAODTracking/Vertex.h"
 #include <HistManager/TrackHelper.h>
 #include <HistManager/assert.h>
 #include <vector>
@@ -37,7 +38,7 @@ void TrackHists::BookHists() {
   // from truth particle itself
   m_prodR         = declare1D(m_name, "prodR",         "production R [mm]", 110,    0.0, 1100.0);
   m_prodZ         = declare1D(m_name, "prodZ",         "production Z [mm]", 310,    0.0, 3100.0);
-  m_truthPt       = declare1D(m_name, "truthPt",       "Truth p_{T} [GeV]", 200,    0.0, 2000.0); 
+  m_truthPt       = declare1D(m_name, "truthPt",       "Truth p_{T} [GeV]", 200,    0.0, 200.0); 
   m_truthPtnarrow = declare1D(m_name, "truthPtnarrow", "Truth p_{T} [GeV]", 200,    0.0,   50.0); 
   m_truthEta      = declare1D(m_name, "truthEta",      "Truth #eta",         80,   -4.0,    4.0); 
   m_truthAbseta   = declare1D(m_name, "truthAbseta",       "|#eta|", 20, 0.0, 4.0); 
@@ -75,7 +76,7 @@ void TrackHists::BookHists() {
 
     const std::string PtTitle = "#Delta(p_{T})( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
     const std::string QPtTitle = "#Delta(q/p_{T}) x p_{T}( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
-    const std::string EtaTitle = "#Delta(#eta)( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
+    const std::string EtaTitle = "#Delta(#eta)/|#eta_{truth}|( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
     const std::string PhiTitle = "#Delta(#phi)( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
     const std::string D0Title = "#Delta(D0)( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
     const std::string Z0Title = "#Delta(Z0)( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
@@ -93,10 +94,10 @@ void TrackHists::BookHists() {
 
     m_biasPt_abseta.push_back(declare1D(m_name, (PtName + count).c_str(),  (PtTitle + PtUnits).c_str(), 200,-16000.0,16000.0));
     m_biasQPt_abseta.push_back(declare1D(m_name, (QPtName + count).c_str(),  (QPtTitle).c_str(), 200,-0.4,0.4));
-    m_biasEta_abseta.push_back(declare1D(m_name, (EtaName + count).c_str(),  (EtaTitle).c_str(), 200,-0.4,0.4));
+    m_biasEta_abseta.push_back(declare1D(m_name, (EtaName + count).c_str(),  (EtaTitle).c_str(), 200,-0.08,0.08));
     m_biasPhi_abseta.push_back(declare1D(m_name, (PhiName + count).c_str(),  (PhiTitle).c_str(), 200,-5e-3,5e-3));
     m_biasD0_abseta.push_back(declare1D(m_name, (D0Name + count).c_str(),  (D0Title + D0Units).c_str(), 200,-1.0,1.0));
-    m_biasZ0_abseta.push_back(declare1D(m_name, (Z0Name + count).c_str(),  (Z0Title + Z0Units).c_str(), 200,-200.0,200.0));
+    m_biasZ0_abseta.push_back(declare1D(m_name, (Z0Name + count).c_str(),  (Z0Title + Z0Units).c_str(), 100,-0.8,0.8));
 
     m_biasPt_poseta.push_back(declare1D(m_name, (PtName + count + "_pos").c_str(),  (PtTitle + PtUnits).c_str(), 200,-16000.0,16000.0));
     m_biasQPt_poseta.push_back(declare1D(m_name, (QPtName + count + "_pos").c_str(),  (QPtTitle).c_str(), 200,-0.4,0.4));
@@ -122,7 +123,11 @@ void TrackHists::BookHists() {
   m_abseta      = declare1D(m_name, "abseta",      "#eta",               20,    0.0,    4.0); 
   m_phi         = declare1D(m_name, "phi",         "#phi",               32,   -3.2,    3.2); 
   m_d0          = declare1D(m_name, "d0",          "d_{0} [mm]",        100,   -0.2,    0.2); 
+  m_d0_manual   = declare1D(m_name, "d0_manual",   "d_{0} [mm]",        100,   -0.2,    0.2); 
+  m_d0_truthd0  = declare2D(m_name, "d0_truthd0",  "track d_{0} [mm]", "bias d_{0} [mm]", 100, -0.2, 0.2, 100, -0.2, 0.2);
   m_z0          = declare1D(m_name, "z0",          "z_{0} [mm]",        100, -200.0,  200.0); 
+  m_z0_abseta   = declare2D(m_name, "z0_abseta",   "|#eta|", "z_{0} [mm]", 20,0.0,4.0, 100, -200, 200);
+  m_z0_truthz0  = declare2D(m_name, "z0_truthz0",  "track z_{0} [mm]", "bias z_{0} [mm]", 100, -200.0, 200.0, 100, -200.0, 200.0); 
   m_z0Corr1     = declare1D(m_name, "z0Corr1",     "z_{0} at PV [mm]",   80,   -8.0,    8.0); 
   m_z0Corr2     = declare1D(m_name, "z0Corr2",     "z_{0} at PV [mm]",   80,   -8.0,    8.0); 
 
@@ -270,7 +275,19 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
   m_eta          ->Fill(trk->eta(),weight); 
   m_abseta       ->Fill(TMath::Abs(trk->eta()),weight); 
   m_d0           ->Fill(trk->d0(),weight); 
+
+  if (trk->vertex()) {
+    m_d0_manual    ->Fill(TMath::Sign(
+				      TMath::Sqrt(
+						  TMath::Power(trk->vertex()->x(),2) +
+						  TMath::Power(trk->vertex()->y(),2)),
+				      trk->vertex()->x()*trk->pt()*TMath::Sin(trk->phi()) -
+				      trk->vertex()->y()*trk->pt()*TMath::Cos(trk->phi())),
+			  weight);
+  } 
+
   m_z0           ->Fill(trk->z0(),weight); 
+  m_z0_abseta    ->Fill(TMath::Abs(trk->eta()), trk->z0());
   m_phi          ->Fill(trk->phi(),weight); 
 
   float signQ = 0.0;
@@ -387,11 +404,32 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
     if (truthParticle->isAvailable<float>("d0")) {
       truthd0 = truthParticle->auxdata<float>("d0");
     }
+    // else if(truthParticle->hasProdVtx()) {
+    //   const double p = TMath::Sqrt(TMath::Power(truthParticle->px(),2) +
+    // 				   TMath::Power(truthParticle->py(),2) +
+    // 				   TMath::Power(truthParticle->pz(),2));
 
+    //   /*truthd0 = (truthParticle->prodVtx()->x()*truthParticle->py() - 
+    // 	truthParticle->prodVtx()->y()*truthParticle->px())/p; */ //TODO: check same definition in ParticleAnalysis
+      
+    //   truthd0 = TMath::Sign(truthParticle->prodVtx()->perp(),
+    // 			    truthParticle->prodVtx()->x()*truthParticle->py() - 
+    // 			    truthParticle->prodVtx()->y()*truthParticle->px());
+      
+    //   if (p > 1E-10)
+    // 	truthd0 = (truthParticle->prodVtx()->x()*truthParticle->py() - 
+    // 		   truthParticle->prodVtx()->y()*truthParticle->px())/p;
+    
     float truthz0 = 0.0;
     if (truthParticle->isAvailable<float>("z0")) {
       truthz0 = truthParticle->auxdata<float>("z0");
     }
+    else if(truthParticle->hasProdVtx()) {
+      truthz0 = truthParticle->prodVtx()->z();
+    }
+
+    m_z0_truthz0    -> Fill(trk->z0(), trk->z0() - truthz0);
+    m_d0_truthd0    -> Fill(trk->d0(), trk->d0() - truthd0);
 
     PrintMessage("Truth Properties...");
     m_truthPt       -> Fill(truthParticle->pt()*1e-3,weight);
@@ -424,11 +462,11 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
       Assert("TrackHists::FillHists()\tetaBinId out of bounds", etaBinId < m_etaVectorSize && etaBinId >= 0);
       m_biasPt_abseta[etaBinId]  -> Fill(sigPt,  weight);
       m_biasQPt_abseta[etaBinId] -> Fill(sigQPt, weight);
-      m_biasEta_abseta[etaBinId] -> Fill(sigEta, weight);
+      m_biasEta_abseta[etaBinId] -> Fill(sigEta/TMath::Abs(truthParticle->eta()), weight); //TODO: sigmaEta/Eta
       m_biasPhi_abseta[etaBinId] -> Fill(sigPhi, weight);
       m_biasD0_abseta[etaBinId]  -> Fill(sigD0,  weight);
       m_biasZ0_abseta[etaBinId]  -> Fill(sigZ0,  weight);
-      
+
       if (truthParticle->eta() < 0) {
 	m_biasPt_negeta[etaBinId]  -> Fill(sigPt,  weight);
 	m_biasQPt_negeta[etaBinId]  -> Fill(sigQPt,  weight);

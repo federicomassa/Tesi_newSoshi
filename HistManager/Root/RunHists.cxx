@@ -28,11 +28,11 @@ void RunHists::BookHists() {
   m_sysPhi_abseta  = declareGraphErrors(m_name, "sysPhi_abseta", "|#eta|", "#Delta(#phi) bias"); 
   m_sysD0_abseta   = declareGraphErrors(m_name, "sysD0_abseta", "|#eta|", "#Delta(D0) bias [mm]"); 
   m_sysZ0_abseta   = declareGraphErrors(m_name, "sysZ0_abseta", "|#eta|", "#Delta(Z0) bias [mm]"); 
-  m_sysEta_abseta  = declareGraphErrors(m_name, "sysEta_abseta", "|#eta|", "#Delta(#eta) bias");
+  m_sysEta_abseta  = declareGraphErrors(m_name, "sysEta_abseta", "|#eta|", "#Delta(#eta)/|#eta_{truth}| bias");
 
   m_sigPt_abseta   = declareGraphErrors(m_name, "sigPt_abseta", "|#eta|", "#sigma(p_{T}) [MeV]"); 
   m_sigQPt_abseta  = declareGraphErrors(m_name, "sigQPt_abseta", "|#eta|", "p_{T}^{truth} x #sigma(q/p_{T})");
-  m_sigEta_abseta  = declareGraphErrors(m_name, "sigEta_abseta", "|#eta|", "#sigma(#eta)");
+  m_sigEta_abseta  = declareGraphErrors(m_name, "sigEta_abseta", "|#eta|", "#sigma(#eta)/|#eta_{truth}|");
   m_sigPhi_abseta  = declareGraphErrors(m_name, "sigPhi_abseta", "|#eta|", "#sigma(#phi)"); 
   m_sigD0_abseta   = declareGraphErrors(m_name, "sigD0_abseta", "|#eta|", "#sigma(D0) [mm]"); 
   m_sigZ0_abseta   = declareGraphErrors(m_name, "sigZ0_abseta", "|#eta|", "#sigma(Z0) [mm]"); 
@@ -42,11 +42,11 @@ void RunHists::BookHists() {
   m_sysPhi_poseta  = declareGraphErrors(m_name, "sysPhi_poseta", "|#eta|", "#Delta(#phi) bias: positive #eta"); 
   m_sysD0_poseta   = declareGraphErrors(m_name, "sysD0_poseta", "|#eta|", "#Delta(D0) bias [mm]: positive #eta"); 
   m_sysZ0_poseta   = declareGraphErrors(m_name, "sysZ0_poseta", "|#eta|", "#Delta(Z0) bias [mm]: positive #eta"); 
-  m_sysEta_poseta  = declareGraphErrors(m_name, "sysEta_poseta", "|#eta|", "#Delta(#eta) bias: positive #eta");
+  m_sysEta_poseta  = declareGraphErrors(m_name, "sysEta_poseta", "|#eta|", "#Delta(#eta)/|#eta_{truth}| bias: positive #eta");
 
   m_sigPt_poseta   = declareGraphErrors(m_name, "sigPt_poseta", "|#eta|", "#sigma(p_{T}) [MeV]: positive #eta"); 
   m_sigQPt_poseta  = declareGraphErrors(m_name, "sigQPt_poseta", "|#eta|", "p_{T}^{truth} x #sigma(q/p_{T}): positive #eta");
-  m_sigEta_poseta  = declareGraphErrors(m_name, "sigEta_poseta", "|#eta|", "#sigma(#eta): positive #eta");
+  m_sigEta_poseta  = declareGraphErrors(m_name, "sigEta_poseta", "|#eta|", "#sigma(#eta)/|#eta_{truth}|: positive #eta");
   m_sigPhi_poseta  = declareGraphErrors(m_name, "sigPhi_poseta", "|#eta|", "#sigma(#phi): positive #eta"); 
   m_sigD0_poseta   = declareGraphErrors(m_name, "sigD0_poseta", "|#eta|", "#sigma(D0) [mm]: positive #eta"); 
   m_sigZ0_poseta   = declareGraphErrors(m_name, "sigZ0_poseta", "|#eta|", "#sigma(Z0) [mm]: positive #eta"); 
@@ -56,11 +56,11 @@ void RunHists::BookHists() {
   m_sysPhi_negeta  = declareGraphErrors(m_name, "sysPhi_negeta", "|#eta|", "#Delta(#phi) bias: negative #eta"); 
   m_sysD0_negeta   = declareGraphErrors(m_name, "sysD0_negeta", "|#eta|", "#Delta(D0) bias [mm]: negative #eta"); 
   m_sysZ0_negeta   = declareGraphErrors(m_name, "sysZ0_negeta", "|#eta|", "#Delta(Z0) bias [mm]: negative #eta"); 
-  m_sysEta_negeta  = declareGraphErrors(m_name, "sysEta_negeta", "|#eta|", "#Delta(#eta) bias: negative #eta");
+  m_sysEta_negeta  = declareGraphErrors(m_name, "sysEta_negeta", "|#eta|", "#Delta(#eta)/|#eta_{truth}| bias: negative #eta");
 
   m_sigPt_negeta   = declareGraphErrors(m_name, "sigPt_negeta", "|#eta|", "#sigma(p_{T}) [MeV]: negative #eta"); 
   m_sigQPt_negeta  = declareGraphErrors(m_name, "sigQPt_negeta", "|#eta|", "p_{T}^{truth} x #sigma(q/p_{T}): negative #eta");
-  m_sigEta_negeta  = declareGraphErrors(m_name, "sigEta_negeta", "|#eta|", "#sigma(#eta): negative #eta");
+  m_sigEta_negeta  = declareGraphErrors(m_name, "sigEta_negeta", "|#eta|", "#sigma(#eta)/|#eta_{truth}|: negative #eta");
   m_sigPhi_negeta  = declareGraphErrors(m_name, "sigPhi_negeta", "|#eta|", "#sigma(#phi): negative #eta"); 
   m_sigD0_negeta   = declareGraphErrors(m_name, "sigD0_negeta", "|#eta|", "#sigma(D0) [mm]: negative #eta"); 
   m_sigZ0_negeta   = declareGraphErrors(m_name, "sigZ0_negeta", "|#eta|", "#sigma(Z0) [mm]: negative #eta"); 

@@ -42,6 +42,13 @@ class EventFeatures {
     unsigned int nPixelHitsAtIBL;
     unsigned int nPixelHitsAtBLayer;
 
+    double truthMass;
+    double truthCharge;
+    double recoMass;
+    double recoCharge;
+    double recoNMatchedMass;
+    double recoNMatchedCharge;
+    
     EventFeatures() {
       nPseudoTracks = -1;
       nSecondaryPseudoTracks = -1;
@@ -73,6 +80,12 @@ class EventFeatures {
       nPixelClustersAtBLayer = -1;
       nPixelHitsAtIBL = -1;
       nPixelHitsAtBLayer = -1;
+      truthMass = -1.0;
+      truthCharge = -100.0;
+      recoMass = -1.0;
+      recoCharge = -100.0;
+      recoNMatchedMass = -1.0;
+      recoNMatchedCharge = -100.0;
     };
 
     void dumpInfo() {

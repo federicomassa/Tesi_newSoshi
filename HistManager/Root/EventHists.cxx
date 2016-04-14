@@ -74,6 +74,14 @@ void EventHists::BookHists() {
   m_nPixelClustersAtBLayer_vsMu_wide = declare2D(m_name, "nPixelClustersAtBLayer_vsMu_wide", "N Pixel clusters at BLayer", "pilueup #mu", 100, 0.0, 5000, 30,0.0,30.0); 
   m_nPixelHitsAtBLayer_vsMu_wide     = declare2D(m_name, "nPixelHitsAtBLayer_vsMu_wide",     "N Pixel hits at BLayer", "pilueup #mu", 100, 0.0, 20000, 30,0.0,30.0); 
 
+  m_truthMass                        = declare1D(m_name, "truthMass", "Truth parent mass [GeV]", 200,0.0,200.0);
+  m_truthCharge                      = declare1D(m_name, "truthCharge", "Truth parent charge", 20,-10.0,10.0);
+  m_recoMass                         = declare1D(m_name, "recoMass", "Reco parent mass [GeV]", 200,0.0,200.0);
+  m_recoCharge                       = declare1D(m_name, "recoCharge", "Reco parent charge", 20,-10.0,10.0);
+  m_recoNMatchedMass                 = declare1D(m_name, "recoNMatchedMass", "Reco parent mass [GeV]", 200,0.0,200.0);
+  m_recoNMatchedCharge               = declare1D(m_name, "recoNMatchedCharge", "Reco parent charge", 20,-10.0,10.0);
+  m_biasMass                         = declare1D(m_name, "biasMass", "Bias parent mass [GeV]", 200,-100,100.0);
+  m_biasNMatchedMass                 = declare1D(m_name, "biasNMatchedMass", "Bias parent mass [GeV]", 200,-100,100.0);
 
 } // BookHists
 
@@ -149,6 +157,24 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
   m_nPixelHitsAtBLayer_wide          -> Fill(1.0*evt.nPixelHitsAtBLayer,weight);
   m_nPixelClustersAtBLayer_vsMu_wide -> Fill(1.0*evt.nPixelClustersAtBLayer,evt.muValue,weight);
   m_nPixelHitsAtBLayer_vsMu_wide     -> Fill(1.0*evt.nPixelHitsAtBLayer,evt.muValue,weight);
+
+  if (TMath::Abs(evt.truthMass + 1.0) > 1E-6)
+    m_truthMass                     -> Fill(1.0*evt.truthMass/1000.0, weight);
+  if (TMath::Abs(evt.truthCharge + 100.0) > 1E-6)
+    m_truthCharge                   -> Fill(1.0*evt.truthCharge, weight);
+  if (TMath::Abs(evt.recoMass + 1.0) > 1E-6)
+    m_recoMass                      -> Fill(1.0*evt.recoMass/1000.0, weight);
+  if (TMath::Abs(evt.recoCharge + 100.0) > 1E-6)
+    m_recoCharge                    -> Fill(1.0*evt.recoCharge, weight);
+  if (TMath::Abs(evt.recoNMatchedMass + 1.0) > 1E-6)
+    m_recoNMatchedMass              -> Fill(1.0*evt.recoNMatchedMass/1000.0, weight);
+  if (TMath::Abs(evt.recoNMatchedCharge + 100.0) > 1E-6)
+    m_recoNMatchedCharge            -> Fill(1.0*evt.recoNMatchedCharge, weight);
+  if (TMath::Abs(evt.truthMass + 1.0) > 1E-6 && TMath::Abs(evt.recoMass + 1.0) > 1E-6)
+    m_biasMass                      -> Fill(1.0*(evt.recoMass-evt.truthMass)/1000.0, weight);
+  if (TMath::Abs(evt.truthMass + 1.0) > 1E-6 && TMath::Abs(evt.recoNMatchedMass + 1.0) > 1E-6)
+    m_biasNMatchedMass              -> Fill(1.0*(evt.recoNMatchedMass-evt.truthMass)/1000.0, weight);
+
 
 }
 

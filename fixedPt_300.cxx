@@ -6,6 +6,7 @@
 #include <TFile.h>
 #include <TLegend.h>
 #include <TROOT.h>
+#include <TMath.h>
 #include <TStyle.h>
 #include <TAxis.h>
 #include <TString.h>
@@ -17,6 +18,43 @@
 
 
 using namespace std;
+
+Double_t GetError(Double_t, Double_t, Double_t);
+
+Double_t GetMean(Double_t v1, Double_t e1, Double_t v2, Double_t e2, Double_t v3, Double_t e3) {
+
+  if (TMath::Abs(v1) > 1E-9 &&
+      TMath::Abs(v2) > 1E-9 &&
+      TMath::Abs(v3) > 1E-9 &&
+
+      TMath::Abs(e1) > 1E-9 &&
+      TMath::Abs(e2) > 1E-9 &&
+      TMath::Abs(e3) > 1E-9) {
+    return (v1/e1/e1 + v2/e2/e2 + v3/e3/e3)*TMath::Power(GetError(e1,e2,e3),2);
+  }
+  else {
+    return (v1+v2+v3)/3.0;
+  }
+
+  std::cout << "ERROR in GetMean(...)" << std::endl;
+
+}
+
+Double_t GetError (Double_t e1, Double_t e2, Double_t e3) {
+  
+  if (TMath::Abs(e1) > 1E-9 &&
+      TMath::Abs(e2) > 1E-9 &&
+      TMath::Abs(e3) > 1E-9) {
+
+    return TMath::Sqrt(1.0/(1/e1/e1 + 1/e2/e2 + 1/e3/e3));
+  }
+
+  else return 0.0;
+
+  std::cout << "ERROR in GetError(...)" << std::endl;
+  return -1.0;
+
+}
 
 void fixedPt(const string& particle, const double& pt, const string& fixOption, const string& value,
 	     const bool& doSigmaPlots = true, 
@@ -33,13 +71,13 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
   //          = "ExtBrl4", "IExtBrl4", ... for fixOption = "LAYOUT"
 
   string particle_lower, particle_upper;
-  bool fixPileup, fixLayout;
-
+  bool /*fixPileup, */fixLayout;
+  
   if (particle.compare("pi") == 0) {
     particle_lower = particle;
     particle_upper = "Pi";
   }
-
+  
   else if (particle.compare("mu") == 0) {
     particle_lower = particle;
     particle_upper = "Mu";
@@ -50,49 +88,56 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     return;
   }
 
-
-  if (fixOption.compare("PILEUP") == 0) {
+  int pileup_value = -1;
+  
+  if (/*fixOption.compare("PILEUP") == 0) {
     fixPileup = true;
-    fixLayout = false;
-  }
+    fixLayout = false;*/false) {}
   else if (fixOption.compare("LAYOUT") == 0) {
-    fixPileup = false;
+    //fixPileup = false;
     fixLayout = true;
   }
   else {
     cout << "ERROR: fixOption not recognized" << endl;
     return;
   }
-    
+  
   string pt_str;
-
+  
   stringstream ss;
   ss << pt/1000; //to GeV
   ss >> pt_str;
   ss.clear();
   
-  string imagePath;
-  if (fixPileup) 
-    imagePath = "Plots/Mixed/" + particle_lower + pt_str + "pu" + value + "_"; 
-  else if (fixLayout) 
-    imagePath = "Plots/" + value + "/" + particle_lower + pt_str + "_";
+  
+  /*  if (fixPileup) {
+    ss << value;
+    ss >> pileup_value;
+    ss.clear();
+    }*/
 
+  string imagePath;
+/*  if (fixPileup) 
+    imagePath = "Plots/Mixed/" + particle_lower + pt_str + "pu" + value + "_"; */
+  if (fixLayout) 
+    imagePath = "Plots/" + value + "/" + particle_lower + pt_str + "_";
+  
   string legendLabel;
-  if (fixPileup) 
-    legendLabel = particle_lower + pt_str + "pu" + value + ": ";
-  else if (fixLayout) 
+  /*if (fixPileup) 
+    legendLabel = particle_lower + pt_str + "pu" + value + ": ";*/
+  if (fixLayout) 
     legendLabel = particle_lower + pt_str + " " + value + ": pu";
 
   string basePath, prePath, postPath;
 
-  if (fixPileup) {
+  /*if (fixPileup) {
     basePath = "AnalysisResults";
     prePath = basePath + "/";
     postPath = "/dataset" + particle_upper + "_" + 
       pt_str + "GeV/hist-" + particle_lower + 
       pt_str + "pu" + value + ".root"; 
-  }
-  else if (fixLayout) {
+      }*/
+  if (fixLayout) {
     basePath = "AnalysisResults";
     prePath = basePath + "/" + value;
     postPath = "/dataset" + particle_upper + "_" + 
@@ -107,16 +152,16 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
   vector<string> Pileup;
   Pileup.push_back("10");
-  Pileup.push_back("50");
-  Pileup.push_back("140");
+  //  Pileup.push_back("50");
+  // Pileup.push_back("140");
   Pileup.push_back("200");
   Pileup.push_back("300");
 
   vector<string>* IterVariable = 0;
 
-  if (fixPileup)
-    IterVariable = &Layouts;
-  else if (fixLayout)
+  /*  if (fixPileup)
+      IterVariable = &Layouts;*/
+  if (fixLayout)
     IterVariable = &Pileup;
 
   vector<int> colors;
@@ -135,27 +180,55 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
   if (Layouts.size() >= Pileup.size()) {
     Assert("Layouts, colors and markerStyle vectors mismatched", 
-	   Layouts.size() == colors.size() &&
-	   Layouts.size() == markerStyle.size());
+	   Layouts.size() <= colors.size() &&
+	   colors.size() == markerStyle.size());
   }
   else {
     Assert("Pileup, colors and markerStyle vectors mismatched", 
-	   Pileup.size() == colors.size() &&
-	   Pileup.size() == markerStyle.size());
+	   Pileup.size() <= colors.size() &&
+	   colors.size() == markerStyle.size());
   }
 
   vector<string> Path;
   for (unsigned int i = 0; i < IterVariable->size(); i++) {
-    if (fixPileup) 
-      Path.push_back(prePath + IterVariable->at(i) + postPath);
-    else if (fixLayout)
-      Path.push_back(prePath + postPath + IterVariable->at(i) + ".root");
+    /*    if (fixPileup && pileup_value != 300) 
+	  Path.push_back(prePath + IterVariable->at(i) + postPath);
+    else if (fixPileup && pileup_value == 300) {
+      Path.push_back(prePath + IterVariable->at(i) + "/datasetPi_15GeV/hist-pi15pu300-2.root");
+      }      */
+    if (fixLayout) {
+      ss << IterVariable->at(i);
+      ss >> pileup_value;
+      ss.clear();
+
+      if (pileup_value != 300)
+	Path.push_back(prePath + postPath + IterVariable->at(i) + ".root");
+      else {
+	Path.push_back(prePath + postPath + IterVariable->at(i) + "-1.root");
+	Path.push_back(prePath + postPath + IterVariable->at(i) + "-2.root");
+	Path.push_back(prePath + postPath + IterVariable->at(i) + "-3.root");
+      }
+    }
   }
 
   vector<TFile*> inFiles;
   for (unsigned int i = 0; i < IterVariable->size(); i++) 
     inFiles.push_back(new TFile(Path[i].c_str()));
 
+  if (fixLayout) {
+    inFiles.push_back(new TFile(Path[IterVariable->size()].c_str()));
+    inFiles.push_back(new TFile(Path[IterVariable->size() + 1].c_str()));
+  }
+
+
+  // N is 0 for fixPileup and is 2 for fixLayout to account for pu300 splitting
+  int N;
+  /*  if (fixPileup)
+      N = 0; */
+  if (fixLayout)
+    N = 2;
+  else
+    std::cout << "Something's wrong with N" << std::endl;
 
   if (doSigmaPlots) {
     /////// DRAW SIGMA /////
@@ -163,10 +236,31 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     // =============== sigma pt vs eta ================ //
 
     vector<TGraphErrors*> sigPt_abseta;
-    for (unsigned int i = 0; i < IterVariable->size(); i++) {
+    for (unsigned int i = 0; i < IterVariable->size() + N; i++) {
       sigPt_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__sigPt_abseta")));
       CheckPtr(sigPt_abseta[i]);
     }
+
+    TGraphErrors* g = new TGraphErrors();
+    for (int j = 0; j < sigPt_abseta[0]->GetN(); j++) {
+      Double_t value1, value2, value3;
+      Double_t x1, x2, x3;
+      sigPt_abseta[2]->GetPoint(j,x1,value1);
+      sigPt_abseta[3]->GetPoint(j,x2,value2);
+      sigPt_abseta[4]->GetPoint(j,x3,value3);
+      Assert("x points must be equal!", x1 == x2 && x1 == x3);
+
+      Double_t error1, error2, error3;
+      Double_t xx1, xx2, xx3;
+      error1 = sigPt_abseta[2]->GetErrorY(j);
+      error2 = sigPt_abseta[3]->GetErrorY(j);
+      error3 = sigPt_abseta[4]->GetErrorY(j);
+
+      g->SetPoint(j, x1, GetMean(value1,error1,value2,error2,value3,error3));
+      g->SetPointError(j, 0.1, GetError(error1,error2,error3));
+    }
+
+    sigPt_abseta.insert(sigPt_abseta.begin()+2,g);
 
     TCanvas* canv_sigPt_abseta = new TCanvas();
   
@@ -197,7 +291,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
   
     canv_sigPt_abseta -> Print((imagePath + "sigPt_abseta.png").c_str(), "png");
     //    delete canv_sigPt_abseta;
-  
+    delete g;
     // =============== sigma qpt vs eta ================ //
 
     vector<TGraphErrors*> sigQPt_abseta;
@@ -211,6 +305,28 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
     TMultiGraph* mg_sigQPt_abseta = new TMultiGraph;
     mg_sigQPt_abseta   -> SetName("sigQPt_abseta_combined");
     mg_sigQPt_abseta   -> SetTitle("p_{T}^{truth} x #sigma(q/p_{T}) vs |#eta|;Truth |#eta|;p_{T}^{truth} x #sigma(q/p_{T})");
+
+    g = new TGraphErrors();
+    for (int j = 0; j < sigPt_abseta[0]->GetN(); j++) {
+      Double_t value1, value2, value3;
+      Double_t x1, x2, x3;
+      sigPt_abseta[2]->GetPoint(j,x1,value1);
+      sigPt_abseta[3]->GetPoint(j,x2,value2);
+      sigPt_abseta[4]->GetPoint(j,x3,value3);
+      Assert("x points must be equal!", x1 == x2 && x1 == x3);
+
+      Double_t error1, error2, error3;
+      Double_t xx1, xx2, xx3;
+      error1 = sigPt_abseta[2]->GetErrorY(j);
+      error2 = sigPt_abseta[3]->GetErrorY(j);
+      error3 = sigPt_abseta[4]->GetErrorY(j);
+
+      g->SetPoint(j, x1, GetMean(value1,error1,value2,error2,value3,error3));
+      g->SetPointError(j, 0.1, GetError(error1,error2,error3));
+    }
+
+    sigPt_abseta.insert(sigPt_abseta.begin()+2,g);
+    
   
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
       sigQPt_abseta[i]     -> SetLineColor(colors[i]);
@@ -883,10 +999,10 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
       nPixHits.push_back(dynamic_cast<TH2F*>(inFiles[i]->Get("TrackHist_reco_all__eta_nPixHits")));
       CheckPtr(nPixHits[i]);
       
-      if (fixPileup)
+      /*      if (fixPileup)
 	nPixHits[i] -> SetTitle(("Number of Pixel hits vs |#eta|: " + IterVariable->at(i) + " " + particle_lower + pt_str + "pu" + value + 
-				";|#eta|;").c_str());
-      else if (fixLayout)
+	";|#eta|;").c_str());*/
+      if (fixLayout)
 	nPixHits[i] -> SetTitle(("Number of Pixel hits vs |#eta|: " + value + " " + particle_lower + pt_str + "pu" + IterVariable->at(i) + 
 				 ";|#eta|;").c_str());
       	
@@ -897,9 +1013,9 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
       string hitsPlotPath;
       
-      if (fixPileup) 
-	hitsPlotPath = "Plots/" + IterVariable->at(i) + "/" + particle_lower + pt_str + "pu" + value + "_";
-      else if (fixLayout)
+      /*if (fixPileup) 
+	hitsPlotPath = "Plots/" + IterVariable->at(i) + "/" + particle_lower + pt_str + "pu" + value + "_";*/
+      if (fixLayout)
 	hitsPlotPath = "Plots/" + value + "/" + particle_lower + pt_str + "pu" + IterVariable->at(i) + "_";
 
       canv_nPixHits[i] -> Print((hitsPlotPath + "nPixHits.png").c_str(), "png");
@@ -913,10 +1029,10 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
       nSCTHits.push_back(dynamic_cast<TH2F*>(inFiles[i]->Get("TrackHist_reco_all__eta_nSCTHits")));
       CheckPtr(nSCTHits[i]);
       
-      if (fixPileup)
+      /*if (fixPileup)
 	nSCTHits[i] -> SetTitle(("Number of SCT hits vs |#eta|: " + IterVariable->at(i) + " " + particle_lower + pt_str + "pu" + value + 
-				";|#eta|;").c_str());
-      else if (fixLayout)
+	";|#eta|;").c_str());*/
+      if (fixLayout)
 	nSCTHits[i] -> SetTitle(("Number of SCT hits vs |#eta|: " + value + " " + particle_lower + pt_str + "pu" + IterVariable->at(i) + 
 				 ";|#eta|;").c_str());
       	
@@ -927,9 +1043,9 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
       string hitsPlotPath;
 
-      if (fixPileup) 
-	hitsPlotPath = "Plots/" + IterVariable->at(i) + "/" + particle_lower + pt_str + "pu" + value + "_";
-      else if (fixLayout)
+      /*if (fixPileup) 
+	hitsPlotPath = "Plots/" + IterVariable->at(i) + "/" + particle_lower + pt_str + "pu" + value + "_";*/
+      if (fixLayout)
 	hitsPlotPath = "Plots/" + value + "/" + particle_lower + pt_str + "pu" + IterVariable->at(i) + "_";
 
       canv_nSCTHits[i] -> Print((hitsPlotPath + "nSCTHits.png").c_str(), "png");
@@ -943,10 +1059,10 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
       nSiHits.push_back(dynamic_cast<TH2F*>(inFiles[i]->Get("TrackHist_reco_all__eta_nSiHits")));
       CheckPtr(nSiHits[i]);
       
-      if (fixPileup)
+      /*if (fixPileup)
 	nSiHits[i] -> SetTitle(("Number of Si hits vs |#eta|: " + IterVariable->at(i) + " " + particle_lower + pt_str + "pu" + value + 
-				";|#eta|;").c_str());
-      else if (fixLayout)
+	";|#eta|;").c_str());*/
+      if (fixLayout)
 	nSiHits[i] -> SetTitle(("Number of Si hits vs |#eta|: " + value + " " + particle_lower + pt_str + "pu" + IterVariable->at(i) + 
 				 ";|#eta|;").c_str());
       	
@@ -957,9 +1073,9 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
       string hitsPlotPath;
 
-      if (fixPileup) 
-	hitsPlotPath = "Plots/" + IterVariable->at(i) + "/" + particle_lower + pt_str + "pu" + value + "_";
-      else if (fixLayout)
+      /*if (fixPileup) 
+	hitsPlotPath = "Plots/" + IterVariable->at(i) + "/" + particle_lower + pt_str + "pu" + value + "_";*/
+      if (fixLayout)
 	hitsPlotPath = "Plots/" + value + "/" + particle_lower + pt_str + "pu" + IterVariable->at(i) + "_";
       
       canv_nSiHits[i] -> Print((hitsPlotPath + "nSiHits.png").c_str(), "png");

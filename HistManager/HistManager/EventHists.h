@@ -78,6 +78,14 @@ class EventHists : public ManageHists {
     TH2F* m_nPixelClustersAtBLayer_vsMu_wide; //!
     TH2F* m_nPixelHitsAtBLayer_vsMu_wide; //!
 
+    TH1F* m_truthMass; //!
+    TH1F* m_truthCharge; //!
+    TH1F* m_recoMass; //!
+    TH1F* m_recoCharge; //!
+    TH1F* m_recoNMatchedMass; //!
+    TH1F* m_recoNMatchedCharge; //!
+    TH1F* m_biasMass; //!
+    TH1F* m_biasNMatchedMass; //!
 };
 
 #endif //HistManager_EventHists_H
