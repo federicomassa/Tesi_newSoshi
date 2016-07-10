@@ -4,7 +4,7 @@
 #include <ParticleAnalysis/ZmumuAnalysis.h>
 #include <HistManager/EventFeaturesInterface.h>
 #include <HistManager/ProcessFeaturesInterface.h>
-#include <HistManager/TrackHelper.h>
+#include <Utility/TrackHelper.h>
 
 // EDM includes: - if move to header file will not compile!
 #include "AthContainers/ConstDataVector.h"

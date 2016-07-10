@@ -13,8 +13,9 @@
 const double maxEta = 4.0;
 
 TruthHists::TruthHists(TString name) {
-   m_name = "TruthHist_" + name;
-   m_label = "Truth Particle "; // don't forget the space
+  m_baseName = name;
+  m_name = "TruthHist_" + name;
+  m_label = "Truth Particle "; // don't forget the space
 }
 
 TruthHists::~TruthHists() {}
@@ -31,11 +32,15 @@ void TruthHists::BookHists() {
 
   /* track parameterization */
   m_pt 			     = declare1D(m_name, "pt", 	 "p_{T} [GeV]", 	200,  0.0,     200.0 ); 
+  m_ptVsEta 		     = declare2D(m_name, "ptVsEta", "p_{T} [GeV]", "|#eta|", 200,  0.0,     200.0, 40, 0, 4.0); 
   m_eta			     = declare1D(m_name, "eta",	 "#eta", 			  80,	 -maxEta,     maxEta    ); 
+  m_eta_wide		     = declare1D(m_name, "eta_wide",	 "#eta", 			  160,	 -8.0,     8.0    ); 
   m_abseta                   = declare1D(m_name, "abseta", "|#eta|",    20,   0.0,     maxEta); 
   m_d0 			     = declare1D(m_name, "d0", 	 "d_{0}",		    120, -0.09,    0.09   ); 
   m_z0 			     = declare1D(m_name, "z0", 	 "z_{0}",		    120, -300.0,   300.0  ); 
   m_phi			     = declare1D(m_name, "phi",	 "#phi", 			  32,	 -3.2,     3.2    ); 
+
+  m_pdgId		     = declare1D(m_name, "pdgId",	 "pdgId", 			  5001,	 -2500,     2501    ); 
 
   m_prodVtx_X                = declare1D(m_name, "prodVtx_X", "Production vertex x [mm]", 100,-0.1, 0.1);
   m_prodVtx_Y                = declare1D(m_name, "prodVtx_Y", "Production vertex y [mm]", 100,-0.1, 0.1);
@@ -73,7 +78,9 @@ void TruthHists::FillHists(const xAOD::TruthParticle* tpart, float weight) const
 
   /* track parameterization */
   m_pt 		 -> Fill(tpart->pt()* 1e-3,weight); 
-  m_eta		 -> Fill(tpart->eta(),weight); 
+  m_ptVsEta      -> Fill(tpart->pt()* 1e-3,TMath::Abs(tpart->eta()), weight); 
+  m_eta		 -> Fill(tpart->eta(),weight);
+  m_eta_wide     -> Fill(tpart->eta(), weight);
   m_abseta -> Fill(TMath::Abs(tpart->eta()),weight); 
   if (tpart->isAvailable<float>("d0")) {
     m_d0 -> Fill(tpart->auxdata<float>("d0"),weight); 
@@ -94,6 +101,8 @@ void TruthHists::FillHists(const xAOD::TruthParticle* tpart, float weight) const
 
   if (TMath::Abs(tpart->eta()) <= maxEta) //TODO: remember this. Only written if truth is detectable
     m_phi -> Fill(tpart->phi(),weight); 
+
+  m_pdgId -> Fill(tpart->pdgId(), weight);
 
   //check prodVertex
   if (tpart->hasProdVtx()) {

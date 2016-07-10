@@ -2,8 +2,7 @@
 #include "xAODTruth/TruthParticleContainer.h"
 #include "xAODTruth/TruthVertex.h"
 #include "xAODTracking/Vertex.h"
-#include <HistManager/TrackHelper.h>
-#include <HistManager/assert.h>
+#include <Utility/assert.h>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -38,6 +37,7 @@ void TrackHists::BookHists() {
   // from truth particle itself
   m_prodR         = declare1D(m_name, "prodR",         "production R [mm]", 110,    0.0, 1100.0);
   m_prodZ         = declare1D(m_name, "prodZ",         "production Z [mm]", 310,    0.0, 3100.0);
+  m_pdgId         = declare1D(m_name, "pdgId",         "pdgId", 1000, - 500.0,500.0);
   m_truthPt       = declare1D(m_name, "truthPt",       "Truth p_{T} [GeV]", 200,    0.0, 200.0); 
   m_truthPtnarrow = declare1D(m_name, "truthPtnarrow", "Truth p_{T} [GeV]", 200,    0.0,   50.0); 
   m_truthEta      = declare1D(m_name, "truthEta",      "Truth #eta",         80,   -4.0,    4.0); 
@@ -92,6 +92,14 @@ void TrackHists::BookHists() {
     const std::string D0Name = "biasD0_bin";
     const std::string Z0Name = "biasZ0_bin";
 
+    const std::string PixHitsName = "PixHits_bin";
+    const std::string SCTHitsName = "SCTHits_bin";
+    const std::string SiHitsName = "SiHits_bin";
+
+    const std::string PixHitsTitle = "Number of Pixel hits( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
+    const std::string SCTHitsTitle = "Number of SCT hits( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
+    const std::string SiHitsTitle = "Number of Si hits( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
+
     m_biasPt_abseta.push_back(declare1D(m_name, (PtName + count).c_str(),  (PtTitle + PtUnits).c_str(), 200,-16000.0,16000.0));
     m_biasQPt_abseta.push_back(declare1D(m_name, (QPtName + count).c_str(),  (QPtTitle).c_str(), 200,-0.4,0.4));
     m_biasEta_abseta.push_back(declare1D(m_name, (EtaName + count).c_str(),  (EtaTitle).c_str(), 200,-0.08,0.08));
@@ -113,6 +121,10 @@ void TrackHists::BookHists() {
     m_biasD0_negeta.push_back(declare1D(m_name, (D0Name + count + "_neg").c_str(),  (D0Title + D0Units).c_str(), 200,-1.0,1.0));
     m_biasZ0_negeta.push_back(declare1D(m_name, (Z0Name + count + "_neg").c_str(),  (Z0Title + Z0Units).c_str(), 200,-200.0,200.0));
  
+    m_PixHits.push_back(declare1D(m_name, (PixHitsName + count).c_str(),  (PixHitsTitle).c_str(), 50,-0.5,49.5));
+    m_SCTHits.push_back(declare1D(m_name, (SCTHitsName + count).c_str(),  (SCTHitsTitle).c_str(), 50,-0.5,49.5));
+    m_SiHits.push_back(declare1D(m_name, (SiHitsName + count).c_str(),  (SiHitsTitle).c_str(), 50,-0.5,49.5));
+
   }
 
   /* track parameterization */
@@ -395,6 +407,8 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
 
   if (truthParticle) {
 
+    m_pdgId -> Fill(truthParticle->pdgId(),weight);
+
     if (truthParticle->hasProdVtx()) {
       m_prodR -> Fill(truthParticle->prodVtx()->perp(),weight);
       m_prodZ -> Fill(truthParticle->prodVtx()->z(),weight);
@@ -466,6 +480,10 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
       m_biasPhi_abseta[etaBinId] -> Fill(sigPhi, weight);
       m_biasD0_abseta[etaBinId]  -> Fill(sigD0,  weight);
       m_biasZ0_abseta[etaBinId]  -> Fill(sigZ0,  weight);
+
+      m_PixHits[etaBinId]        -> Fill(nPixHits, weight);
+      m_SCTHits[etaBinId]        -> Fill(nSCTHits, weight);
+      m_SiHits[etaBinId]         -> Fill(nSiHits, weight);
 
       if (truthParticle->eta() < 0) {
 	m_biasPt_negeta[etaBinId]  -> Fill(sigPt,  weight);

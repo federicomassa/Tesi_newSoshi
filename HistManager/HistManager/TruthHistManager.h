@@ -10,23 +10,18 @@ class TruthHistManager {
 
  public:
 
-  TruthHistManager(TString name, bool doAll, bool doGun, bool doPileup);
+  TruthHistManager(TString name);
   ~TruthHistManager();
 
   void Init(EL::Worker* wk);
-  void FillHists(const xAOD::TruthParticle* tp, float weight, bool isHardTruth, bool isPileupTruth) const;
+  void FillHists(const xAOD::TruthParticle* tp, float weight) const;
 
 
   private:
 
     TString m_name;
-    bool m_doAll;
-    bool m_doGun;
-    bool m_doPileup;
 
     TruthHists* m_all;          //!
-    TruthHists* m_gun;          //!
-    TruthHists* m_pileup;       //!
 
     std::vector<TruthHists*> m_histList;
 

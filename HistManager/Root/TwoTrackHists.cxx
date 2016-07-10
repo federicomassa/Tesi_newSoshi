@@ -1,7 +1,7 @@
 #include <HistManager/TwoTrackHists.h>
 #include "xAODTruth/TruthParticleContainer.h"
 #include "xAODTruth/TruthVertex.h"
-#include <HistManager/TrackHelper.h>
+#include <Utility/TrackHelper.h>
 
 #include "xAODTracking/TrackParticleContainer.h"
 

@@ -4,7 +4,7 @@
 #include "HistManager/TrackHists.h"
 #ifndef __MAKECINT__
 #include "xAODTracking/TrackMeasurementValidation.h"
-#include <HistManager/TrackHelper.h>
+#include <Utility/TrackHelper.h>
 #endif // not __MAKECINT__
 
 #include <iostream>
@@ -39,7 +39,8 @@ class TrackHistManager {
     TrackHists* m_secondary;    //!
     TrackHists* m_secondary_dup;//!
     TrackHists* m_fake;         //!
-    TrackHists* m_true;
+    TrackHists* m_true;         //!
+    TrackHists* m_fakeCharge;   //!
     TrackHists* m_primary_bhit;      //!
     TrackHists* m_primary_bhitShare; //!
     TrackHists* m_primary_bhitSplit; //!

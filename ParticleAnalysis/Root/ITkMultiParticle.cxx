@@ -4,20 +4,23 @@
  * neutral particle decay into equal particles
  * like Z0 -> 2 mu or H -> 4 mu 
  *
- * G. Facini + modification F.Massa
+ * G. Facini + modifications F.Massa
  * Wed Sep 10 07:21:58 CEST 2014
  *
  ******************************************/
+
+//TO SET PARAMETERS SEE util/ITkPhysics.cxx
 
 #include <EventLoop/Job.h>
 #include <EventLoop/StatusCode.h>
 #include <EventLoop/Worker.h>
 #include <ParticleAnalysis/ITkMultiParticle.h>
-#include <ParticleAnalysis/DeltaFunctions.h>
-#include <ParticleAnalysis/combinations.h>
+#include <Utility/DeltaFunctions.h>
+#include <Utility/combinations.h>
+#include <Utility/PhysicsEvent.h>
 #include <HistManager/RunHists.h>
 #include <HistManager/EventFeaturesInterface.h>
-#include <HistManager/TrackHelper.h>
+#include <Utility/TrackHelper.h>
 
 // EDM includes: - if move to header file will not compile!
 #include "xAODEventInfo/EventInfo.h"
@@ -74,16 +77,24 @@ EL::StatusCode ITkMultiParticle::histInitialize() {
   // recoTracks histograms
 
   trkHist_all       = new TrackHists("TrackAll"); //every track, no cuts here
-  truHist_all       = new TruthHistManager("all", true, true, true); //every truth status, no cuts
+  truHist_all       = new TruthHistManager("all"); //every truth status, no cuts
+  truHist_hard      = new TruthHistManager("hard"); //
+  truHist_pileup    = new TruthHistManager("pileup"); //
   truHist_all       -> Init(wk());
-  trkHist_reco      = new TrackHistManager("reco",true,true,true,true,true); //every track that matches the hs + mindRmatched < 0.1
+  truHist_hard      -> Init(wk());
+  truHist_pileup    -> Init(wk());
+  trkHist_matched      = new TrackHistManager("matched",true,true,true,true,true); //every track that matches the hs
+  trkHist_reco = new TrackHistManager("reco",true,true,true,true,true); //every track that is recognized as part of signal
+  trkHist_fakeCharge = new TrackHistManager("fakeCharge", true, true, true, true, true);
   clusHist_all      = new ClusterHists("SiliconAll");
   vtxHist_secondary = new VertexHists("Vertex");
   eventHist_all     = new EventHists("all");
-  runHist_reco      = new RunHistManager(trkHist_reco, truHist_all->GetList().at(1)); //runHist reco is between target track and gun truth
+  runHist_reco      = new RunHistManager(trkHist_reco, truHist_hard); //runHist reco is between target track and gun truth
 
   trkHist_all       -> Init(wk());
-  trkHist_reco      -> Init(wk());
+  trkHist_matched      -> Init(wk());
+  trkHist_fakeCharge   -> Init(wk());
+  trkHist_reco -> Init(wk());
   clusHist_all      -> Init(wk());
   vtxHist_secondary -> Init(wk());
   eventHist_all     -> Init(wk());
@@ -106,26 +117,23 @@ EL::StatusCode ITkMultiParticle::initialize() {
 
   Info("initialize()", "Number of events = %lli", m_event->getEntries() ); // print long long int
   m_eventCounter=0;
-  
-  m_trkHist_reco_ptCut = 3000.0; //MeV
-  m_trkHist_reco_hitsCut = 5; //Si hits
 	
   return EL::StatusCode::SUCCESS;
 }
 
 EL::StatusCode ITkMultiParticle::execute() {
   // print every 100 events, so we know where we are:
-  if(m_eventCounter % 1 == 0) {
+  if(m_eventCounter % 200 == 0) {
     Info("execute()", "Event number = %i", m_eventCounter );
   }
 
+  m_eventCounter++;
+
   if (/*m_eventCounter == 11090 || m_eventCounter == 40465*/ false) 
     {
-      m_eventCounter++;
       return EL::StatusCode::SUCCESS;
     }
   //std::cout << "Event count " << m_eventCounter << std::endl;
-  m_eventCounter++;
   if(m_eventCounter > 1e5) { 
     if(m_eventCounter == 1e5) { 
       std::cout << "STOPPING after event " << m_eventCounter << std::endl;
@@ -135,6 +143,7 @@ EL::StatusCode ITkMultiParticle::execute() {
   }
 
   EventFeatures eventFeatures;
+  PhysicsEvent eventReco(m_nTarget, m_etaMax, m_decayMass, m_parentMass);
 
   typedef std::vector<ElementLink< xAOD::TrackStateValidationContainer > > MeasurementsOnTrack;
   typedef std::vector<ElementLink< xAOD::TrackStateValidationContainer > >::const_iterator MeasurementsOnTrackIter;
@@ -142,6 +151,7 @@ EL::StatusCode ITkMultiParticle::execute() {
   //---------------------------
   // Reset barcode map in histogram class
   //---------------------------
+  trkHist_matched->resetBarcodes();
   trkHist_reco->resetBarcodes();
 
   //---------------------------
@@ -265,6 +275,9 @@ EL::StatusCode ITkMultiParticle::execute() {
     }
     if ((*truthPart_itr)->charge()==0) { continue; }
 
+    //WARNING::truthPriParts will not contain truth outside detector eta range
+    //if (TMath::Abs((*truthPart_itr)->eta()) > m_etaMax) {continue; }
+
     // Copy this particle to the new container:
     xAOD::TruthParticle* tp = new xAOD::TruthParticle();
     tp->makePrivateStore( **truthPart_itr );
@@ -316,9 +329,7 @@ EL::StatusCode ITkMultiParticle::execute() {
       totalCharge += (*(genTargetMatched_itr[i]))->charge();
     }
     //parent mass and total charge check
-    if (momentum.M() > m_parentMass + m_parentMassTolerance ||
-	momentum.M() < m_parentMass - m_parentMassTolerance ||
-	TMath::Abs(totalCharge) > 1E-6) {
+    if (TMath::Abs(totalCharge) > 1E-6) {
       std::cout << "ERROR\t found " << m_nTarget << " particles but not corresponding to parent" << std::endl;
       exit(1);
     }
@@ -348,7 +359,7 @@ EL::StatusCode ITkMultiParticle::execute() {
       for (std::vector<xAOD::TruthParticleContainer::const_iterator>::iterator genItr = (*combItr).begin(); genItr != (*combItr).end(); genItr++) {
 	momentum += (**genItr)->p4();
 	totalCharge += (**genItr)->charge();
-      }
+      } 
       
       if (TMath::Abs(totalCharge) < 1E-6) {
 	double residual = TMath::Abs(momentum.M() - m_parentMass);
@@ -374,25 +385,24 @@ EL::StatusCode ITkMultiParticle::execute() {
 
   }
 
-  TLorentzVector truthMomentum(0.0,0.0,0.0,0.0);
-  double totalTruthCharge = 0.0;
+  eventReco.SetTruth(genTargetMatched_itr);
 
   for (unsigned int i = 0; i < m_nTarget; i++) {
-    // if ((*(genTargetMatched_itr[i]))->hasProdVtx()) {
-    //   std::cout << "TruthVertex:\t" << (*(genTargetMatched_itr[i]))->prodVtx()->x() << '\t' <<
-    // 	(*(genTargetMatched_itr[i]))->prodVtx()->y() << '\t' <<
-    // 	(*(genTargetMatched_itr[i]))->prodVtx()->z() << std::endl;
-    // }
-    // else
-    //   std::cout << "TruthVertex:\t" << "no prod Vtx" << std::endl;
-
     isValidMatching = isValidMatching && (TMath::Abs((*(genTargetMatched_itr[i]))->eta()) < m_etaMax);
-    truthMomentum += (*(genTargetMatched_itr[i]))->p4();
-    totalTruthCharge += (*(genTargetMatched_itr[i]))->charge();
   }
 
-  double truthParentMass = truthMomentum.M();
-  eventFeatures.truthCharge = totalTruthCharge;
+  //here put every event info about truth particles
+  /*  eventFeatures.truthMass = eventReco.GetTruthMass();
+  eventFeatures.truthPt   = eventReco.GetTruthP4().Pt();
+  eventFeatures.truthMaxPt = eventReco.GetTruthMaxPt();
+  eventFeatures.truthMinPt = eventReco.GetTruthMinPt();
+  eventFeatures.truthMaxEtaPt = eventReco.GetTruthMaxEtaPt();
+  eventFeatures.truthMaxEta = eventReco.GetTruthMaxEta();
+  eventFeatures.truthMinEta = eventReco.GetTruthMinEta();
+  eventFeatures.truthCharge = eventReco.GetTruthCharge();
+  eventFeatures.truthSmallestDR = eventReco.GetTruthSmallestDR();
+  eventFeatures.truthOutsideDetector = eventReco.GetTruthOutsideDetector();
+  */
 
   //==========================
   // Count number of vertices
@@ -402,6 +412,7 @@ EL::StatusCode ITkMultiParticle::execute() {
     if ((*vtx_itr)->vertexType()!=0) { numVtx++; }
   }
 
+  
 
   //================================================
   // Create new track container with truth matching
@@ -487,9 +498,10 @@ EL::StatusCode ITkMultiParticle::execute() {
 
   ///////////////////////////////////////////////////////////////////////////
   //matched = tracks associated with truth minimizing dR distance
-  //NMatched (candidates) = true simulation of analysis, look for combination that more approximates parentMass
+  // (candidates) = true simulation of analysis, look for combination that more approximates parentMass
 
   /////////////// Now find the tracks corresponding to every truth matched and fill a pair vector///
+  std::vector<xAOD::TrackParticleContainer::const_iterator> itkTrk_matched;
   std::vector<std::pair<xAOD::TruthParticleContainer::const_iterator, xAOD::TrackParticleContainer::const_iterator> > truth_trackMatched;
   std::vector<xAOD::TrackParticleContainer::const_iterator> itkTrk_itr_candidates;
 
@@ -498,25 +510,36 @@ EL::StatusCode ITkMultiParticle::execute() {
       float mindR = largeNumber;
       xAOD::TrackParticleContainer::const_iterator itkTrk_itr_matched;
       for (xAOD::TrackParticleContainer::const_iterator itkTrk_itr=itkTrack->begin(); itkTrk_itr!=itkTrack->end(); itkTrk_itr++) {
-	
-	
 	float dR = deltaR((*(genTargetMatched_itr[i]))->phi(), (*itkTrk_itr)->phi(), (*(genTargetMatched_itr[i]))->eta(), (*itkTrk_itr)->eta());
 	if (dR < mindR) { 
 	  itkTrk_itr_matched = itkTrk_itr;
 	  mindR = dR;
 	}  
       }
+      itkTrk_matched.push_back(itkTrk_itr_matched);
       truth_trackMatched.push_back(std::make_pair(genTargetMatched_itr[i],itkTrk_itr_matched));
     }
+
+    eventReco.SetPair(truth_trackMatched);
+    eventReco.SetMatched(itkTrk_matched);
   }
-  
+
+ 
 
   for (xAOD::TrackParticleContainer::const_iterator itkTrk_itr=itkTrack->begin(); itkTrk_itr!=itkTrack->end(); itkTrk_itr++) {
     //parent reconstruction without truth matching
-    const xAOD::TruthParticle* truthParticle = xAOD::TrackHelper::truthParticle(*itkTrk_itr);
-    if (TMath::Abs(truthParticle->pdgId()) == m_idTarget &&
-	(*itkTrk_itr)->pt() > m_ptCut) {
-      itkTrk_itr_candidates.push_back(itkTrk_itr);
+    //const xAOD::TruthParticle* truthParticle = xAOD::TrackHelper::truthParticle(*itkTrk_itr);
+    //insert all reconstruction cuts over single track here
+    if ((*itkTrk_itr)->pt() > m_ptCut ) {
+      uint8_t getInt = 0;
+      (*itkTrk_itr)->summaryValue(getInt, xAOD::numberOfPixelHits);
+      int nPixHits = getInt;
+      (*itkTrk_itr)->summaryValue(getInt, xAOD::numberOfSCTHits);
+      int nSCTHits = getInt;
+
+      if ((nPixHits + nSCTHits) >= m_hitCut) {
+	itkTrk_itr_candidates.push_back(itkTrk_itr);
+      }
     }
   }
 
@@ -525,13 +548,22 @@ EL::StatusCode ITkMultiParticle::execute() {
 
   if (itkTrk_itr_candidates.size() == m_nTarget) {
     double totalCharge = 0.0;
+    TLorentzVector candidateMomentum(0.0,0.0,0.0,0.0);
     for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator candItr = itkTrk_itr_candidates.begin();
 	 candItr != itkTrk_itr_candidates.end();
 	 candItr++) {
       totalCharge += (**candItr)->charge();
+      double px = (**candItr)->pt()*TMath::Cos((**candItr)->phi());
+      double py = (**candItr)->pt()*TMath::Sin((**candItr)->phi());
+      double pz = (**candItr)->pt()*TMath::SinH((**candItr)->eta());
+      double e = TMath::Sqrt(TMath::Power(px,2)+TMath::Power(py,2)+TMath::Power(pz,2) + TMath::Power(m_decayMass,2));
+      TLorentzVector tmp(px,py,pz,e);
+      candidateMomentum += tmp;
     }
 
-    if (TMath::Abs(totalCharge) > 1E-6)
+    //apply here cuts on set of candidates
+    if (TMath::Abs(totalCharge) > 1E-6 ||
+	TMath::Abs(candidateMomentum.M() - m_parentMass) > m_parentMassTolerance)
       isValidCandidate = false;
   }
 
@@ -565,7 +597,9 @@ EL::StatusCode ITkMultiParticle::execute() {
       if (TMath::Abs(totalCharge) < 1E-6) {
 	double candidateParentMass = combMomentum.M();
 	double residual = TMath::Abs(candidateParentMass - m_parentMass);
-	if (residual < minResidual) {
+	//apply here cuts on candidate set
+	if (residual < minResidual &&
+	    residual < m_parentMassTolerance) {
 	  minResidual = residual;
 	  best_recoTrk_itr = (*combItr);
 	}
@@ -581,42 +615,33 @@ EL::StatusCode ITkMultiParticle::execute() {
   
   
   ////////////////////////////////////////////////////////////////////
-  // now look into candidates WITH SAME VERTEX for parent decay and zero charge
+  // now look into candidates for parent decay and zero charge
   //  int nCount = 0;
+
+  //only for Higgs compatibility
+  std::vector<std::pair<xAOD::TrackParticleContainer::const_iterator, double> > dummyPair;
+
   if (isValidCandidate) {
-    TLorentzVector tmpMomentum(0.0,0.0,0.0,0.0);
-    double totalNMatchedCharge = 0.0;
+    eventReco.SetReco(itkTrk_itr_candidates, dummyPair);
     for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator candidate_itr = itkTrk_itr_candidates.begin();
 	 candidate_itr != itkTrk_itr_candidates.end();
-	 candidate_itr++) {
-      
-      double px = (**candidate_itr)->pt()*TMath::Cos((**candidate_itr)->phi());
-      double py = (**candidate_itr)->pt()*TMath::Sin((**candidate_itr)->phi());
-      double pz = (**candidate_itr)->pt()*TMath::SinH((**candidate_itr)->eta());
-      double e = TMath::Sqrt(TMath::Power(px,2) + TMath::Power(py,2) + TMath::Power(pz,2) + TMath::Power(m_decayMass,2));
+	 candidate_itr++)
+      trkHist_reco -> FillHists(**candidate_itr, 1.0);
+  
+  
+    //here put every event info on reco tracks
+    /*    eventFeatures.recoMass = eventReco.GetRecoMass();
+    eventFeatures.recoCharge = eventReco.GetRecoCharge();
+    eventFeatures.recoTruthCharge = eventReco.GetRecoTruthCharge();
+    eventFeatures.recoPt = eventReco.GetRecoP4().Pt();
+    eventFeatures.recoTruthPt = eventReco.GetRecoTruthP4().Pt();
+    eventFeatures.recoMaxPt = eventReco.GetRecoMaxPt();
+    eventFeatures.recoMinPt = eventReco.GetRecoMinPt();
+    eventFeatures.recoMaxEta = eventReco.GetRecoMaxEta();
+    eventFeatures.recoMinEta = eventReco.GetRecoMinEta();
+    eventFeatures.recoSmallestDR = eventReco.GetRecoSmallestDR();
+    */
 
-      TLorentzVector tmp(px,py,pz,e); 
-      tmpMomentum += tmp;
-      totalNMatchedCharge += (**candidate_itr)->charge();
-      //nCount++;
-      //const xAOD::Vertex* v = (**candidate_itr)->vertex();
-      //if (v) {
-      //      std::cout << "Candidate " << nCount << ": Vertex\t" << v->x() << '\t' << v->y() << '\t' << v->z() << std::endl;
-      //std::cout << "          " << " "    << ": Momentum\t" << (**candidate_itr)->pt() << '\t' << (**candidate_itr)->eta() << '\t' << 
-      //	(**candidate_itr)->charge() << std::endl;
-      //check if the number of 
-      
-      
-      
-      //}
-      //else {
-      //std::cout << "Candidate " << nCount << ": Vertex\t" << "NULL" << std::endl;
-      //  }
-      
-    }
-    std::cout << "recoNMatchedMass: " << tmpMomentum.M() << std::endl;
-    eventFeatures.recoNMatchedMass = tmpMomentum.M();
-    eventFeatures.recoNMatchedCharge = totalNMatchedCharge;
   }
 
   //---------------------
@@ -675,17 +700,18 @@ EL::StatusCode ITkMultiParticle::execute() {
   eventFeatures.nIsoTrack = nIsoTrk;
   eventFeatures.nVertex = numVtx;
 
-  eventFeatures.truthMass = truthParentMass;
+
 
   for (xAOD::TruthParticleContainer::const_iterator truItr=truthPriParts->begin(); truItr!=truthPriParts->end(); truItr++) {
     bool isSignalTruth = false;
     for (unsigned int i = 0; i < genTargetMatched_itr.size(); i++) {
       isSignalTruth = isSignalTruth || ((truItr) == (genTargetMatched_itr[i]));
     }
+    truHist_all->FillHists((*truItr),1.0);
     if (isSignalTruth) 
-      truHist_all->FillHists((*truItr),1.0,true,false);
+      truHist_hard->FillHists((*truItr),1.0);
     else
-      truHist_all->FillHists((*truItr),1.0,false,true);
+      truHist_pileup->FillHists((*truItr),1.0);
   }
 
   // Fill secondary vertex information
@@ -702,23 +728,15 @@ EL::StatusCode ITkMultiParticle::execute() {
 //  if (mindRMatched<0.02) {
 
   uint8_t getInt(0);
-  TLorentzVector recoMomentum(0.0,0.0,0.0,0.0);
-  double totalRecoCharge = 0.0;
 
   for (std::vector<std::pair<xAOD::TruthParticleContainer::const_iterator,xAOD::TrackParticleContainer::const_iterator> >::iterator itr = 
 	 truth_trackMatched.begin(); itr != truth_trackMatched.end(); itr++) {
-    
-    if (/*(*((*itr).second))->auxdata<float>("matchedDR") < m_dRCut &&
-	(*((*itr).second))->pt() > m_trkHist_reco_ptCut &&
-	xAOD::TrackHelper::numberOfSiHits(*((*itr).second)) >= m_trkHist_reco_hitsCut*/ true) {
-      trkHist_reco->FillHists(*((*itr).second), 1.0 );
-      recoMomentum += (*((*itr).second))->p4();
-      totalRecoCharge += (*((*itr).second))->charge();
-    }
+      trkHist_matched->FillHists(*((*itr).second), 1.0 );
+      if (eventReco.isMatchedSet())
+	if (TMath::Abs(eventReco.GetMatchedCharge()) > 1E-6)
+	  trkHist_fakeCharge -> FillHists(*((*itr).second), 1.0);
+      
   }
-
-  isValidMatching = isValidMatching && (TMath::Abs(totalRecoCharge) < 1E-6); 
-  double recoParentMass = recoMomentum.M();
 
   // Fill all pixel clusters
   xAOD::TrackMeasurementValidationContainer::const_iterator pixCluster_itr = pixClustersOrig->begin();
@@ -734,16 +752,27 @@ EL::StatusCode ITkMultiParticle::execute() {
     clusHist_all -> FillHists( (*sctCluster_itr), 1.0 );
   }
 
+  /*
+  //here put every event info about matched tracks
   if (isValidMatching) {
-    eventFeatures.recoMass = recoParentMass;
-    eventFeatures.recoCharge = totalRecoCharge;
+    eventFeatures.matchedMass = eventReco.GetMatchedMass();
+    eventFeatures.matchedMaxPt = eventReco.GetMatchedMaxPt();
+    eventFeatures.matchedMinPt = eventReco.GetMatchedMinPt();
+    eventFeatures.matchedMaxEta = eventReco.GetMatchedMaxEta();
+    eventFeatures.matchedMaxEtaPt = eventReco.GetMatchedMaxEtaPt();
+    eventFeatures.matchedMinEta = eventReco.GetMatchedMinEta();
+    eventFeatures.matchedCharge = eventReco.GetMatchedCharge();
+    eventFeatures.matchedSmallestDR = eventReco.GetMatchedSmallestDR();
   }
+  */
 
+  eventFeatures.physicsEvent = eventReco;
   eventHist_all->FillHists( eventFeatures, 1.0 ); 
 
   //---------------------
   // CLEAN UP
   //---------------------
+
   delete truthPriParts;
   delete truthPriPartsAux;
   delete recoTracksShallowCopyPair.first;

@@ -28,7 +28,7 @@ class TruthHists : public ManageHists {
     TString m_label;
 
   public:
-
+    TString GetName() const {return m_baseName;}
     /* particle/mother properties */
     TH1F* m_prodR; //!
     TH1F* m_prodRbarrel; //!
@@ -37,7 +37,10 @@ class TruthHists : public ManageHists {
 
     /* track parameterization */
     TH1F* m_pt; //!			  
-    TH1F* m_eta; //!			  
+    TH2F* m_ptVsEta; //!			  
+    TH1F* m_eta; //!
+    TH1F* m_pdgId; //!
+    TH1F* m_eta_wide; //!
     TH1F* m_abseta; //!			  
     TH1F* m_d0; //!			  
     TH1F* m_z0; //!			  
@@ -50,6 +53,8 @@ class TruthHists : public ManageHists {
 
     TH1F* m_prodVtx_incoming; //!
     TH1F* m_prodVtx_outgoing; //!
+
+    TString m_baseName;
 
 };
 

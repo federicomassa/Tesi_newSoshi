@@ -1,6 +1,6 @@
 #include "HistManager/GaussFitter.h"
 #include "HistManager/PrintMessage.h"
-#include "HistManager/assert.h"
+#include "Utility/assert.h"
 #include <TF1.h>
 #include <TH1F.h>
 #include <TMath.h>

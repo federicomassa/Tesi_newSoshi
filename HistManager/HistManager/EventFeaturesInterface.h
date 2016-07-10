@@ -3,6 +3,7 @@
 
 // c++ include(s):
 #include <iostream>
+#include <Utility/PhysicsEvent.h>
 
 class EventFeatures {
 
@@ -42,14 +43,39 @@ class EventFeatures {
     unsigned int nPixelHitsAtIBL;
     unsigned int nPixelHitsAtBLayer;
 
-    double truthMass;
+
+    //for physics studies
+    PhysicsEvent physicsEvent;
+    /*    double truthMass;
+    double truthPt;
+    double truthMaxPt;
+    double truthMinPt;
+    double truthMaxEtaPt;
+    double truthMaxEta;
+    double truthMinEta;
     double truthCharge;
+    double truthSmallestDR;
+    int truthOutsideDetector;
+    double matchedMass;
+    double matchedMaxPt;
+    double matchedMinPt;
+    double matchedMaxEtaPt;
+    double matchedMaxEta;
+    double matchedMinEta;
+    double matchedCharge;
+    double matchedSmallestDR;
     double recoMass;
     double recoCharge;
-    double recoNMatchedMass;
-    double recoNMatchedCharge;
+    double recoTruthCharge;
+    double recoSmallestDR;
+    double recoPt;
+    double recoTruthPt;
+    double recoMaxPt;
+    double recoMinPt;
+    double recoMaxEta;
+    double recoMinEta; */
     
-    EventFeatures() {
+ EventFeatures() : physicsEvent(2, 0, 0, 0) {
       nPseudoTracks = -1;
       nSecondaryPseudoTracks = -1;
       nPrimaryPseudoTracks = -1; 
@@ -80,12 +106,35 @@ class EventFeatures {
       nPixelClustersAtBLayer = -1;
       nPixelHitsAtIBL = -1;
       nPixelHitsAtBLayer = -1;
-      truthMass = -1.0;
+      /*      truthMass = -1.0;
+      truthOutsideDetector = -1;
+      truthPt   = -1.0;
+      truthMaxPt = -1.0;
+      truthMinPt = -1.0;
+      truthMaxEtaPt = -1.0;
+      truthMaxEta = -1.0;
+      truthMinEta = -1.0;
       truthCharge = -100.0;
+      truthSmallestDR = -1.0;
+      matchedMass = -1.0;
+      matchedMaxPt = -1.0;
+      matchedMinPt = -1.0;
+      matchedMaxEtaPt = -1.0;
+      matchedMaxEta = -1.0;
+      matchedMinEta = -1.0;
+      matchedCharge = -100.0;
+      matchedSmallestDR = -1.0;
       recoMass = -1.0;
       recoCharge = -100.0;
-      recoNMatchedMass = -1.0;
-      recoNMatchedCharge = -100.0;
+      recoTruthCharge = -100.0;
+      recoPt = -1.0;
+      recoTruthPt = -1.0;
+      recoMaxPt = -1.0;
+      recoMinPt = -1.0;
+      recoMaxEta = -1.0;
+      recoMinEta = -1.0;
+      recoSmallestDR = -1.0;
+      */
     };
 
     void dumpInfo() {

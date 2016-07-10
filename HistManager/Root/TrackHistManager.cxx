@@ -26,6 +26,7 @@ TrackHistManager::TrackHistManager(TString name, bool doPrimary, bool doSecondar
    if(m_doFake) {
       m_fake           = new TrackHists(name+"_fake");
       m_true           = new TrackHists(name+"_true");
+      m_fakeCharge     = new TrackHists(name+"_fakeCharge");
    }
    if( (m_doPrimary && m_doSecondary) && m_doDups) { 
      m_primary_dup     = new TrackHists(name+"_primary_dup");
@@ -60,9 +61,11 @@ void TrackHistManager::Init(EL::Worker* wk) {
   if(m_doFake) {   
     m_fake          -> Init( wk );
     m_true          -> Init( wk );
+    m_fakeCharge    -> Init( wk );
 
     m_histList       . push_back(m_fake);
     m_histList       . push_back(m_true);
+    m_histList       . push_back(m_fakeCharge);
   }
   if( (m_doPrimary && m_doSecondary) && m_doDups) {
     m_primary_dup   -> Init( wk );
@@ -97,6 +100,7 @@ void TrackHistManager::resetBarcodes() {
   if(m_doFake) {     
     m_fake          -> resetBarcodes();
     m_true          -> resetBarcodes();
+    m_fakeCharge    -> resetBarcodes();
   }
   if( (m_doPrimary && m_doSecondary) && m_doDups) {
     m_primary_dup   -> resetBarcodes();
@@ -113,12 +117,18 @@ void TrackHistManager::resetBarcodes() {
 
 void TrackHistManager::FillHists(const xAOD::TrackParticle* trk, float weight) const {
 
+  const xAOD::TruthParticle* truth = xAOD::TrackHelper::truthParticle(trk);
+
   m_all->FillHists( trk,weight);
   if( m_doFake && xAOD::TrackHelper::isFake( trk ) ){
     m_fake->FillHists( trk,weight);
   }
   else if (m_doFake && !xAOD::TrackHelper::isFake( trk ) ) {
     m_true->FillHists( trk,weight);
+  }
+  else if (m_doFake && truth) {
+    if ( TMath::Abs(trk->charge() - truth->charge()) > 1E-6)
+      m_fakeCharge -> FillHists(trk,weight);
   }
   else if( m_doPrimary && xAOD::TrackHelper::isPrimary( trk ) ){
     if( !m_primary->hasBeenUsed( trk ) ){

@@ -4,7 +4,6 @@
 #include "TMath.h"
 #include <vector>
 #include <iostream>
-#include <ParticleAnalysis/combinations.h>
 
 template<class T> void go(const std::vector<T>& initVector, std::vector<T>& combVector, std::vector<std::vector<T> >& resultVector, int offset, int k) {
 

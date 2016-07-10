@@ -1,0 +1,21 @@
+#ifndef HIGGSEVENTSELECTOR_H
+#define HIGGSEVENTSELECTOR_H
+
+#include <vector>
+#include <xAODTracking/TrackParticleContainer.h>
+
+class HiggsEventSelector {
+
+ private:
+  const std::vector<xAOD::TrackParticleContainer::const_iterator> candidate;
+  bool m_isRankedPtCutSet;
+  bool m_isOnShellMassCutSet, m_isOffShellMassCutSet;
+ public:
+  HiggsEventSelector(const std::vector<xAOD::TrackParticleContainer::const_iterator>&);
+  bool Check() const;
+  void SetRankedPtCut(const std::vector<double>&);
+  void SetOnShellMassCut(const double&, const double&);
+  void SetOffShellMassCut(const double&, const double&);
+};
+
+#endif //HIGGSEVENTSELECTOR_H

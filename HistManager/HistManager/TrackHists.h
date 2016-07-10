@@ -3,7 +3,7 @@
 
 #include <TMath.h>
 #include "HistManager/ManageHists.h"
-#include "HistManager/TrackHelper.h"
+#include "Utility/TrackHelper.h"
 #include <set>
 #include <vector>
 
@@ -56,6 +56,7 @@ class TrackHists : public ManageHists {
     /* particle properties */
     TH1F* m_prodR; //!
     TH1F* m_prodZ; //!
+    TH1F* m_pdgId; //!
     TH1F* m_truthPt; //!
     TH1F* m_truthPtnarrow; //!
     TH1F* m_truthEta; //!
@@ -128,6 +129,10 @@ class TrackHists : public ManageHists {
     TH2F* m_eta_nPixHits; //!
     TH2F* m_eta_nSCTHits; //!
     TH2F* m_eta_nSiHits; //!
+
+    std::vector<TH1F*> m_PixHits; //!
+    std::vector<TH1F*> m_SCTHits; //!
+    std::vector<TH1F*> m_SiHits; //!
 
     TH1F* m_nGangedPix; //! 
     TH1F* m_nGangedPixFF; //! 

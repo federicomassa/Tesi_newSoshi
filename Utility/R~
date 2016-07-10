@@ -1,0 +1,511 @@
+#include <Utility/HiggsEventSelector.h>
+#include <Utility/assert.h>
+#include <Utility/combinations.h>
+#include <Utility/InvariantMass.h>
+#include <Utility/DeltaFunctions.h>
+
+#include <TMath.h>
+
+#include <algorithm>
+
+double HiggsEventSelector::m_ZMass = 91187.6;
+double HiggsEventSelector::m_muMass = 105.6583715;
+
+std::vector<xAOD::TrackParticleContainer::const_iterator> HiggsEventSelector::ChooseOffShellCombination(const std::pair<std::vector<xAOD::TrackParticleContainer::const_iterator>, std::vector<xAOD::TrackParticleContainer::const_iterator> >& comb1,
+													const std::pair<std::vector<xAOD::TrackParticleContainer::const_iterator>, std::vector<xAOD::TrackParticleContainer::const_iterator> >& comb2) const {
+
+  double minResidual = TMath::Abs(InvariantMass::TrackInvariantMass(comb1.first, m_muMass) - m_ZMass);
+  const std::vector<xAOD::TrackParticleContainer::const_iterator>* best = &(comb1.second);
+
+  if (TMath::Abs(InvariantMass::TrackInvariantMass(comb1.second, m_muMass) - m_ZMass) < minResidual) {
+    minResidual = TMath::Abs(InvariantMass::TrackInvariantMass(comb1.second, m_muMass) - m_ZMass);
+    best = &(comb1.first);
+  }
+
+  if (TMath::Abs(InvariantMass::TrackInvariantMass(comb2.first, m_muMass) - m_ZMass) < minResidual) {
+    minResidual = TMath::Abs(InvariantMass::TrackInvariantMass(comb2.first, m_muMass) - m_ZMass);
+    best = &(comb2.second);
+  }
+
+  if (TMath::Abs(InvariantMass::TrackInvariantMass(comb2.second, m_muMass) - m_ZMass) < minResidual) {
+    minResidual = TMath::Abs(InvariantMass::TrackInvariantMass(comb2.second, m_muMass) - m_ZMass);
+    best = &(comb2.first);
+  }
+
+  return *best;
+  
+}
+
+std::vector<xAOD::TrackParticleContainer::const_iterator> HiggsEventSelector::ChooseOnShellCombination(const std::pair<std::vector<xAOD::TrackParticleContainer::const_iterator>, std::vector<xAOD::TrackParticleContainer::const_iterator> >& comb1,
+													const std::pair<std::vector<xAOD::TrackParticleContainer::const_iterator>, std::vector<xAOD::TrackParticleContainer::const_iterator> >& comb2) const {
+
+  double minResidual = TMath::Abs(InvariantMass::TrackInvariantMass(comb1.first, m_muMass) - m_ZMass);
+  const std::vector<xAOD::TrackParticleContainer::const_iterator>* best = &(comb1.first);
+
+  if (TMath::Abs(InvariantMass::TrackInvariantMass(comb1.second, m_muMass) - m_ZMass) < minResidual) {
+    minResidual = TMath::Abs(InvariantMass::TrackInvariantMass(comb1.second, m_muMass) - m_ZMass);
+    best = &(comb1.second);
+  }
+
+  if (TMath::Abs(InvariantMass::TrackInvariantMass(comb2.first, m_muMass) - m_ZMass) < minResidual) {
+    minResidual = TMath::Abs(InvariantMass::TrackInvariantMass(comb2.first, m_muMass) - m_ZMass);
+    best = &(comb2.first);
+  }
+
+  if (TMath::Abs(InvariantMass::TrackInvariantMass(comb2.second, m_muMass) - m_ZMass) < minResidual) {
+    minResidual = TMath::Abs(InvariantMass::TrackInvariantMass(comb2.second, m_muMass) - m_ZMass);
+    best = &(comb2.second);
+  }
+
+  return *best;
+  
+}
+
+void HiggsEventSelector::CheckOnShellMassCut(const std::vector<xAOD::TrackParticleContainer::const_iterator>& tracks, int& checkCut) const {
+  
+  checkCut = InvariantMass::TrackInvariantMass(tracks, m_muMass) < m_onShellMassCutHigh &&
+    InvariantMass::TrackInvariantMass(tracks, m_muMass) > m_onShellMassCutLow ? 0 : 5;
+
+}	
+
+void HiggsEventSelector::CheckOffShellMassCut(const std::vector<xAOD::TrackParticleContainer::const_iterator>& tracks, int& checkCut) const {
+  
+  checkCut = InvariantMass::TrackInvariantMass(tracks, m_muMass) < m_offShellMassCutHigh &&
+    InvariantMass::TrackInvariantMass(tracks, m_muMass) > m_offShellMassCutLow ? 0 : 6;
+
+}
+
+
+HiggsEventSelector::HiggsEventSelector(std::vector<xAOD::TrackParticleContainer::const_iterator>& tracks) : candidate(tracks) {
+  Assert("In HiggsEventSelector::HiggsEventSelector(...): wrong vector size", tracks.size() == 4);
+  m_isRankedPtCutSet = false;
+  m_isOnShellMassCutSet = false;
+  m_isOffShellMassCutSet = false;
+  m_isCenteredMuonCutSet = false;
+  m_isCenteredOffShellMuonCutSet = false;
+  m_isIsolationCutSet = false;
+}
+
+int HiggsEventSelector::Check() const {
+
+  double totalCharge = 0.0;
+  for (auto itr = candidate.begin();
+       itr != candidate.end();
+       itr++)
+    totalCharge += (**itr)->charge();
+
+  //total charge Cut
+  if (TMath::Abs(totalCharge) > 1E-6)
+    std::cout << "HiggsEventSelector::Check(): CHARGE??" << std::endl;
+  
+
+  if (m_isRankedPtCutSet)
+    if (!CheckRankedPtCut())
+      return 1;
+
+  if (m_isCenteredMuonCutSet)
+    if (!CheckCenteredMuonCut())
+      return 2;
+
+  int checkCut = 0;
+
+  //there are two neutral combinations
+  std::vector<std::vector<xAOD::TrackParticleContainer::const_iterator> > doublets = 
+    combinations<xAOD::TrackParticleContainer::const_iterator>(candidate, 2);
+
+  //erase charged doublets
+  for (auto itr = doublets.begin();
+       itr != doublets.end();
+       itr++) {
+
+    double charge = 0.0;
+    for (auto itr2 = (*itr).begin();
+	 itr2 != (*itr).end();
+	 itr2++) {
+
+      charge += (**itr2)->charge();
+    }
+
+    if (TMath::Abs(charge) > 1E-6) {
+      doublets.erase(itr);
+      itr--;
+    }
+
+  }
+
+
+  //two doublets form a pair (mumu, mumu)
+  std::pair<std::vector<xAOD::TrackParticleContainer::const_iterator>, std::vector<xAOD::TrackParticleContainer::const_iterator> > comb1;
+  std::pair<std::vector<xAOD::TrackParticleContainer::const_iterator>, std::vector<xAOD::TrackParticleContainer::const_iterator> > comb2;
+
+  int doubletIndex;
+  //to find pairs, start from first doublets and look for the one that does not contain any of its particles
+  for (auto itr = doublets.begin() + 1;
+       itr != doublets.end();
+       itr++) {
+    bool isDoubletValid = true;
+
+    for (auto itr2 = (*itr).begin();
+	 itr2 != (*itr).end();
+	 itr2++) {
+      isDoubletValid = isDoubletValid &&
+	(std::find(doublets[0].begin(), doublets[0].end(), *itr2) == doublets[0].end());
+    }
+
+    if (isDoubletValid) {
+      comb1 = std::make_pair(doublets[0], doublets[itr - doublets.begin()]);
+      doubletIndex = itr - doublets.begin();
+      break;
+    }
+  }
+
+  //and comb2 is the other
+  int index[2];
+  int i = 0;
+  for (auto itr = doublets.begin() + 1;
+       itr != doublets.end();
+       itr++) {
+    
+    if (itr - doublets.begin() != doubletIndex) {
+      index[i] = itr - doublets.begin();
+      i++;
+    }
+  }
+
+  comb2 = std::make_pair(doublets[index[0]], doublets[index[1]]);
+  
+  std::vector<xAOD::TrackParticleContainer::const_iterator> onShellComb = ChooseOnShellCombination(comb1,comb2);
+  std::vector<xAOD::TrackParticleContainer::const_iterator> offShellComb = ChooseOffShellCombination(comb1,comb2);
+
+  if (m_isCenteredOffShellMuonCutSet) {
+    CheckCenteredOffShellMuonCut(offShellComb, checkCut);
+    if (checkCut != 0)
+      return checkCut;
+  }
+  
+
+  if (m_isDRCutSet)
+    if (!CheckDRCut())
+      return 4;
+
+
+  //now check cuts separately
+  if (m_isOnShellMassCutSet) {
+    CheckOnShellMassCut(onShellComb, checkCut);
+    if (checkCut != 0)
+      return checkCut;
+  }
+
+  if (m_isOffShellMassCutSet) {
+    CheckOffShellMassCut(offShellComb, checkCut);
+    if (checkCut != 0)
+      return checkCut;
+  }
+
+  if (m_isIsolationCutSet) {
+    if (!CheckIsolationCut())
+      return 7;
+  }
+
+  
+  //sort candidate
+  candidate.clear();
+  candidate.push_back(onShellComb[0]);
+  candidate.push_back(onShellComb[1]);
+  candidate.push_back(offShellComb[0]);
+  candidate.push_back(offShellComb[1]);
+
+  return checkCut;
+}
+
+bool HiggsEventSelector::CheckRankedPtCut() const {
+
+  bool checkRanked = true;
+
+  std::vector<double> pt;
+  for (auto itr = candidate.begin();
+       itr != candidate.end();
+       itr++) {
+    pt.push_back((**itr)->pt());
+  }
+
+  std::sort(pt.begin(), pt.end());
+  
+  for (auto itr = pt.begin();
+       itr != pt.end();
+       itr++) {
+    checkRanked = checkRanked && 
+      (pt[itr - pt.begin()] > m_rankedPtCut[itr - pt.begin()]);
+  }
+
+  return checkRanked;
+
+}
+
+void HiggsEventSelector::SetRankedPtCut(const std::vector<double>& rankedPtCut) {
+  Assert("In HiggsEventSelector::SetRankedPtCut(...): wrong vector size", rankedPtCut.size() == 4);
+  m_rankedPtCut = rankedPtCut;
+  m_isRankedPtCutSet = true;
+};
+
+void HiggsEventSelector::CheckCenteredOffShellMuonCut(const std::vector<xAOD::TrackParticleContainer::const_iterator>& tracks, int& checkCut) const {
+  
+  Assert("In HiggsEventSelector::CheckCenteredOffShellMuonCut(...): wrong vector size", tracks.size() == 2);
+
+  bool check = false;
+
+  for (auto itr = tracks.begin();
+       itr != tracks.end();
+       itr++) {
+    check = check ||
+      (TMath::Abs((**itr)->eta()) > m_centeredOffShellMuonCutEtaLow &&
+       TMath::Abs((**itr)->eta()) < m_centeredOffShellMuonCutEtaHigh);
+      }
+
+  
+  checkCut = check ? 0 : 3;
+  
+}
+
+
+
+int HiggsEventSelector::CheckOnShellMassCut(const std::pair<std::vector<xAOD::TrackParticleContainer::const_iterator>,
+					     std::vector<xAOD::TrackParticleContainer::const_iterator> >& comb1,
+					     const std::pair<std::vector<xAOD::TrackParticleContainer::const_iterator>,
+					     std::vector<xAOD::TrackParticleContainer::const_iterator> >& comb2,
+					       int& checkCut) const {
+
+  double mass11 = InvariantMass::TrackInvariantMass(comb1.first, m_muMass);
+  double mass21 = InvariantMass::TrackInvariantMass(comb1.second, m_muMass);
+  
+  double residual11 = TMath::Abs(mass11 - m_ZMass);
+  double residual21 = TMath::Abs(mass21 - m_ZMass);
+
+  double* onShell1;
+  double* offShell1;
+
+  int whichIsOnShell1 = -1;
+
+  if (residual11 < residual21) {
+    whichIsOnShell1 = 0;
+    onShell1 = &mass11;
+    offShell1 = &mass21;
+  }
+  else { 
+    whichIsOnShell1 = 1;
+    onShell1 = &mass21;
+    offShell1 = &mass11;
+  }
+
+  bool isComb1Valid = (*onShell1 < m_onShellMassCutHigh && *onShell1 > m_onShellMassCutLow);
+  if (m_isOffShellMassCutSet) 
+    isComb1Valid = isComb1Valid && (*offShell1 < m_offShellMassCutHigh && *offShell1 > m_offShellMassCutLow);
+
+  //////////////////////////////
+
+  double mass12 = InvariantMass::TrackInvariantMass(comb2.first, m_muMass);
+  double mass22 = InvariantMass::TrackInvariantMass(comb2.second, m_muMass);
+  
+  double residual12 = TMath::Abs(mass12 - m_ZMass);
+  double residual22 = TMath::Abs(mass22 - m_ZMass);
+
+  double* onShell2;
+  double* offShell2;
+
+  int whichIsOnShell2 = -1;
+
+  if (residual12 < residual22) {
+    whichIsOnShell2 = 0;
+    onShell2 = &mass12;
+    offShell2 = &mass22;
+  }
+  else { 
+    whichIsOnShell2 = 1;
+    onShell2 = &mass22;
+    offShell2 = &mass12;
+  }
+
+  bool isComb2Valid = (*onShell2 < m_onShellMassCutHigh && *onShell2 > m_onShellMassCutLow);
+  if (m_isOffShellMassCutSet) 
+    isComb2Valid = isComb2Valid && (*offShell2 < m_offShellMassCutHigh && *offShell2 > m_offShellMassCutLow);
+
+  /////////////////////////////////
+
+  //rewrite candidates so it is ordered: first on shell and then off-shell
+  if (isComb1Valid && isComb2Valid) {
+    if (TMath::Abs(*onShell1 - m_ZMass) < TMath::Abs(*onShell2 - m_ZMass))
+      isComb2Valid = false;
+    else
+      isComb1Valid = false;
+  }
+  
+
+  if (isComb1Valid && !isComb2Valid) {
+    candidate.clear();
+    if (whichIsOnShell1 == 0) {
+      candidate.push_back(comb1.first[0]);
+      candidate.push_back(comb1.first[1]);
+      candidate.push_back(comb1.second[0]);
+      candidate.push_back(comb1.second[1]);
+    }
+    else if (whichIsOnShell1 == 1) {
+      candidate.push_back(comb1.second[0]);
+      candidate.push_back(comb1.second[1]);
+      candidate.push_back(comb1.first[0]);
+      candidate.push_back(comb1.first[1]);
+    }
+    else {
+      std::cout << "WTF comb1Valid: exit" << std::endl;
+      exit(1);
+    }
+  }
+  else if (!isComb1Valid && isComb2Valid) {
+    candidate.clear();
+    if (whichIsOnShell2 == 0) {
+      candidate.push_back(comb2.first[0]);
+      candidate.push_back(comb2.first[1]);
+      candidate.push_back(comb2.second[0]);
+      candidate.push_back(comb2.second[1]);
+    }
+    else if (whichIsOnShell2 == 1) {
+      candidate.push_back(comb2.second[0]);
+      candidate.push_back(comb2.second[1]);
+      candidate.push_back(comb2.first[0]);
+      candidate.push_back(comb2.first[1]);
+    }
+    else {
+      std::cout << "WTF comb2Valid: exit" << std::endl;
+      exit(1);
+    } 
+  }
+
+
+  /*
+  if (m_isCenteredOffShellMuonCutSet) {
+    if (isComb1Valid && !isComb2Valid) {
+      if (whichIsOnShell1 == 0)
+	CheckCenteredOffShellMuonCut(comb1.second, checkCut);
+      else if (whichIsOnShell1 == 1)
+	CheckCenteredOffShellMuonCut(comb1.first, checkCut);
+    }
+    if (isComb2Valid && !isComb1Valid) {
+      if (whichIsOnShell2 == 0)
+	CheckCenteredOffShellMuonCut(comb2.second, checkCut);
+      else if (whichIsOnShell2 == 1)
+	CheckCenteredOffShellMuonCut(comb2.first, checkCut);
+    } 
+  }
+  
+  if (checkCut != 0)
+    return checkCut;
+  */
+  
+  checkCut = (isComb1Valid || isComb2Valid) ? 0 : 5;
+  return checkCut;
+
+}
+
+
+void HiggsEventSelector::SetOnShellMassCut(const double& low, const double& high) {
+  Assert("In HiggsEventSelector::SetOnShellMassCut(...): low > high", high - low >= 1E-6);
+
+  m_onShellMassCutLow = low;
+  m_onShellMassCutHigh = high;
+
+  m_isOnShellMassCutSet = true;
+}
+
+
+void HiggsEventSelector::SetOffShellMassCut(const double& low, const double& high) {
+  Assert("In HiggsEventSelector::SetOffShellMassCut(...): low > high", high - low >= 1E-6);
+
+  m_offShellMassCutLow = low;
+  m_offShellMassCutHigh = high;
+
+  m_isOffShellMassCutSet = true;
+
+
+}
+
+void HiggsEventSelector::SetCenteredMuonCut(const double& etaCutLow, const double& etaCutHigh, const int& nMuons) {
+  m_isCenteredMuonCutSet = true;
+  m_centeredMuonCutEtaLow = etaCutLow;
+  m_centeredMuonCutEtaHigh = etaCutHigh;
+  m_centeredMuonCutN = nMuons;
+}
+
+void HiggsEventSelector::SetCenteredOffShellMuonCut(const double& etaCutLow, const double& etaCutHigh) {
+  Assert("In HiggsEventSelector::SetCenteredOffShellMuonCut(...): onShellMassCut and/or offShellMassCut not set", m_isOnShellMassCutSet && m_isOffShellMassCutSet);
+  
+  m_isCenteredOffShellMuonCutSet = true;
+  m_centeredOffShellMuonCutEtaLow = etaCutLow;
+  m_centeredOffShellMuonCutEtaHigh = etaCutHigh;
+}
+
+
+void HiggsEventSelector::SetDRCut(const double& dRCut) {
+  m_dRCut = dRCut;
+}
+
+void HiggsEventSelector::SetIsolationCut(const std::vector<std::pair<xAOD::TrackParticleContainer::const_iterator, double> >& isolation, const double& isolationCut) {
+  m_candidateIsolation = isolation;
+  m_isolationCut = isolationCut;
+}
+
+bool HiggsEventSelector::CheckCenteredMuonCut() const {
+
+  int nCenteredMuons = 0;
+
+  for (auto itr = candidate.begin();
+       itr != candidate.end();
+       itr++) {
+    if (TMath::Abs((**itr)->eta()) < m_centeredMuonCutEtaHigh && TMath::Abs((**itr)->eta()) > m_centeredMuonCutEtaLow) 
+      nCenteredMuons++;
+  }
+
+  if (4 - nCenteredMuons <= m_centeredMuonCutN)
+    return true;
+  else
+    return false;
+
+  return false;
+
+}
+
+
+
+bool HiggsEventSelector::CheckDRCut() const {
+  
+  double minDR = 1000000000;
+
+  auto doublets = combinations<xAOD::TrackParticleContainer::const_iterator>(candidate, 2);
+
+  for (auto itr = doublets.begin();
+       itr != doublets.end();
+       itr++) {
+    double dR = deltaR((*((*itr)[0]))->phi(), (*((*itr)[1]))->phi(), (*((*itr)[0]))->eta(), (*((*itr)[1]))->eta());
+    if (dR < minDR)
+      minDR = dR;
+  }
+
+  if (minDR > m_dRCut)
+    return true;
+  else
+    return false;
+
+  return false;
+
+}
+
+bool HiggsEventSelector::CheckIsolationCut() const {
+
+  for (auto itr = m_candidateIsolation.begin();
+       itr != m_candidateIsolation.end();
+       itr++) {
+    if ((*itr).second > m_isolationCut)
+      return false;
+  }
+
+  return true;
+
+}

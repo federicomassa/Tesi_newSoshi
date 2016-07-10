@@ -44,6 +44,10 @@ public:
 
   TrackHists*       trkHist_all; //!
   TruthHistManager* truHist_all; //!
+  TruthHistManager* truHist_hard; //!
+  TruthHistManager* truHist_pileup; //!
+  TrackHistManager* trkHist_matched; //!
+  TrackHistManager* trkHist_fakeCharge; //!
   TrackHistManager* trkHist_reco; //!
   ClusterHists*     clusHist_all; //!
   VertexHists*      vtxHist_secondary; //!
@@ -60,6 +64,7 @@ public:
 
   void SetTargetParticleID(int idTarget) { m_idTarget = idTarget; }
   void SetPtCut(double ptCut) { m_ptCut = ptCut;}
+  void SetHitCut(int hitCut) {m_hitCut = hitCut;}
   void SetParentMass(double parentMass) {m_parentMass = parentMass;}
   void SetDecayMass(double decayMass) {m_decayMass = decayMass;}
   void SetParentMassTolerance(double tolerance) {m_parentMassTolerance = tolerance;}
@@ -81,6 +86,7 @@ public:
 private:
   unsigned int m_idTarget, m_nTarget;
   double m_ptCut, m_parentMass, m_decayMass, m_parentMassTolerance, m_dRCut, m_etaMax;
+  int m_hitCut;
   //Reconstruction cuts
   double m_trkHist_reco_ptCut;
   int m_trkHist_reco_hitsCut;

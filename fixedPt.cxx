@@ -106,11 +106,11 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
   Layouts.push_back("InclBrl4");
 
   vector<string> Pileup;
-  Pileup.push_back("10");
+  //  Pileup.push_back("10");
   Pileup.push_back("50");
   Pileup.push_back("140");
   Pileup.push_back("200");
-  Pileup.push_back("300");
+  //Pileup.push_back("300");
 
   vector<string>* IterVariable = 0;
 
@@ -135,13 +135,13 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
   if (Layouts.size() >= Pileup.size()) {
     Assert("Layouts, colors and markerStyle vectors mismatched", 
-	   Layouts.size() == colors.size() &&
-	   Layouts.size() == markerStyle.size());
+	   Layouts.size() <= colors.size() &&
+	   Layouts.size() <= markerStyle.size());
   }
   else {
     Assert("Pileup, colors and markerStyle vectors mismatched", 
-	   Pileup.size() == colors.size() &&
-	   Pileup.size() == markerStyle.size());
+	   Pileup.size() <= colors.size() &&
+	   Pileup.size() <= markerStyle.size());
   }
 
   vector<string> Path;
@@ -164,7 +164,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
     vector<TGraphErrors*> sigPt_abseta;
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
-      sigPt_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__sigPt_abseta")));
+      sigPt_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all_hard_all__sigPt_abseta")));
       CheckPtr(sigPt_abseta[i]);
     }
 
@@ -202,7 +202,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
     vector<TGraphErrors*> sigQPt_abseta;
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
-      sigQPt_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__sigQPt_abseta")));
+      sigQPt_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all_hard_all__sigQPt_abseta")));
       CheckPtr(sigQPt_abseta[i]);
     }
 
@@ -240,7 +240,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
     vector<TGraphErrors*> sigEta_abseta;
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
-      sigEta_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__sigEta_abseta")));
+      sigEta_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all_hard_all__sigEta_abseta")));
       CheckPtr(sigEta_abseta[i]);
     }
 
@@ -280,7 +280,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
     vector<TGraphErrors*> sigPhi_abseta;
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
-      sigPhi_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__sigPhi_abseta")));
+      sigPhi_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all_hard_all__sigPhi_abseta")));
       CheckPtr(sigPhi_abseta[i]);
     }
 
@@ -318,7 +318,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
     vector<TGraphErrors*> sigD0_abseta;
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
-      sigD0_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__sigD0_abseta")));
+      sigD0_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all_hard_all__sigD0_abseta")));
       CheckPtr(sigD0_abseta[i]);
     }
 
@@ -356,7 +356,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
     vector<TGraphErrors*> sigZ0_abseta;
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
-      sigZ0_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__sigZ0_abseta")));
+      sigZ0_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all_hard_all__sigZ0_abseta")));
       CheckPtr(sigZ0_abseta[i]);
     }
 
@@ -398,7 +398,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
     vector<TGraphErrors*> sysPt_abseta;
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
-      sysPt_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__sysPt_abseta")));
+      sysPt_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all_hard_all__sysPt_abseta")));
       CheckPtr(sysPt_abseta[i]);
     }
 
@@ -437,7 +437,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
     vector<TGraphErrors*> sysQPt_abseta;
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
-      sysQPt_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__sysQPt_abseta")));
+      sysQPt_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all_hard_all__sysQPt_abseta")));
       CheckPtr(sysQPt_abseta[i]);
     }
 
@@ -476,7 +476,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
     vector<TGraphErrors*> sysEta_abseta;
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
-      sysEta_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__sysEta_abseta")));
+      sysEta_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all_hard_all__sysEta_abseta")));
       CheckPtr(sysEta_abseta[i]);
     }
 
@@ -517,7 +517,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
     vector<TGraphErrors*> sysPhi_abseta;
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
-      sysPhi_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__sysPhi_abseta")));
+      sysPhi_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all_hard_all__sysPhi_abseta")));
       CheckPtr(sysPhi_abseta[i]);
     }
 
@@ -556,7 +556,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
     vector<TGraphErrors*> sysD0_abseta;
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
-      sysD0_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__sysD0_abseta")));
+      sysD0_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all_hard_all__sysD0_abseta")));
       CheckPtr(sysD0_abseta[i]);
     }
 
@@ -595,7 +595,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
     vector<TGraphErrors*> sysZ0_abseta;
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
-      sysZ0_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all__sysZ0_abseta")));
+      sysZ0_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_all_hard_all__sysZ0_abseta")));
       CheckPtr(sysZ0_abseta[i]);
     }
 
@@ -639,7 +639,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
     vector<TGraphErrors*> eff_abseta;
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
-      eff_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_true__eff_abseta")));
+      eff_abseta.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_true_hard_all__eff_abseta")));
       CheckPtr(eff_abseta[i]);
     }
 
@@ -660,7 +660,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
   
     mg_eff_abseta     -> Draw("APE");
     mg_eff_abseta     -> GetYaxis() -> SetTitleOffset(1.2);
-    mg_eff_abseta     -> GetYaxis() -> SetRangeUser(0.90,1.0);
+    mg_eff_abseta     -> GetYaxis() -> SetRangeUser(0.85,1.0);
     mg_eff_abseta     -> GetXaxis() -> SetRangeUser(0.0,4.0);  
 
     TLegend* leg_eff_abseta = new TLegend(0.15,0.30,0.30,0.15);
@@ -677,7 +677,7 @@ void fixedPt(const string& particle, const double& pt, const string& fixOption, 
 
     vector<TGraphErrors*> eff_phi;
     for (unsigned int i = 0; i < IterVariable->size(); i++) {
-      eff_phi.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_true__eff_phi")));
+      eff_phi.push_back(dynamic_cast<TGraphErrors*>(inFiles[i]->Get("RunHist_reco_true_hard_all__eff_phi")));
       CheckPtr(eff_phi[i]);
     }
 

@@ -1,0 +1,54 @@
+#include <Utility/HiggsEventSelector.h>
+#include <Utility/Assert.h>
+
+HiggsEventSelector::HiggsEventSelector(const std::vector<xAOD::TrackParticleContainer::const_iterator>& tracks) : candidate(tracks) {
+  Assert("In HiggsEventSelector::HiggsEventSelector(...): wrong vector size", tracks.size() == 4);
+  m_isRankedPtCutSet = false;
+  m_isOnShellMassCutSet = false;
+  m_isOffShellMassCutSet = false;
+}
+
+bool HiggsEventSelector::Check() const {
+  bool checkCut = true;
+
+  if (m_isRankedPtCutSet)
+    checkCut = checkCut && CheckRankedPtCut();
+  if (m_isOnShellMassCutSet)
+    checkCut = checkCut && CheckOnShellMassCut();
+  if (m_isOffShellMassCutSet)
+    checkCut = checkCut && CheckOffShellMassCut();
+
+
+  return checkCut;
+}
+
+bool HiggsEventSelector::CheckRankedPtCut() {return true;}
+void HiggsEventSelector::SetRankedPtCut(std::vector<double>& rankedPtCut) {
+  Assert("In HiggsEventSelector::SetRankedPtCut(...): wrong vector size", rankedPtCut.size() == 4);
+  m_rankedPtCut = rankedPtCut;
+  m_isRankedPtCutSet = true;
+};
+
+bool HiggsEventSelector::CheckOnShellMassCut() {
+  return true;
+}
+void HiggsEventSelector::SetOnShellMassCut(const double& low, const double& high) {
+  Assert("In HiggsEventSelector::SetOnShellMassCut(...): low > high", high - low >= 1E-6);
+
+  m_onShellMassCutLow = low;
+  m_onShellMassCutHigh = high;
+
+  m_isOnShellMassCutSet = true;
+}
+
+bool HiggsEventSelector::CheckOffShellMassCut() {return true;}
+void HiggsEventSelector::SetOffShellMassCut(const double& low, const double& high) {
+  Assert("In HiggsEventSelector::SetOffShellMassCut(...): low > high", high - low >= 1E-6);
+
+  m_offShellMassCutLow = low;
+  m_offShellMassCutHigh = high;
+
+  m_isOffShellMassCutSet = true;
+
+
+}

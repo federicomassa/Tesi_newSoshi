@@ -12,10 +12,10 @@
 #include <EventLoop/StatusCode.h>
 #include <EventLoop/Worker.h>
 #include <ParticleAnalysis/ITkStudy.h>
-#include <ParticleAnalysis/DeltaFunctions.h>
+#include <Utility/DeltaFunctions.h>
 #include <HistManager/RunHists.h>
 #include <HistManager/EventFeaturesInterface.h>
-#include <HistManager/TrackHelper.h>
+#include <Utility/TrackHelper.h>
 
 // EDM includes: - if move to header file will not compile!
 #include "xAODEventInfo/EventInfo.h"
@@ -72,7 +72,10 @@ EL::StatusCode ITkStudy::histInitialize() {
 
   trkHist_all       = new TrackHists("TrackAll"); //every track, no cuts here
   std::cout << "1" << std::endl;
-  truHist_all       = new TruthHistManager("all", true, true, true); //every truth status, no cuts
+  truHist_all       = new TruthHistManager("all"); //every truth status, no cuts
+  truHist_hard      = new TruthHistManager("hard"); //gun particles
+  
+  truHist_hard      -> Init(wk());
   truHist_all       -> Init(wk());
   trkHist_reco      = new TrackHistManager("reco",true,true,true,true,true); //every track that matches the hs + mindRmatched < 0.1
   std::cout << "1" << std::endl;
@@ -81,7 +84,7 @@ EL::StatusCode ITkStudy::histInitialize() {
   vtxHist_secondary = new VertexHists("Vertex");
   std::cout << "1" << std::endl;
   eventHist_all     = new EventHists("all");
-  runHist_reco      = new RunHistManager(trkHist_reco, truHist_all->GetList().at(1)); //runHist reco is between target track and gun truth
+  runHist_reco      = new RunHistManager(trkHist_reco, truHist_hard); //runHist reco is between target track and gun truth
   std::cout << "1" << std::endl;
 
 
@@ -118,7 +121,7 @@ EL::StatusCode ITkStudy::initialize() {
   m_eventCounter=0;
   
   m_trkHist_reco_ptCut = 3000.0; //MeV
-  m_trkHist_reco_hitsCut = 5; //Si hits
+  m_trkHist_reco_hitsCut = 9; //Si hits
 	
   return EL::StatusCode::SUCCESS;
 }
@@ -443,14 +446,11 @@ EL::StatusCode ITkStudy::execute() {
   eventHist_all->FillHists( eventFeatures, 1.0 ); 
 
   for (xAOD::TruthParticleContainer::const_iterator truItr=truthPriParts->begin(); truItr!=truthPriParts->end(); truItr++) {
-    truHist_all->FillHists((*truItr),1.0, false, false);
-    /*
+    truHist_all->FillHists((*truItr),1.0);
+    
     if (TMath::Abs((*truItr)->pdgId())==m_idTarget && TMath::Abs((*truItr)->pt()-m_EnergyTarget)<0.1) {
-      truHist_all->FillGunHists( (*truItr), 1.0 ); to be corrected
+      truHist_hard->FillHists( (*truItr), 1.0 );
     }
-    else
-      truHist_all->FillPileupHists((*truItr),1.0); to be corrected
-    */
   }
 
   // Fill secondary vertex information

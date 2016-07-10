@@ -2,7 +2,7 @@
 #include "HistManager/RunHists.h"
 #include "HistManager/TrackHistManager.h"
 #include "HistManager/TrackHists.h"
-#include "HistManager/assert.h"
+#include "Utility/assert.h"
 #include "HistManager/PrintMessage.h"
 
 const Verbosity verbosity_level = Verbosity::ERROR;
@@ -11,7 +11,7 @@ RunHists::RunHists(const TrackHists* const trackHist, const TruthHists* const tr
   m_trackHist(trackHist),
   m_truthHist(truthHist) 
 {
-  m_name = "RunHist_" + trackHist->GetName();
+  m_name = "RunHist_" + trackHist->GetName() + "_" + truthHist->GetName();
   m_label = "Run ";
 }
 
@@ -64,6 +64,11 @@ void RunHists::BookHists() {
   m_sigPhi_negeta  = declareGraphErrors(m_name, "sigPhi_negeta", "|#eta|", "#sigma(#phi): negative #eta"); 
   m_sigD0_negeta   = declareGraphErrors(m_name, "sigD0_negeta", "|#eta|", "#sigma(D0) [mm]: negative #eta"); 
   m_sigZ0_negeta   = declareGraphErrors(m_name, "sigZ0_negeta", "|#eta|", "#sigma(Z0) [mm]: negative #eta"); 
+
+  m_PixHits        = declareGraphErrors(m_name, "PixHits", "|#eta|", "<PixHits>");
+  m_SCTHits        = declareGraphErrors(m_name, "SCTHits", "|#eta|", "<SCTHits>");
+  m_SiHits        = declareGraphErrors(m_name, "SiHits", "|#eta|", "<SiHits>");
+
 
   m_eff_abseta     = declareGraphErrors(m_name, "eff_abseta", "|#eta|", "Efficiency"); 
   m_eff_phi        = declareGraphErrors(m_name, "eff_phi", "#phi", "Efficiency"); 
@@ -378,5 +383,34 @@ void RunHists::FillHists(float weight) const {
     m_eff_phi->SetPointError (i, m_phiInterval/2.0, TMath::Sqrt(eff*(1-eff)/den));
     
   }
+
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_PixHits.begin(); itr != m_trackHist->m_PixHits.end(); itr++) {
+    int index = itr - m_trackHist->m_PixHits.begin();
+
+    m_PixHits->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetMean());
+    m_PixHits->SetPointError(index,m_etaInterval/2.0,(*itr)->GetMeanError());
+
+  }
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_SCTHits.begin(); itr != m_trackHist->m_SCTHits.end(); itr++) {
+    int index = itr - m_trackHist->m_SCTHits.begin();
+
+    m_SCTHits->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetMean());
+    m_SCTHits->SetPointError(index,m_etaInterval/2.0,(*itr)->GetMeanError());
+
+  }
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_SiHits.begin(); itr != m_trackHist->m_SiHits.end(); itr++) {
+    int index = itr - m_trackHist->m_SiHits.begin();
+
+    m_SiHits->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetMean());
+    m_SiHits->SetPointError(index,m_etaInterval/2.0,(*itr)->GetMeanError());
+
+  }
+
+
+
+
 
 }

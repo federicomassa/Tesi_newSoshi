@@ -9,13 +9,13 @@
 #include <HistManager/TrackHistManager.h>
 #include <HistManager/RunHistManager.h>
 #include <HistManager/RunHists.h>
-#include <HistManager/assert.h>
+#include <Utility/assert.h>
 
 //name identifies the type of tracks reconstructed, for example reco (matched) or all (matched+pileup).
 //Every RunHists object contained in the m_runHistList vector matches the correspondent TrackHists object contained in m_trackHistList
-RunHistManager::RunHistManager(const TrackHistManager* const trackHistManager, const TruthHists* const truthHist):
+RunHistManager::RunHistManager(const TrackHistManager* const trackHistManager, const TruthHistManager* const truthHistManager):
   m_trackHistList(trackHistManager->GetList()),
-  m_truthHist(truthHist) 
+  m_truthHistList(truthHistManager->GetList()) 
 {
   m_name = trackHistManager->GetName();
 }
@@ -29,8 +29,10 @@ void RunHistManager::Init(EL::Worker* wk) {
   m_wk = wk;
   //Now initialize the worker and add RunHists objects to vector, needed for RunHistManager
   for (std::vector<TrackHists*>::const_iterator trk_itr = m_trackHistList.begin(); trk_itr != m_trackHistList.end(); trk_itr++) {
-    m_runHistList.push_back(new RunHists(*trk_itr, m_truthHist));
-    m_runHistList.back()->Init(wk);
+    for (std::vector<TruthHists*>::const_iterator tru_itr = m_truthHistList.begin(); tru_itr != m_truthHistList.end(); tru_itr++) {
+      m_runHistList.push_back(new RunHists(*trk_itr, *tru_itr));
+      m_runHistList.back()->Init(wk);
+    }
   }
 
   BookHists();
@@ -65,10 +67,10 @@ void RunHistManager::FillHists(float weight) const {
 
   //take address of TrackHists object correspondent to all reco tracks
   TrackHists* trackHist_reco_all = m_trackHistList[0];
-  Assert("RunHistManager::FillHists()\t trackHist_reco_all mismatched", trackHist_reco_all->GetName().Contains("reco_all"));
+  //  Assert("RunHistManager::FillHists()\t trackHist_reco_all mismatched", trackHist_reco_all->GetName().Contains("reco_all"));
   //take address of TrackHists object correspondent to fake reco tracks
   TrackHists* trackHist_reco_fake = m_trackHistList[3];
-  Assert("RunHistManager::FillHists()\t trackHist_reco_fake mismatched", trackHist_reco_all->GetName().Contains("reco_all"));
+  //  Assert("RunHistManager::FillHists()\t trackHist_reco_fake mismatched", trackHist_reco_all->GetName().Contains("reco_all"));
 
   //we are using true eta
   TH1F* reco_all_abseta = trackHist_reco_all->m_truthAbseta;

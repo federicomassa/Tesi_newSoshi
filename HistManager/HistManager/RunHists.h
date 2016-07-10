@@ -67,6 +67,10 @@ class RunHists : public ManageHists {
   TGraphErrors* m_eff_abseta; //!
   TGraphErrors* m_eff_phi; //!
 
+  TGraphErrors* m_PixHits; //!
+  TGraphErrors* m_SCTHits; //!
+  TGraphErrors* m_SiHits; //!
+
 };
 
 #endif // end HistManager_RunHists_h

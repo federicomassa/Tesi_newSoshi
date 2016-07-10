@@ -46,16 +46,17 @@ int main( int argc, char* argv[] ) {
   std::cout << "Target particle ID : " << idTarget << std::endl;
 
   //analysis parameters
-  double zMass = 91187.6;
+  double ZMass = 91187.6;
   double HMass = 125090; 
 
   double muonMass = 105.6583715;
 
-  double parentMass = zMass; //choosing Z->mumu now
+  double parentMass = HMass; //choosing Z->mumu now
   double decayMass = muonMass;
 
-  double ptCut = 0.0; //pt cut of muons produced from Z decay
-  double parentMassTolerance = 500000; //muons recognized as coming from Z if
+  double ptCut = 5000.0; //pt cut of muons produced from Z decay
+  const int hitCut = 9; //track quality, every reco track has got to have >= hitCut total hits
+  double parentMassTolerance = 100000; //muons recognized as coming from Z if
                                       //invariant mass is within parentMass
                                       //                          +- tolerance
   // Set up the job for xAOD access:
@@ -87,6 +88,7 @@ int main( int argc, char* argv[] ) {
   ITkMultiParticle *alg = new ITkMultiParticle;
   alg -> SetTargetParticleID(idTarget);
   alg -> SetPtCut(ptCut);
+  alg -> SetHitCut(hitCut);
   alg -> SetParentMass(parentMass);
   alg -> SetParentMassTolerance(parentMassTolerance);
   alg -> SetDecayMass(decayMass);
