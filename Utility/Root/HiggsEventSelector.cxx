@@ -64,14 +64,14 @@ std::vector<xAOD::TrackParticleContainer::const_iterator> HiggsEventSelector::Ch
 void HiggsEventSelector::CheckOnShellMassCut(const std::vector<xAOD::TrackParticleContainer::const_iterator>& tracks, int& checkCut) const {
   
   checkCut = InvariantMass::TrackInvariantMass(tracks, m_muMass) < m_onShellMassCutHigh &&
-    InvariantMass::TrackInvariantMass(tracks, m_muMass) > m_onShellMassCutLow ? 0 : 7;
+    InvariantMass::TrackInvariantMass(tracks, m_muMass) > m_onShellMassCutLow ? 0 : 8;
 
 }	
 
 void HiggsEventSelector::CheckOffShellMassCut(const std::vector<xAOD::TrackParticleContainer::const_iterator>& tracks, int& checkCut) const {
   
   checkCut = InvariantMass::TrackInvariantMass(tracks, m_muMass) < m_offShellMassCutHigh &&
-    InvariantMass::TrackInvariantMass(tracks, m_muMass) > m_offShellMassCutLow ? 0 : 8;
+    InvariantMass::TrackInvariantMass(tracks, m_muMass) > m_offShellMassCutLow ? 0 : 9;
 
 }
 
@@ -79,6 +79,7 @@ void HiggsEventSelector::CheckOffShellMassCut(const std::vector<xAOD::TrackParti
 HiggsEventSelector::HiggsEventSelector(std::vector<xAOD::TrackParticleContainer::const_iterator>& tracks) : candidate(tracks) {
   Assert("In HiggsEventSelector::HiggsEventSelector(...): wrong vector size", tracks.size() == 4);
   m_isRankedPtCutSet = false;
+  m_isMassCutSet = false;
   m_isOnShellMassCutSet = false;
   m_isOffShellMassCutSet = false;
   m_isCenteredMuonCutSet = false;
@@ -102,8 +103,11 @@ int HiggsEventSelector::Check() const {
     if (!CheckDRCut())
       return 1;
 
+  if (m_isMassCutSet) 
+    if (!CheckMassCut())
+      return 2;
 
-  //return code: 2 3 4 5 (from high to low pt)
+  //return code: 3 4 5 6 (from high to low pt)
   if (m_isRankedPtCutSet) {
     int checkRankedPtCut = CheckRankedPtCut();
     if (checkRankedPtCut != 0)
@@ -206,7 +210,7 @@ int HiggsEventSelector::Check() const {
 
   if (m_isIsolationCutSet) {
     if (!CheckIsolationCut())
-      return 9;
+      return 10;
   }
 
   
@@ -224,7 +228,7 @@ int HiggsEventSelector::CheckRankedPtCut() const {
 
   bool checkRanked = true;
 
-  int returnCode[] = {2,3,4,5};
+  int returnCode[] = {3,4,5,6};
 
   std::vector<double> pt;
   for (auto itr = candidate.begin();
@@ -253,6 +257,22 @@ void HiggsEventSelector::SetRankedPtCut(const std::vector<double>& rankedPtCut) 
   m_isRankedPtCutSet = true;
 };
 
+bool HiggsEventSelector::CheckMassCut() const {
+
+  double mass = InvariantMass::TrackInvariantMass(candidate, m_muMass);
+
+  return (mass > m_massCutLow && mass < m_massCutHigh);
+
+}
+
+void HiggsEventSelector::SetMassCut(const double& low, const double& high) {
+  m_massCutLow = low;
+  m_massCutHigh = high;
+  
+  m_isMassCutSet = true;
+}
+
+
 void HiggsEventSelector::CheckCenteredOffShellMuonCut(const std::vector<xAOD::TrackParticleContainer::const_iterator>& tracks, int& checkCut) const {
   
   Assert("In HiggsEventSelector::CheckCenteredOffShellMuonCut(...): wrong vector size", tracks.size() == 2);
@@ -268,7 +288,7 @@ void HiggsEventSelector::CheckCenteredOffShellMuonCut(const std::vector<xAOD::Tr
       }
 
   
-  checkCut = check ? 0 : 6;
+  checkCut = check ? 0 : 7;
   
 }
 

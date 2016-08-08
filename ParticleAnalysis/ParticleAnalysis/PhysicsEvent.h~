@@ -1,0 +1,138 @@
+#ifndef PHYSICS_EVENT_H
+#define PHYSICS_EVENT_H
+
+#include <xAODTracking/TrackParticleContainer.h>
+#include <xAODTruth/TruthParticleContainer.h>
+
+#include <vector>
+#include <utility>
+#include <HistManager/assert.h>
+
+class TLorentzVector;
+
+class PhysicsEvent {
+ private:
+  std::vector<xAOD::TruthParticleContainer::const_iterator> m_truthItr;
+  std::vector<xAOD::TrackParticleContainer::const_iterator> m_matchedItr;
+  std::vector<xAOD::TrackParticleContainer::const_iterator> m_recoItr;
+  std::vector<std::pair<xAOD::TruthParticleContainer::const_iterator, xAOD::TrackParticleContainer::const_iterator> > m_truthMatchedPair;
+
+  const unsigned int m_nTarget;  
+  const double m_decayMass;
+  const double m_parentMass;
+  const double m_largeNumber;
+  bool m_isTruthSet, m_isMatchedSet, m_isRecoSet, m_isPairSet;
+
+ public:
+ PhysicsEvent(const int& nTarget, const double& maxEta, const double& decayMass, const double& parentMass) : m_nTarget(nTarget), m_decayMass(decayMass), m_parentMass(parentMass), m_largeNumber(10000000.0) {
+
+    Assert("in PhysicsEvent::PhysicsEvent(...): size should be >= 2", 
+	   m_nTarget >= 2);
+
+    m_isTruthSet = false; 
+    m_isMatchedSet = false;
+    m_isRecoSet = false;
+    m_isPairSet = false;
+  }
+  
+  void SetTruth(const std::vector<xAOD::TruthParticleContainer::const_iterator>& truth) {
+    Assert("In PhysicsEvent::SetTruth(): size not corresponding", truth.size() == m_nTarget);
+    Assert("In PhysicsEvent::SetTruth(): truth already set", !m_isTruthSet);
+
+    m_truthItr = truth;
+    m_isTruthSet = true;
+  }
+  
+  void SetMatched(const std::vector<xAOD::TrackParticleContainer::const_iterator>& matched) {
+    Assert("In PhysicsEvent::SetMatched(): size not corresponding", matched.size() == m_nTarget);
+    Assert("In PhysicsEvent::SetMatched(): matched already set", !m_isMatchedSet);    
+    Assert("In PhysicsEvent::SetMatched(): truth not set yet", m_isTruthSet);
+
+    m_matchedItr = matched;
+    m_isMatchedSet = true;
+  }
+  
+  void SetReco(const std::vector<xAOD::TrackParticleContainer::const_iterator>& reco) {
+    Assert("In PhysicsEvent::SetReco(): size not corresponding", reco.size() == m_nTarget);
+    Assert("In PhysicsEvent::SetReco(): reco already set", !m_isRecoSet);    
+
+    m_recoItr = reco;
+    m_isRecoSet = true;
+  }
+
+  void SetPair(const std::vector<std::pair<xAOD::TruthParticleContainer::const_iterator, xAOD::TrackParticleContainer::const_iterator> >& pair) {
+    Assert("In PhysicsEvent::SetPair(): size not corresponding", pair.size() == m_nTarget);
+    Assert("In PhysicsEvent::SetPair(): pair already set", !m_isPairSet);
+
+    m_truthMatchedPair = pair;
+    m_isPairSet = true;
+
+  }
+
+  const std::vector<xAOD::TruthParticleContainer::const_iterator>& GetTruth() const {
+    if (!m_isTruthSet) {
+      std::cout << "in PhysicsEvent::GetTruth(): truth is not set" << std::endl;
+      exit(1);
+    }
+
+    return m_truthItr;
+  }
+
+  const std::vector<xAOD::TrackParticleContainer::const_iterator>& GetMatched() const {
+    if (!m_isMatchedSet) {
+      std::cout << "in PhysicsEvent::GetMatched(): matched is not set" << std::endl;
+      exit(1);
+    }
+
+    return m_matchedItr;
+  } 
+
+  const std::vector<xAOD::TrackParticleContainer::const_iterator>& GetReco() const {
+    if (!m_isRecoSet) {
+      std::cout << "in PhysicsEvent::GetReco(): reco is not set" << std::endl;
+      exit(1);
+    }
+
+    return m_recoItr;
+  }
+  
+  const bool& isTruthSet() {return m_isTruthSet;}
+  const bool& isMatchedSet() {return m_isMatchedSet;}
+  const bool& isRecoSet() {return m_isRecoSet;}
+  const bool& isPairSet() {return m_isPairSet;}
+
+  double GetTruthMass();
+  TLorentzVector GetTruthP4();
+  double GetTruthCharge();
+  double GetTruthSmallestDR();
+  double GetTruthMaxPt();
+  double GetTruthMinPt();
+  double GetTruthMaxEtaPt();
+  double GetTruthMaxEta();
+  double GetTruthMinEta();
+  double GetTruthOutsideDetector();
+
+  double GetMatchedMass();
+  TLorentzVector GetMatchedP4();
+  double GetMatchedCharge();
+  double GetMatchedSmallestDR();
+  double GetMatchedMaxPt();
+  double GetMatchedMinPt();
+  double GetMatchedMaxEtaPt();
+  double GetMatchedMaxEta();
+  double GetMatchedMinEta();
+
+  double GetRecoMass();
+  TLorentzVector GetRecoP4();
+  TLorentzVector GetRecoTruthP4();
+  double GetRecoCharge();
+  double GetRecoTruthCharge();
+  double GetRecoSmallestDR();
+  double GetRecoMaxPt();
+  double GetRecoMinPt();
+  double GetRecoMaxEta();
+  double GetRecoMinEta();
+
+};
+
+#endif

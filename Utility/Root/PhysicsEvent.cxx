@@ -356,6 +356,42 @@ TLorentzVector PhysicsEvent::GetTruthP4()  {
   return p;
 }
 
+TLorentzVector PhysicsEvent::GetTruthP4WithPhotons()  {
+  Assert("In GetTruthP4WithGamma(): Truth not set", m_isTruthSet);
+  Assert("In GetTruthP4WithGamma(): Photons not set", m_arePhotonsSet);
+  TLorentzVector p(0.0,0.0,0.0,0.0);
+
+  for (std::vector<xAOD::TruthParticleContainer::const_iterator>::iterator itr = m_truthItr.begin();
+       itr != m_truthItr.end();
+       itr++) {
+    double px = (**itr)->pt()*TMath::Cos((**itr)->phi());
+    double py = (**itr)->pt()*TMath::Sin((**itr)->phi());
+    double pz = (**itr)->pt()*TMath::SinH((**itr)->eta());
+    TLorentzVector tmp(px,py,pz,TMath::Sqrt(TMath::Power(px,2)+
+					    TMath::Power(py,2)+
+					    TMath::Power(pz,2)+
+					    TMath::Power(m_decayMass,2)));
+    p += tmp;
+  }
+
+  for (std::vector<const xAOD::TruthParticle*>::iterator itr = m_primaryPhotons.begin();
+       itr != m_primaryPhotons.end();
+       itr++) {
+    double px = (*itr)->pt()*TMath::Cos((*itr)->phi());
+    double py = (*itr)->pt()*TMath::Sin((*itr)->phi());
+    double pz = (*itr)->pt()*TMath::SinH((*itr)->eta());
+    TLorentzVector tmp(px,py,pz,TMath::Sqrt(TMath::Power(px,2)+
+					    TMath::Power(py,2)+
+					    TMath::Power(pz,2)));
+    p += tmp;
+    
+  }
+  
+  return p;
+}
+
+
+
 TLorentzVector PhysicsEvent::GetMatchedP4()  {
   Assert("In GetMatchedP4(): Matched not set", m_isMatchedSet);
   TLorentzVector p(0.0,0.0,0.0,0.0);

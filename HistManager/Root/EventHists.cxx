@@ -79,6 +79,8 @@ void EventHists::BookHists() {
   m_nPixelHitsAtBLayer_vsMu_wide     = declare2D(m_name, "nPixelHitsAtBLayer_vsMu_wide",     "N Pixel hits at BLayer", "pilueup #mu", 100, 0.0, 20000, 30,0.0,30.0); 
 
   m_truthMass                        = declare1D(m_name, "truthMass", "Truth parent mass [GeV]", 300,0.0,300.0);
+  m_truthMassWithPhotons             = declare1D(m_name, "truthMassWithPhotons", "Truth parent mass [GeV]", 200,124.9,125.1);
+  m_nPrimaryPhotons                  = declare1D(m_name, "nPrimaryPhotons", "n primary photons in event", 10, 0, 10);
   m_truthEta                         = declare1D(m_name, "truthEta", "Truth parent #eta", 200, -10.0,10.0);
   m_visibleTruthMass                 = declare1D(m_name, "visibleTruthMass", "Truth parent mass [GeV]", 300,0.0,300.0);
   m_truthOutsideDetector             = declare1D(m_name, "truthOutsideDetector", "# hard truth outside detector", 10, 0.0, 10.0);
@@ -316,6 +318,12 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
     std::vector<xAOD::TruthParticleContainer::const_iterator> truth_v = evt.physicsEvent.GetTruth();      
 
     m_truthMass                     -> Fill(1.0*evt.physicsEvent.GetTruthMass()/1000.0, weight);
+
+    if (evt.physicsEvent.arePhotonsSet()) {
+      m_truthMassWithPhotons        -> Fill(1.0*evt.physicsEvent.GetTruthP4WithPhotons().M()/1000.0, weight);
+      m_nPrimaryPhotons             -> Fill(evt.physicsEvent.GetPhotons().size());
+    }
+
     if (evt.physicsEvent.isTruthVisible)
       m_visibleTruthMass                     -> Fill(1.0*evt.physicsEvent.GetTruthMass()/1000.0, weight);
 

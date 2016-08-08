@@ -13,6 +13,7 @@ class TLorentzVector;
 class PhysicsEvent {
  private:
   std::vector<xAOD::TruthParticleContainer::const_iterator> m_truthItr;
+  std::vector<const xAOD::TruthParticle*> m_primaryPhotons;
   std::vector<xAOD::TrackParticleContainer::const_iterator> m_matchedItr;
   std::vector<xAOD::TrackParticleContainer::const_iterator> m_recoItr;
   std::vector<std::pair<xAOD::TruthParticleContainer::const_iterator, xAOD::TrackParticleContainer::const_iterator> > m_truthMatchedPair;
@@ -26,7 +27,7 @@ class PhysicsEvent {
   
   static const double m_ZMass;
 
-  bool m_isTruthSet, m_isMatchedSet, m_isRecoSet, m_isPairSet, m_isRecoPairSet;
+  bool m_isTruthSet, m_arePhotonsSet, m_isMatchedSet, m_isRecoSet, m_isPairSet, m_isRecoPairSet;
   void MatchReco();
 
  public:
@@ -40,6 +41,7 @@ class PhysicsEvent {
 	   m_nTarget >= 2);
 
     m_isTruthSet = false; 
+    m_arePhotonsSet = false;
     m_isMatchedSet = false;
     m_isRecoSet = false;
     m_isPairSet = false;
@@ -91,12 +93,15 @@ class PhysicsEvent {
     recoCutCode4 = physicsEvent.recoCutCode4;
 
     m_isTruthSet = physicsEvent.isTruthSet();
+    m_arePhotonsSet = physicsEvent.arePhotonsSet();
     m_isMatchedSet = physicsEvent.isMatchedSet();
     m_isRecoSet = physicsEvent.isRecoSet();
     m_isPairSet = physicsEvent.isPairSet();
 
     if (physicsEvent.isTruthSet())
       m_truthItr = physicsEvent.GetTruth();
+    if (physicsEvent.arePhotonsSet())
+      m_primaryPhotons = physicsEvent.GetPhotons();
     if (physicsEvent.isMatchedSet())
       m_matchedItr = physicsEvent.GetMatched();
     if (physicsEvent.isRecoSet()) {
@@ -126,6 +131,13 @@ class PhysicsEvent {
     m_truthItr = truth;
     m_isTruthSet = true;
 
+  }
+
+  void SetPhotons(const std::vector<const xAOD::TruthParticle*>& primaryPhotons) {
+    Assert("In PhysicsEvent::SetPhotons(): photons already set", !m_arePhotonsSet);
+
+    m_primaryPhotons = primaryPhotons;
+    m_arePhotonsSet = true;
   }
   
   void SetMatched(const std::vector<xAOD::TrackParticleContainer::const_iterator>& matched) {
@@ -164,6 +176,16 @@ class PhysicsEvent {
 
     return m_truthItr;
   }
+
+  const std::vector<const xAOD::TruthParticle*>& GetPhotons() const {
+    if (!m_arePhotonsSet) {
+      std::cout << "in PhysicsEvent::GetPhotons(): truth is not set" << std::endl;
+      exit(1);
+    }
+
+    return m_primaryPhotons;
+  }
+
 
   const std::vector<xAOD::TrackParticleContainer::const_iterator>& GetMatched() const {
     if (!m_isMatchedSet) {
@@ -226,6 +248,7 @@ class PhysicsEvent {
   int GetNCenteredOffShellMuons();
 
   const bool& isTruthSet() const {return m_isTruthSet;}
+  const bool& arePhotonsSet() const {return m_arePhotonsSet;}
   const bool& isMatchedSet() const {return m_isMatchedSet;}
   const bool& isRecoSet() const {return m_isRecoSet;}
   const bool& isPairSet() const {return m_isPairSet;}
@@ -239,6 +262,7 @@ class PhysicsEvent {
   
   double GetTruthMass();
   TLorentzVector GetTruthP4();
+  TLorentzVector GetTruthP4WithPhotons();
   double GetTruthCharge();
   double GetTruthSmallestDR();
   double GetTruthMaxPt();

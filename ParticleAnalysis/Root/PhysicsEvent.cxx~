@@ -1,0 +1,404 @@
+#include <ParticleAnalysis/PhysicsEvent.h>
+#include <ParticleAnalysis/combinations.h>
+#include <ParticleAnalysis/DeltaFunctions.h>
+#include <HistManager/TrackHelper.h>
+#include <HistManager/assert.h>
+#include <TLorentzVector.h>
+#include <TMath.h>
+
+double PhysicsEvent::GetTruthMass() {
+  Assert("In GetTruthMass(): Truth not set", m_isTruthSet);
+
+  return GetTruthP4().M();
+}
+
+double PhysicsEvent::GetMatchedMass() {
+  Assert("In GetMatchedMass(): Matched not set", m_isMatchedSet);
+
+  return GetMatchedP4().M();
+}
+
+double PhysicsEvent::GetRecoMass() {
+  Assert("In GetRecoMass(): Reco not set", m_isRecoSet);
+
+  return GetRecoP4().M();
+}
+
+TLorentzVector PhysicsEvent::GetTruthP4() {
+  Assert("In GetTruthP4(): Truth not set", m_isTruthSet);
+  TLorentzVector p(0.0,0.0,0.0,0.0);
+
+  for (std::vector<xAOD::TruthParticleContainer::const_iterator>::iterator itr = m_truthItr.begin();
+       itr != m_truthItr.end();
+       itr++) {
+    double px = (**itr)->pt()*TMath::Cos((**itr)->phi());
+    double py = (**itr)->pt()*TMath::Sin((**itr)->phi());
+    double pz = (**itr)->pt()*TMath::SinH((**itr)->eta());
+    TLorentzVector tmp(px,py,pz,TMath::Sqrt(TMath::Power(px,2)+
+					    TMath::Power(py,2)+
+					    TMath::Power(pz,2)+
+					    TMath::Power(m_decayMass,2)));
+    p += tmp;
+  }
+
+  return p;
+}
+
+TLorentzVector PhysicsEvent::GetMatchedP4() {
+  Assert("In GetMatchedP4(): Matched not set", m_isMatchedSet);
+  TLorentzVector p(0.0,0.0,0.0,0.0);
+
+  for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator itr = m_matchedItr.begin();
+       itr != m_matchedItr.end();
+       itr++) {
+    double px = (**itr)->pt()*TMath::Cos((**itr)->phi());
+    double py = (**itr)->pt()*TMath::Sin((**itr)->phi());
+    double pz = (**itr)->pt()*TMath::SinH((**itr)->eta());
+    TLorentzVector tmp(px,py,pz,TMath::Sqrt(TMath::Power(px,2)+
+					    TMath::Power(py,2)+
+					    TMath::Power(pz,2)+
+					    TMath::Power(m_decayMass,2)));
+    p += tmp;
+  }
+
+  return p;
+}
+
+TLorentzVector PhysicsEvent::GetRecoP4() {
+  Assert("In GetRecoP4(): Reco not set", m_isRecoSet);
+  TLorentzVector p(0.0,0.0,0.0,0.0);
+
+  for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator itr = m_recoItr.begin();
+       itr != m_recoItr.end();
+       itr++) {
+    double px = (**itr)->pt()*TMath::Cos((**itr)->phi());
+    double py = (**itr)->pt()*TMath::Sin((**itr)->phi());
+    double pz = (**itr)->pt()*TMath::SinH((**itr)->eta());
+    TLorentzVector tmp(px,py,pz,TMath::Sqrt(TMath::Power(px,2)+
+					    TMath::Power(py,2)+
+					    TMath::Power(pz,2)+
+					    TMath::Power(m_decayMass,2)));
+    p += tmp;
+  }
+
+  return p;
+}
+
+TLorentzVector PhysicsEvent::GetRecoTruthP4() {
+  Assert("In GetRecoP4(): Reco not set", m_isRecoSet);
+  TLorentzVector p(0.0,0.0,0.0,0.0);
+
+  for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator itr = m_recoItr.begin();
+       itr != m_recoItr.end();
+       itr++) {
+    const xAOD::TruthParticle* truth = xAOD::TrackHelper::truthParticle(**itr);
+    p += truth->p4();
+  }
+
+  return p;
+}
+
+double PhysicsEvent::GetTruthMaxPt() {
+
+  double maxPt = -1.0;
+
+  for (std::vector<xAOD::TruthParticleContainer::const_iterator>::iterator itr = m_truthItr.begin();
+       itr != m_truthItr.end();
+       itr++) {
+    if ((**itr)->pt() > maxPt)
+      maxPt = (**itr)->pt();
+  }
+
+  return maxPt;
+}
+
+double PhysicsEvent::GetTruthMinPt() {
+
+  double minPt = m_largeNumber;
+
+  for (std::vector<xAOD::TruthParticleContainer::const_iterator>::iterator itr = m_truthItr.begin();
+       itr != m_truthItr.end();
+       itr++) {
+    if ((**itr)->pt() < minPt)
+      minPt = (**itr)->pt();
+  }
+
+  return minPt;
+}
+
+double PhysicsEvent::GetTruthMaxEtaPt() {
+  double maxEta = GetTruthMaxEta();
+  double residual = m_largeNumber;
+  xAOD::TruthParticleContainer::const_iterator maxEtaItr;
+  for (std::vector<xAOD::TruthParticleContainer::const_iterator>::iterator itr = m_truthItr.begin();
+       itr != m_truthItr.end();
+       itr++) {
+    if (TMath::Abs(TMath::Abs((**itr)->eta()) - maxEta) < residual) {
+      residual = TMath::Abs(TMath::Abs((**itr)->eta()) - maxEta);
+      maxEtaItr = *itr;
+    }
+  }
+
+  return (*maxEtaItr)->pt();
+}
+
+
+double PhysicsEvent::GetMatchedMaxPt() {
+
+  double maxPt = -1.0;
+
+  for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator itr = m_matchedItr.begin();
+       itr != m_matchedItr.end();
+       itr++) {
+    if ((**itr)->pt() > maxPt)
+      maxPt = (**itr)->pt();
+  }
+
+  return maxPt;
+}
+
+double PhysicsEvent::GetMatchedMinPt() {
+
+  double minPt = m_largeNumber;
+
+  for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator itr = m_matchedItr.begin();
+       itr != m_matchedItr.end();
+       itr++) {
+    if ((**itr)->pt() < minPt)
+      minPt = (**itr)->pt();
+  }
+
+  return minPt;
+}
+
+
+double PhysicsEvent::GetMatchedMaxEtaPt() {
+  double maxEta = GetTruthMaxEta();
+  double residual = m_largeNumber;
+  xAOD::TrackParticleContainer::const_iterator maxEtaItr;
+  for (std::vector<std::pair<xAOD::TruthParticleContainer::const_iterator, xAOD::TrackParticleContainer::const_iterator> >::iterator itr = m_truthMatchedPair.begin();
+       itr != m_truthMatchedPair.end();
+       itr++) {
+    if (TMath::Abs(TMath::Abs((*(*itr).first)->eta()) - maxEta) < residual) {
+      residual = TMath::Abs(TMath::Abs((*(*itr).first)->eta()) - maxEta);
+      maxEtaItr = (*itr).second;
+    }
+  }
+
+  return (*maxEtaItr)->pt();
+}
+
+
+double PhysicsEvent::GetRecoMaxPt() {
+
+  double maxPt = -1.0;
+
+  for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator itr = m_recoItr.begin();
+       itr != m_recoItr.end();
+       itr++) {
+    if ((**itr)->pt() > maxPt)
+      maxPt = (**itr)->pt();
+  }
+
+  return maxPt;
+}
+
+double PhysicsEvent::GetRecoMinPt() {
+
+  double minPt = m_largeNumber;
+
+  for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator itr = m_recoItr.begin();
+       itr != m_recoItr.end();
+       itr++) {
+    if ((**itr)->pt() < minPt)
+      minPt = (**itr)->pt();
+  }
+
+  return minPt;
+}
+
+
+double PhysicsEvent::GetTruthMaxEta() {
+
+  double maxEta = -1.0;
+
+  for (std::vector<xAOD::TruthParticleContainer::const_iterator>::iterator itr = m_truthItr.begin();
+       itr != m_truthItr.end();
+       itr++) {
+    if (TMath::Abs((**itr)->eta()) > maxEta)
+      maxEta = TMath::Abs((**itr)->eta());
+  }
+
+  return maxEta;
+}
+
+double PhysicsEvent::GetTruthMinEta() {
+
+  double minEta = m_largeNumber;
+
+  for (std::vector<xAOD::TruthParticleContainer::const_iterator>::iterator itr = m_truthItr.begin();
+       itr != m_truthItr.end();
+       itr++) {
+    if (TMath::Abs((**itr)->eta()) < minEta)
+      minEta = TMath::Abs((**itr)->eta());
+  }
+
+  return minEta;
+}
+
+
+double PhysicsEvent::GetMatchedMaxEta() {
+
+  double maxEta = -1.0;
+
+  for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator itr = m_matchedItr.begin();
+       itr != m_matchedItr.end();
+       itr++) {
+    if (TMath::Abs((**itr)->eta()) > maxEta)
+      maxEta = TMath::Abs((**itr)->eta());
+  }
+
+  return maxEta;
+}
+
+double PhysicsEvent::GetMatchedMinEta() {
+
+  double minEta = m_largeNumber;
+
+  for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator itr = m_matchedItr.begin();
+       itr != m_matchedItr.end();
+       itr++) {
+    if (TMath::Abs((**itr)->eta()) < minEta)
+      minEta = TMath::Abs((**itr)->eta());
+  }
+
+  return minEta;
+}
+
+
+double PhysicsEvent::GetRecoMaxEta() {
+
+  double maxEta = -1.0;
+
+  for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator itr = m_recoItr.begin();
+       itr != m_recoItr.end();
+       itr++) {
+    if (TMath::Abs((**itr)->eta()) > maxEta)
+      maxEta = TMath::Abs((**itr)->eta());
+  }
+
+  return maxEta;
+}
+
+double PhysicsEvent::GetRecoMinEta() {
+
+  double minEta = m_largeNumber;
+
+  for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator itr = m_recoItr.begin();
+       itr != m_recoItr.end();
+       itr++) {
+    if (TMath::Abs((**itr)->eta()) < minEta)
+      minEta = TMath::Abs((**itr)->eta());
+  }
+
+  return minEta;
+}
+
+
+double PhysicsEvent::GetTruthCharge() {
+  Assert("In GetTruthCharge(): Truth not set", m_isTruthSet);
+  double charge = 0.0;
+
+  for (std::vector<xAOD::TruthParticleContainer::const_iterator>::iterator itr = m_truthItr.begin();
+       itr != m_truthItr.end();
+       itr++) 
+    charge += (**itr)->charge();
+
+  return charge;
+}
+
+double PhysicsEvent::GetMatchedCharge() {
+  Assert("In GetMatchedCharge(): Matched not set", m_isMatchedSet);
+  double charge = 0.0;
+
+  for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator itr = m_matchedItr.begin();
+       itr != m_matchedItr.end();
+       itr++) 
+    charge += (**itr)->charge();
+
+  return charge;
+}
+
+double PhysicsEvent::GetRecoCharge() {
+  Assert("In GetRecoCharge(): Reco not set", m_isRecoSet);
+  double charge = 0.0;
+
+  for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator itr = m_recoItr.begin();
+       itr != m_recoItr.end();
+       itr++) 
+    charge += (**itr)->charge();
+
+  return charge;
+}
+
+double PhysicsEvent::GetRecoTruthCharge() {
+  Assert("In GetRecoTruthCharge(): Reco not set", m_isRecoSet);
+  double charge = 0.0;
+
+  for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator itr = m_recoItr.begin();
+       itr != m_recoItr.end();
+       itr++) {
+    const xAOD::TruthParticle* truth = xAOD::TrackHelper::truthParticle(**itr);
+    charge += truth->charge();
+  }
+  return charge;
+}
+
+
+double PhysicsEvent::GetTruthSmallestDR() {
+  Assert("In GetTruthSmallestDR(): Truth not set", m_isTruthSet);
+  std::vector<std::vector<xAOD::TruthParticleContainer::const_iterator> > doublets = 
+    combinations<xAOD::TruthParticleContainer::const_iterator>(m_truthItr, 2);
+
+  double smallestDR = m_largeNumber;
+    for (std::vector<std::vector<xAOD::TruthParticleContainer::const_iterator> >::iterator doublets_itr = doublets.begin();
+	 doublets_itr != doublets.end(); doublets_itr++) {
+      double dR = deltaR((*((*doublets_itr)[0]))->phi(),(*((*doublets_itr)[1]))->phi() ,(*((*doublets_itr)[0]))->eta() ,(*((*doublets_itr)[1]))->phi());
+      if (dR < smallestDR)
+	smallestDR = dR;
+    }
+    return smallestDR;
+}
+
+double PhysicsEvent::GetMatchedSmallestDR() {
+  Assert("In GetMatchedSmallestDR(): Matched not set", m_isMatchedSet);
+  std::vector<std::vector<xAOD::TrackParticleContainer::const_iterator> > doublets = 
+    combinations<xAOD::TrackParticleContainer::const_iterator>(m_matchedItr, 2);
+
+  double smallestDR = m_largeNumber;
+    for (std::vector<std::vector<xAOD::TrackParticleContainer::const_iterator> >::iterator doublets_itr = doublets.begin();
+	 doublets_itr != doublets.end(); doublets_itr++) {
+      double dR = deltaR((*((*doublets_itr)[0]))->phi(),(*((*doublets_itr)[1]))->phi() ,(*((*doublets_itr)[0]))->eta() ,(*((*doublets_itr)[1]))->phi());
+      if (dR < smallestDR)
+	smallestDR = dR;
+    }
+    return smallestDR;
+}
+
+double PhysicsEvent::GetRecoSmallestDR() {
+  Assert("In GetRecoSmallestDR(): Reco not set", m_isRecoSet);
+  std::vector<std::vector<xAOD::TrackParticleContainer::const_iterator> > doublets = 
+    combinations<xAOD::TrackParticleContainer::const_iterator>(m_recoItr, 2);
+
+  double smallestDR = m_largeNumber;
+    for (std::vector<std::vector<xAOD::TrackParticleContainer::const_iterator> >::iterator doublets_itr = doublets.begin();
+	 doublets_itr != doublets.end(); doublets_itr++) {
+      double dR = deltaR((*((*doublets_itr)[0]))->phi(),(*((*doublets_itr)[1]))->phi() ,(*((*doublets_itr)[0]))->eta() ,(*((*doublets_itr)[1]))->phi());
+      if (dR < smallestDR)
+	smallestDR = dR;
+    }
+    return smallestDR;
+}
+
+
+

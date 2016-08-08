@@ -11,12 +11,14 @@ class HiggsEventSelector {
   std::vector<xAOD::TrackParticleContainer::const_iterator>& candidate;
   std::vector<std::pair<xAOD::TrackParticleContainer::const_iterator, double> > m_candidateIsolation;
   bool m_isRankedPtCutSet;
+  bool m_isMassCutSet;
   bool m_isOnShellMassCutSet, m_isOffShellMassCutSet;
   bool m_isCenteredMuonCutSet;
   bool m_isCenteredOffShellMuonCutSet;
   bool m_isDRCutSet;
   bool m_isIsolationCutSet;
   std::vector<double> m_rankedPtCut;
+  double m_massCutLow, m_massCutHigh;
   double m_onShellMassCutLow, m_onShellMassCutHigh;
   double m_offShellMassCutLow, m_offShellMassCutHigh;
   double m_centeredMuonCutEtaLow, m_centeredMuonCutEtaHigh;
@@ -40,6 +42,7 @@ class HiggsEventSelector {
   HiggsEventSelector(std::vector<xAOD::TrackParticleContainer::const_iterator>&);
   int Check() const;
   int CheckRankedPtCut() const;
+  bool CheckMassCut() const;
   void CheckOnShellMassCut(const std::vector<xAOD::TrackParticleContainer::const_iterator>&, int&) const;
   void CheckOffShellMassCut(const std::vector<xAOD::TrackParticleContainer::const_iterator>&, int&) const;
 
@@ -52,6 +55,7 @@ class HiggsEventSelector {
   bool CheckDRCut() const;
   bool CheckIsolationCut() const;
   void SetRankedPtCut(const std::vector<double>&);
+  void SetMassCut(const double&, const double&);
   void SetOnShellMassCut(const double&, const double&);
   void SetOffShellMassCut(const double&, const double&);
   void SetCenteredMuonCut(const double&, const double&, const int&);

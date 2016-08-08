@@ -79,6 +79,8 @@ class EventHists : public ManageHists {
     TH2F* m_nPixelHitsAtBLayer_vsMu_wide; //!
 
     TH1F* m_truthMass; //!
+    TH1F* m_truthMassWithPhotons; //!
+    TH1F* m_nPrimaryPhotons; //!
     TH1F* m_truthOutsideDetector; //!
     TH1F* m_truthNCenteredMuons; //!
     TH1F* m_truthPt; //!
