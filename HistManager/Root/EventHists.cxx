@@ -19,7 +19,7 @@ void EventHists::BookHists() {
   m_primary_pstrk      = declare1D(m_name, "nPrimaryPstrk",   "N Primary pseudoTracks in Event" ,   4, -0.5, 3.5);
   m_secondary_pstrk    = declare1D(m_name, "nSecondaryPstrk", "N Secondary pseudoTracks in Event",  8, -0.5, 7.5);
   m_lost_pstrk         = declare1D(m_name, "nLostPstrk",      "N Lost pseudoTracks in Event",	      4, -0.5, 3.5);
-  m_recotrk            = declare1D(m_name, "nRecotrk",	      "N recoTracks in Event",  	      4, -0.5, 3.5);  
+  m_recotrk            = declare1D(m_name, "nRecotrk",	      "N recoTracks in Event",  	      30, 0, 30);  
   m_recotrkwide        = declare1D(m_name, "nRecotrkwide",    "N recoTracks in Event",  	   200, -0.5,  199.5);  
   m_sispseed           = declare1D(m_name, "nSispseed",	      "N siSpSeeded Tracks in Event",       15, -0.5, 14.5);  
   m_nPixelClusters     = declare1D(m_name, "nPixelClusters",  "N Pixel Clusters in Event",          41, -0.5, 40.5);
@@ -35,7 +35,7 @@ void EventHists::BookHists() {
   m_LumiBlock        = declare1D(m_name, "LumiBlock",   "Luminosity block",2000,0,2000);
 
   // For ITk
-  m_recotrk1GeV      = declare1D(m_name, "nRecotrk1GeV",    "N recoTracks (p_{T}>1GeV) in Event", 200, -0.5, 199.5);  
+  m_recotrk1GeV      = declare1D(m_name, "nRecotrk1GeV",    "N recoTracks (p_{T}>1GeV) in Event", 40, 0, 40);  
   m_average2TrackEta = declare1D(m_name, "average2TrackEta","average #eta of 2 tracks",      30, -3.0, 3.0);
   m_photonEta        = declare1D(m_name, "photonEta",       "photon #eta",                   5, 0.0, 3.0);
   m_photonEta2Track  = declare1D(m_name, "photonEta2Track", "photon #eta",                   5, 0.0, 3.0);
@@ -46,11 +46,12 @@ void EventHists::BookHists() {
   m_photonDecayR2Track = declare1D(m_name, "photonDecayR2Track", "photon conversion r[mm]",   55,  0.0, 1100.0);
 
   m_nTruth            = declare1D(m_name, "nTruth",            "N Truth in Event",  100, -0.5, 99.5);
-  m_nChargedTruth     = declare1D(m_name, "nChargedTruth",     "N ChargedTruth in Event",  100, -0.5, 99.5);
-  m_nPrimaryChargedTruth     = declare1D(m_name, "nPrimaryChargedTruth",     "N Primary Charged Truth in Event",  100, -0.5, 99.5);
+  m_nChargedTruth     = declare1D(m_name, "nChargedTruth",     "N ChargedTruth in Event",  200, 0, 200);
+  m_nPrimaryChargedTruth     = declare1D(m_name, "nPrimaryChargedTruth",     "N Primary Charged Truth in Event",  100, 0, 100);
+  m_nPrimaryChargedTruth1GeV = declare1D(m_name, "nPrimaryChargedTruth1GeV",     "N Primary Charged Truth in Event with p_{T} > 1 GeV",  100, -0, 100);
   m_nNeutralTruth     = declare1D(m_name, "nNeutralTruth",     "N NeutralTruth in Event",  100, -0.5, 99.5);
   m_nTruth1GeV        = declare1D(m_name, "nTruth1GeV",        "N Truth (p_{T}>1GeV) in Event",  100, -0.5, 99.5);
-  m_nChargedTruth1GeV = declare1D(m_name, "nChargedTruth1GeV", "N ChargedTruth (p_{T}>1GeV) in Event",  100, -0.5, 99.5);
+  m_nChargedTruth1GeV = declare1D(m_name, "nChargedTruth1GeV", "N ChargedTruth (p_{T}>1GeV) in Event",  100, 0, 100);
   m_nNeutralTruth1GeV = declare1D(m_name, "nNeutralTruth1GeV", "N NeutralTruth (p_{T}>1GeV) in Event",  100, -0.5, 99.5);
   m_nIsoTrack         = declare1D(m_name, "nIsoTrack",         "N Iso.Track",      200, -0.5, 199.5);
   m_nVertex           = declare1D(m_name, "nVertex",           "N vertex",         40, -0.5, 39.5);
@@ -79,7 +80,7 @@ void EventHists::BookHists() {
   m_nPixelHitsAtBLayer_vsMu_wide     = declare2D(m_name, "nPixelHitsAtBLayer_vsMu_wide",     "N Pixel hits at BLayer", "pilueup #mu", 100, 0.0, 20000, 30,0.0,30.0); 
 
   m_truthMass                        = declare1D(m_name, "truthMass", "Truth parent mass [GeV]", 300,0.0,300.0);
-  m_truthMassWithPhotons             = declare1D(m_name, "truthMassWithPhotons", "Truth parent mass [GeV]", 200,124.9,125.1);
+  m_truthMassWithPhotons             = declare1D(m_name, "truthMassWithPhotons", "Truth parent mass [GeV]", 200,0,200);
   m_nPrimaryPhotons                  = declare1D(m_name, "nPrimaryPhotons", "n primary photons in event", 10, 0, 10);
   m_truthEta                         = declare1D(m_name, "truthEta", "Truth parent #eta", 200, -10.0,10.0);
   m_visibleTruthMass                 = declare1D(m_name, "visibleTruthMass", "Truth parent mass [GeV]", 300,0.0,300.0);
@@ -177,7 +178,7 @@ void EventHists::BookHists() {
   m_recoMatchedMaxDR                 = declare1D(m_name, "recoMatchedMaxDR", "max dR in reco matching", 2000, 0.0, 20.0);
   m_isRecoMatchingRight              = declare1D(m_name, "isRecoMatchingRight", "", 5, 0.0, 5.0);
 
-  m_recoIsolation                    = declare1D(m_name, "recoIsolation", "isolation", 100, 0, 5);
+  m_recoIsolation                    = declare1D(m_name, "recoMaxIsolation", "isolation", 100, 0, 5);
   m_recoIsolationVsPt                = declare2D(m_name, "recoIsolationVsPt", "isolation", "track p_{T}", 100, 0, 5, 200, 0, 200);
   m_recoSumPtVsPt                    = declare2D(m_name, "recoSumPtVsPt", "sum of p_{T}", "track p_{T}", 200, 0, 200, 200, 0, 200);
 
@@ -279,6 +280,7 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
   m_nTruth        -> Fill(1.0*evt.nTruth,weight);
   m_nChargedTruth -> Fill(1.0*evt.nChargedTruth,weight);
   m_nPrimaryChargedTruth -> Fill(1.0*evt.nPrimaryChargedTruth,weight);
+  m_nPrimaryChargedTruth1GeV -> Fill(1.0*evt.nPrimaryChargedTruth1GeV,weight);
   m_nNeutralTruth -> Fill(1.0*evt.nNeutralTruth,weight);
   m_nTruth1GeV        -> Fill(1.0*evt.nTruth1GeV,weight);
   m_nChargedTruth1GeV -> Fill(1.0*evt.nChargedTruth1GeV,weight);
@@ -322,6 +324,7 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
     if (evt.physicsEvent.arePhotonsSet()) {
       m_truthMassWithPhotons        -> Fill(1.0*evt.physicsEvent.GetTruthP4WithPhotons().M()/1000.0, weight);
       m_nPrimaryPhotons             -> Fill(evt.physicsEvent.GetPhotons().size());
+
     }
 
     if (evt.physicsEvent.isTruthVisible)
@@ -411,6 +414,11 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
       m_truthOnShellMass                    -> Fill(tmp.M()/1000.0);
       if (evt.physicsEvent.isTruthVisible)
 	m_visibleTruthOnShellMass                    -> Fill(tmp.M()/1000.0);
+
+
+      // if (TMath::Abs(evt.physicsEvent.GetTruthP4WithPhotons().M()/1000.0 - 90) < 10)
+      // 	std::cout << "NEL PICCO: ONVSOFF: " << tmp.M()/1000 << '\t';
+	  
       
       tmp.SetPxPyPzE(0.0,0.0,0.0,0.0);
       for (auto itr = truth_v.begin() + 2;
@@ -419,6 +427,12 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
 	tmp += (**itr)->p4();
       
       m_truthOffShellMass                   -> Fill(tmp.M()/1000.0);
+
+
+      // if (TMath::Abs(evt.physicsEvent.GetTruthP4WithPhotons().M()/1000.0 - 90) < 10)
+      // 	std::cout << tmp.M()/1000 << std::endl;
+      
+
       if (evt.physicsEvent.isTruthVisible)
 	m_visibleTruthOffShellMass                   -> Fill(tmp.M()/1000.0);
       
@@ -458,20 +472,26 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
     }
 
     
-    m_recoIsolation -> Fill(isolation[0].second, weight);
-    m_recoIsolationVsPt -> Fill(isolation[0].second, (*(isolation[0].first))->pt()/1000.0, weight);
-    m_recoSumPtVsPt -> Fill(isolation[0].second*(*(isolation[0].first))->pt()/1000.0, (*(isolation[0].first))->pt()/1000.0, weight);
-    m_recoIsolation -> Fill(isolation[1].second, weight);
-    m_recoIsolationVsPt -> Fill(isolation[1].second, (*(isolation[1].first))->pt()/1000.0, weight);
-    m_recoSumPtVsPt -> Fill(isolation[1].second*(*(isolation[1].first))->pt()/1000.0, (*(isolation[1].first))->pt()/1000.0, weight);
-    m_recoIsolation -> Fill(isolation[2].second, weight);
-    m_recoIsolationVsPt -> Fill(isolation[2].second, (*(isolation[2].first))->pt()/1000.0, weight);
-    m_recoSumPtVsPt -> Fill(isolation[2].second*(*(isolation[2].first))->pt()/1000.0, (*(isolation[2].first))->pt()/1000.0, weight);
-    m_recoIsolation -> Fill(isolation[3].second, weight);
-    m_recoIsolationVsPt -> Fill(isolation[3].second, (*(isolation[3].first))->pt()/1000.0, weight);
-    m_recoSumPtVsPt -> Fill(isolation[3].second*(*(isolation[3].first))->pt()/1000.0, (*(isolation[3].first))->pt()/1000.0, weight);
-    
+    double maxIsolation = -1;
 
+    for (auto itr = reco_v.begin();
+	 itr != reco_v.end();
+	 itr++) {
+      for (auto itr2 = isolation.begin();
+	   itr2 != isolation.end();
+	   itr2++) {
+	if ((*itr2).first != (*itr))
+	  continue;
+
+	if ((*itr2).second > maxIsolation)
+	  maxIsolation = (*itr2).second;
+
+	m_recoIsolationVsPt -> Fill((*itr2).second, ((*(*itr2).first))->pt()/1000.0, weight);
+	m_recoSumPtVsPt -> Fill((*itr2).second*((*(*itr2).first))->pt()/1000.0, (*((*itr2).first))->pt()/1000.0, weight);
+      }
+    }
+
+    m_recoIsolation -> Fill(maxIsolation,weight);
 
     m_recoNCenteredMuons -> Fill(NCenteredMuons, weight);
     m_recoNCenteredOffShellMuons -> Fill(evt.physicsEvent.GetNCenteredOffShellMuons(/*reco_v, 91187.6, 105.6583715*/), weight);

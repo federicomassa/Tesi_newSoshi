@@ -14,15 +14,18 @@ void CutEfficiency(const char* fname) {
   TH1F* recoCutCode4 = (TH1F*) f->Get("EventHist_all__recoCutCode4");
 
   std::vector<std::string> cutName;
-  cutName.push_back("DR                ");
+  cutName.push_back("Hits              ");
+  cutName.push_back("PtMin             ");
+  cutName.push_back("dZ                ");
+  cutName.push_back("isolation         ");
   cutName.push_back("Pt1               ");
   cutName.push_back("Pt2               ");
   cutName.push_back("Pt3               ");
   cutName.push_back("Pt4               ");
+  cutName.push_back("DR                ");
   cutName.push_back("Eta offshell      ");
   cutName.push_back("Onshell mass      ");
   cutName.push_back("Offshell mass     ");
-
   {
     ///////// NO ETA SELECTION ////////
 

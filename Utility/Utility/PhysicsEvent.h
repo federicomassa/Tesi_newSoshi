@@ -150,7 +150,7 @@ class PhysicsEvent {
   }
   
   void SetReco(const std::vector<xAOD::TrackParticleContainer::const_iterator>& reco, const std::vector<std::pair<xAOD::TrackParticleContainer::const_iterator, double> >& isolation) {
-    Assert("In PhysicsEvent::SetReco(): size not corresponding", reco.size() == m_nTarget && isolation.size() == m_nTarget);
+    //Assert("In PhysicsEvent::SetReco(): size not corresponding", reco.size() == m_nTarget && isolation.size() == m_nTarget);
     Assert("In PhysicsEvent::SetReco(): reco already set", !m_isRecoSet);    
     Assert("In PhysicsEvent::SetReco(): truth not set yet", m_isTruthSet);
     m_recoItr = reco;

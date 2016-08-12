@@ -40,9 +40,9 @@ void TrackHists::BookHists() {
   m_pdgId         = declare1D(m_name, "pdgId",         "pdgId", 1000, - 500.0,500.0);
   m_truthPt       = declare1D(m_name, "truthPt",       "Truth p_{T} [GeV]", 200,    0.0, 200.0); 
   m_truthPtnarrow = declare1D(m_name, "truthPtnarrow", "Truth p_{T} [GeV]", 200,    0.0,   50.0); 
-  m_truthEta      = declare1D(m_name, "truthEta",      "Truth #eta",         80,   -4.0,    4.0); 
+  m_truthEta      = declare1D(m_name, "truthEta",      "Truth #eta",         80,   -4.0,    4.0); //da togliere per efficienza 
   m_truthAbseta   = declare1D(m_name, "truthAbseta",       "|#eta|", 20, 0.0, 4.0); 
-  m_truthPhi      = declare1D(m_name, "truthPhi",      "Truth #phi",         32,   -3.2,    3.2); 
+  m_truthPhi      = declare1D(m_name, "truthPhi",      "Truth #phi",         32,   -3.1415,    3.1415); 
   m_truthD0       = declare1D(m_name, "truthD0",       "Truth d_{0} [mm]",	100,   -0.1,    0.1); 
   m_truthD0_wide  = declare1D(m_name, "truthD0_wide",  "Truth d_{0} [mm]",  100,   -2.0,    2.0); 
   m_truthZ0       = declare1D(m_name, "truthZ0",       "Truth z_{0} [mm]",  100, -200.0,  200.0); 
@@ -102,9 +102,9 @@ void TrackHists::BookHists() {
 
     m_biasPt_abseta.push_back(declare1D(m_name, (PtName + count).c_str(),  (PtTitle + PtUnits).c_str(), 200,-16000.0,16000.0));
     m_biasQPt_abseta.push_back(declare1D(m_name, (QPtName + count).c_str(),  (QPtTitle).c_str(), 200,-0.4,0.4));
-    m_biasEta_abseta.push_back(declare1D(m_name, (EtaName + count).c_str(),  (EtaTitle).c_str(), 200,-0.08,0.08));
+    m_biasEta_abseta.push_back(declare1D(m_name, (EtaName + count).c_str(),  (EtaTitle).c_str(), 100,-0.01,0.01));
     m_biasPhi_abseta.push_back(declare1D(m_name, (PhiName + count).c_str(),  (PhiTitle).c_str(), 200,-5e-3,5e-3));
-    m_biasD0_abseta.push_back(declare1D(m_name, (D0Name + count).c_str(),  (D0Title + D0Units).c_str(), 200,-1.0,1.0));
+    m_biasD0_abseta.push_back(declare1D(m_name, (D0Name + count).c_str(),  (D0Title + D0Units).c_str(), 200,-0.5,0.5));
     m_biasZ0_abseta.push_back(declare1D(m_name, (Z0Name + count).c_str(),  (Z0Title + Z0Units).c_str(), 100,-0.8,0.8));
 
     m_biasPt_poseta.push_back(declare1D(m_name, (PtName + count + "_pos").c_str(),  (PtTitle + PtUnits).c_str(), 200,-16000.0,16000.0));
@@ -131,9 +131,9 @@ void TrackHists::BookHists() {
   m_qoverp      = declare1D(m_name, "qoverp",      "#frac{q}{p} [GeV]", 200,  -2e-3,   2e-3); 
   m_pt          = declare1D(m_name, "pt",          "p_{T} [GeV]",       200,    0.0, 2000.0); 
   m_ptnarrow    = declare1D(m_name, "ptnarrow",    "p_{T} [GeV]",       200,    0.0,   50.0); 
-  m_eta         = declare1D(m_name, "eta",         "#eta",               40,   -4.0,    4.0); 
+  m_eta         = declare1D(m_name, "eta",         "#eta",               40,   -4.0,    4.0); //da togliere per efficienze 
   m_abseta      = declare1D(m_name, "abseta",      "#eta",               20,    0.0,    4.0); 
-  m_phi         = declare1D(m_name, "phi",         "#phi",               32,   -3.2,    3.2); 
+  m_phi         = declare1D(m_name, "phi",         "#phi",               32,   -3.1415,    3.1415); 
   m_d0          = declare1D(m_name, "d0",          "d_{0} [mm]",        100,   -0.2,    0.2); 
   m_d0_manual   = declare1D(m_name, "d0_manual",   "d_{0} [mm]",        100,   -0.2,    0.2); 
   m_d0_truthd0  = declare2D(m_name, "d0_truthd0",  "track d_{0} [mm]", "bias d_{0} [mm]", 100, -0.2, 0.2, 100, -0.2, 0.2);
@@ -198,8 +198,8 @@ void TrackHists::BookHists() {
   m_eProbBrem = declare1D(m_name, "eProbBrem", m_label + "e Prob Brem", 20, 0.0, 1.0); 
 
   m_truthMatchProb = declare1D(m_name, "truthMatchProb", m_label + "Truth Match \"Prob\"", 20, 0.0, 1.0);
-
   m_matchingDR = declare1D(m_name, "matchingDR", "#Delta R", 100, 0.0, 0.1); 
+  m_truthMatchProbVsMatchingDR = declare2D(m_name, "truthMatchProbVsMatchingDR", m_label + "Truth Match \"Prob\"", "matching DR", 20, 0.94, 0.97, 500,0.0,0.001);
 
   m_truthAbseta_dr001 = declare1D(m_name, "truthAbseta_dr001", "|#eta|", 25, 0.0, 5.0); 
   m_truthAbseta_dr002 = declare1D(m_name, "truthAbseta_dr002", "|#eta|", 25, 0.0, 5.0); 
@@ -509,7 +509,8 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
       float mindR = trk->auxdata<float>("matchedDR");
       float prob = xAOD::TrackHelper::truthMatchProb(trk);
       m_truthMatchProb -> Fill(prob,weight);
-      
+      m_truthMatchProbVsMatchingDR->Fill(prob,mindR);
+
       PrintMessage("Before passCut...");
       //  passCut=true;
       //    if (nSiHits>8) { passCut=true; }

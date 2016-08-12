@@ -37,7 +37,7 @@
 #include "xAODCore/ShallowCopy.h"
 
 #include <TLorentzVector.h>
-
+#include <set>
 #include <map>
 #include <algorithm>
 #include <limits>
@@ -47,6 +47,43 @@
 
 // this is needed to distribute the algorithm to the workers
 ClassImp(HiggsAnalysis)
+
+void SortIterate(std::vector<xAOD::TrackParticleContainer::const_iterator>& v, std::vector<xAOD::TrackParticleContainer::const_iterator>& copy) {
+
+  if (v.size() == 0)
+    return;
+
+  double maxP = -1;
+  std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator maxP_itr;
+
+  for (auto itr = v.begin();
+       itr != v.end();
+       itr++) {
+    if ((**itr)->pt() > maxP) {
+      maxP = ((**itr)->pt());
+      maxP_itr = itr;
+    }
+  }
+
+  copy.push_back(*maxP_itr);
+  v.erase(maxP_itr);
+
+  SortIterate(v,copy);
+  
+}
+
+
+void SortVector(std::vector<xAOD::TrackParticleContainer::const_iterator>& v) {
+  
+  std::vector<xAOD::TrackParticleContainer::const_iterator> copy;
+
+  SortIterate(v,copy);
+
+  v = copy;
+
+}
+
+
 
 HiggsAnalysis::HiggsAnalysis() {
 
@@ -59,6 +96,7 @@ EL::StatusCode HiggsAnalysis::setupJob(EL::Job& job) {
 
   // count number of events
   m_eventCounter = 0;
+  m_moreTargets = 0;
   std::cout << "Set counter to 0 " << m_eventCounter << std::endl;
 
   return EL::StatusCode::SUCCESS;
@@ -94,6 +132,7 @@ EL::StatusCode HiggsAnalysis::histInitialize() {
   truHist_visibleHard -> Init(wk());
   trkHist_matched      = new TrackHistManager("matched",true,true,true,false,false); //every track that matches the hs
   trkHist_reco = new TrackHistManager("reco",true,true,true,false,false); //every track that is recognized as part of signal
+  trkHist_pileup = new TrackHistManager("pileup",true,true,true,false,false); //every track that is recognized as part of signal
   trkHist_fakeCharge = new TrackHistManager("fakeCharge", true, true, true, false,false);
   clusHist_all      = new ClusterHists("SiliconAll");
   vtxHist_secondary = new VertexHists("Vertex");
@@ -104,6 +143,7 @@ EL::StatusCode HiggsAnalysis::histInitialize() {
   trkHist_matched      -> Init(wk());
   trkHist_fakeCharge   -> Init(wk());
   trkHist_reco -> Init(wk());
+  trkHist_pileup -> Init(wk());
   clusHist_all      -> Init(wk());
   vtxHist_secondary -> Init(wk());
   eventHist_all     -> Init(wk());
@@ -154,6 +194,7 @@ EL::StatusCode HiggsAnalysis::execute() {
   EventFeatures eventFeatures;
   PhysicsEvent eventReco(m_nTarget, m_etaMax, m_decayMass, m_parentMass);
 
+
   typedef std::vector<ElementLink< xAOD::TrackStateValidationContainer > > MeasurementsOnTrack;
   typedef std::vector<ElementLink< xAOD::TrackStateValidationContainer > >::const_iterator MeasurementsOnTrackIter;
 
@@ -162,6 +203,7 @@ EL::StatusCode HiggsAnalysis::execute() {
   //---------------------------
   trkHist_matched->resetBarcodes();
   trkHist_reco->resetBarcodes();
+  trkHist_pileup->resetBarcodes();
 
   //---------------------------
   // Event information
@@ -238,6 +280,7 @@ EL::StatusCode HiggsAnalysis::execute() {
   int numTruth = 0;
   int numChargedTruth = 0;
   int numPrimaryChargedTruth = 0;
+  int numPrimaryChargedTruth1GeV = 0;
   int numNeutralTruth = 0;
   int numTruth1GeV = 0;
   int numChargedTruth1GeV = 0;
@@ -271,8 +314,11 @@ EL::StatusCode HiggsAnalysis::execute() {
       numTruth++;
       if (TMath::Abs((*truthPart_itr)->charge())==1) { 
 	numChargedTruth++;
-	if ((*truthPart_itr)->barcode() < 200000)
+	if ((*truthPart_itr)->barcode() < 200000) {
 	  numPrimaryChargedTruth++; 
+	  if ((*truthPart_itr)->pt() > 1000.0 && TMath::Abs((*truthPart_itr)->eta()) < 4.0)
+	    numPrimaryChargedTruth1GeV++;
+	}
       } //only primary (not interaction)
       if (TMath::Abs((*truthPart_itr)->charge())==0) { numNeutralTruth++; }
 
@@ -321,6 +367,7 @@ EL::StatusCode HiggsAnalysis::execute() {
 
   bool isValidMatching = true; //if in the event a truth target goes over the geometrical acceptance the tracks should not be matched
 
+
   for (xAOD::TruthParticleContainer::const_iterator truItr=truthPriParts->begin(); truItr!=truthPriParts->end(); truItr++) {
     if (TMath::Abs((*truItr)->pdgId()) == m_idTarget
 	/* && (*truItr)->pt() > m_ptCut */)
@@ -328,6 +375,8 @@ EL::StatusCode HiggsAnalysis::execute() {
   }
 
   ///////////// Now find the right decay products if not already /////////////
+
+  double vtxZ = -1000;
 
   if (genTargetMatched_itr.size() == m_nTarget) {
     //it's the expected number of particles, check if the invariant mass is right
@@ -344,7 +393,7 @@ EL::StatusCode HiggsAnalysis::execute() {
     }
 
     std::vector<const xAOD::TruthVertex*> vtx;
-
+  
     for (std::vector<xAOD::TruthParticleContainer::const_iterator>::iterator genItr = (genTargetMatched_itr).begin(); genItr != (genTargetMatched_itr).end(); genItr++) {
       vtx.push_back((**genItr)->prodVtx());
       if (vtx.back() == 0) {
@@ -352,7 +401,7 @@ EL::StatusCode HiggsAnalysis::execute() {
 	return EL::StatusCode::SUCCESS;
       }
       
-      double vtxZ = vtx[0]->z();
+      vtxZ = vtx[0]->z();
       for (auto itr = vtx.begin() + 1;
 	   itr != vtx.end();
 	   itr++) {
@@ -389,7 +438,6 @@ EL::StatusCode HiggsAnalysis::execute() {
       
       //same z constaint
       std::vector<const xAOD::TruthVertex*> vtx;
-      double vtxZ;
       bool isCombInvalid = false;
 
       for (std::vector<xAOD::TruthParticleContainer::const_iterator>::iterator genItr = (*combItr).begin(); genItr != (*combItr).end(); genItr++) {
@@ -442,14 +490,16 @@ EL::StatusCode HiggsAnalysis::execute() {
 
   }
 
+
   /*  if (TMath::Abs(InvariantMass::TruthInvariantMass(genTargetMatched_itr) - (50000+160000)/2.0) > (160000-50000)/2.0)
     return EL::StatusCode::SUCCESS;
   */
 
   //photons?
   std::vector<const xAOD::TruthParticle*> primaryPhotons;
-  const xAOD::TruthVertex* primaryVtx = (*(genTargetMatched_itr[0]))->prodVtx();
-  
+  const xAOD::TruthVertex* primaryVtx = (*(genTargetMatched_itr[0]))->prodVtx(); 
+  double primaryVtxZ = primaryVtx->z();
+
   if (primaryVtx == NULL) {
     std::cout << "In HiggsAnalysis::execute(): primary vertex not existent?" << std::endl;
     exit(1);
@@ -662,6 +712,7 @@ EL::StatusCode HiggsAnalysis::execute() {
     float x0 = -(rho+d0)*TMath::Sin(phi);
     float y0 =  (rho+d0)*TMath::Cos(phi);
 
+
     int aIsign = 0;
     float aProd = pxQuark*x0+pyQuark*y0;
     if (aProd>0) { aIsign =  1; }
@@ -681,6 +732,7 @@ EL::StatusCode HiggsAnalysis::execute() {
   std::vector<xAOD::TrackParticleContainer::const_iterator> itkTrk_matched;
   std::vector<std::pair<xAOD::TruthParticleContainer::const_iterator, xAOD::TrackParticleContainer::const_iterator> > truth_trackMatched;
   std::vector<xAOD::TrackParticleContainer::const_iterator> itkTrk_itr_candidates;
+
 
   if (isValidMatching) {
     for (unsigned int i = 0; i < genTargetMatched_itr.size(); i++) {
@@ -702,31 +754,191 @@ EL::StatusCode HiggsAnalysis::execute() {
   }
 
  
-
+  //INITIALLY WITHOUT CUTS
   for (xAOD::TrackParticleContainer::const_iterator itkTrk_itr=itkTrack->begin(); itkTrk_itr!=itkTrack->end(); itkTrk_itr++) {
     //parent reconstruction without truth matching
     //const xAOD::TruthParticle* truthParticle = xAOD::TrackHelper::truthParticle(*itkTrk_itr);
     //insert all reconstruction cuts over single track here
-    if ((*itkTrk_itr)->pt() > m_truthPtCut[0] /*500*/ ) {
+    if ((*itkTrk_itr)->pt() > 0 ) {
       uint8_t getInt = 0;
       (*itkTrk_itr)->summaryValue(getInt, xAOD::numberOfPixelHits);
       int nPixHits = getInt;
       (*itkTrk_itr)->summaryValue(getInt, xAOD::numberOfSCTHits);
       int nSCTHits = getInt;
 
-      if ((nPixHits + nSCTHits) >= /*m_hitCut*/ 0) {
+      
+      //change here the analysis eta coverage
+      if ((nPixHits + nSCTHits) >= 0 && TMath::Abs((*itkTrk_itr)->eta()) < 4.0) {
 	itkTrk_itr_candidates.push_back(itkTrk_itr);
       }
     }
   }
 
+  //in this version of the program the recoCutCode is controlled here, it is 
+  //only updated when it does not pass a cut
+
+  if (itkTrk_itr_candidates.size() >= 4)
+    eventReco.recoCutCode = 0;
+  else {
+    eventReco.recoCutCode = -1;
+  }
+
+  SortVector(itkTrk_itr_candidates);  
+
+  // NOW ADD HIT CUT
+  for (auto itr = itkTrk_itr_candidates.begin();
+       itr != itkTrk_itr_candidates.end();
+       itr++) {
+    //parent reconstruction without truth matching
+    //const xAOD::TruthParticle* truthParticle = xAOD::TrackHelper::truthParticle(*itkTrk_itr);
+    //insert all reconstruction cuts over single track here
+      uint8_t getInt = 0;
+      (**itr)->summaryValue(getInt, xAOD::numberOfPixelHits);
+      int nPixHits = getInt;
+      (**itr)->summaryValue(getInt, xAOD::numberOfSCTHits);
+      int nSCTHits = getInt;
+
+      if ((nPixHits + nSCTHits) < m_hitCut) {
+	itkTrk_itr_candidates.erase(itr);
+	itr--;
+      }
+    
+  }
+
+  if (itkTrk_itr_candidates.size() < 4 && eventReco.recoCutCode == 0) {
+    eventReco.recoCutCode = 1; 
+  }
+
+  //NOW MIN PT CUT
+  for (auto itr = itkTrk_itr_candidates.begin();
+       itr != itkTrk_itr_candidates.end();
+       itr++) {
+    if ((**itr)->pt() < m_truthPtCut[0]) {
+	itkTrk_itr_candidates.erase(itr);
+	itr--;
+      }
+    
+  }
+
+  if (itkTrk_itr_candidates.size() < 4 && eventReco.recoCutCode == 0) {
+    eventReco.recoCutCode = 2; 
+  }
+
+
   bool isValidCandidate = true; //selection on reco tracks
+
+  //NOW WE TRY TO DECREASE THE RATE OF EVENTS IN WHICH MORE THAN 4 TRACKS PASS THE CUTS
+  bool moreThan4 = false;
+
+  if (itkTrk_itr_candidates.size() > 4) {
+    std::cout << "More than 4" << std::endl;
+    moreThan4 = true;
+  }
+
+  ///////////// 1. DELTA Z //////////////////
+  //we select only the tracks that are inside a region of 3*sigma_z around the primaryVtx
+  //As the sigma_z resolution depend heavily on the eta of the track, we divide the resolution
+  //into eta regions... sigma_z = 50 um for eta < 2.7; = 150 um for 2.7 < eta < 3.2; = 500 um for 3.2 < eta < 4.0
+
+  double deltaZCut27 = 5*0.05; //mm
+  double deltaZCut32 = 5*0.15; //mm
+  double deltaZCut40 = 5*0.5; //mm
+
+  for (auto itr = itkTrk_itr_candidates.begin();
+       itr != itkTrk_itr_candidates.end();
+       itr++) {
+
+    if (TMath::Abs((**itr)->eta()) < 2.7) {
+      if (TMath::Abs((**itr)->z0() - primaryVtxZ) > deltaZCut27) {
+	itkTrk_itr_candidates.erase(itr);
+	itr--;
+      }
+    }
+
+    else if (TMath::Abs((**itr)->eta()) < 3.2) {
+      if (TMath::Abs((**itr)->z0() - primaryVtxZ) > deltaZCut32) {
+	itkTrk_itr_candidates.erase(itr);
+	itr--;
+      }
+    }
+
+    else if (TMath::Abs((**itr)->eta()) < 4.0) {
+      if (TMath::Abs((**itr)->z0() - primaryVtxZ) > deltaZCut40) {
+	itkTrk_itr_candidates.erase(itr);
+	itr--;
+      }
+    }
+
+    else {
+      std::cout << "HiggsAnalysis::Execute(): TRACK BEYOND ETA 4?" << std::endl;
+      exit(1);
+    }
+
+  }
+
+  if (itkTrk_itr_candidates.size() < 4 && eventReco.recoCutCode == 0)
+    eventReco.recoCutCode = 3;
+
+  //   if (itkTrk_itr_candidates.size() > 4) 
+  //    std::cout << "Still more than 4" << std::endl;
+
+  
+  // else if (moreThan4 && itkTrk_itr_candidates.size() <= 4 && itkTrk_itr_candidates.size() != 0) 
+  //   std::cout << "Now: " << itkTrk_itr_candidates.size() << '\t' << "primary is: " << primaryVtxZ << std::endl;
+
+  // else if (moreThan4 && itkTrk_itr_candidates.size() == 0) {
+  //   std::cout << "NOOOW: " << itkTrk_itr_candidates.size() << '\t' << "primary is: " << primaryVtxZ << std::endl;
+  // }
+
+  
+  ////// 2. PT ISOLATION ///////////
+  //isolation cut: sum(pt in dR < 0.1) / pt(hard track)
+  std::vector<std::pair<xAOD::TrackParticleContainer::const_iterator, double> > recoIsolation;
+  for (auto candidateItr = itkTrk_itr_candidates.begin();
+       candidateItr != itkTrk_itr_candidates.end();
+       candidateItr++) {
+    double ptSum = 0;
+  
+    for (auto tracks = itkTrack->begin();
+	 tracks != itkTrack->end(); 
+	 tracks++) {
+      
+      //if it's the muon candidate do not consider it
+      if (*candidateItr == tracks)
+	continue;
+
+      if (deltaR((**candidateItr)->phi(), (*tracks)->phi(), (**candidateItr)->eta(), (*tracks)->eta()) < 0.1)
+	ptSum += (*tracks)->pt();
+      
+    }
+    
+    if (ptSum/(**candidateItr)->pt() > 1) {
+      itkTrk_itr_candidates.erase(candidateItr);
+      candidateItr--;
+    }
+
+    else
+      recoIsolation.push_back(std::make_pair(*candidateItr,ptSum/(**candidateItr)->pt()));
+
+  }
+
+  if (itkTrk_itr_candidates.size() < 4 && eventReco.recoCutCode == 0)
+    eventReco.recoCutCode = 4;
+
+  //NOW THERE IS NOTHING ELSE WE CAN DO, IF STILL > 4 TARGETS THEN COMBINATORY PROBLEM...
+  
+  if (itkTrk_itr_candidates.size() > 4) 
+    std::cout << "STILL MORE THAN 4!!!!!" << std::endl;
+ 
+  if (moreThan4 && itkTrk_itr_candidates.size() <= 4) 
+    std::cout << "\t ----> " << itkTrk_itr_candidates.size() << std::endl;
 
 
   if (itkTrk_itr_candidates.size() == m_nTarget) {
     
     double totalCharge = 0.0;
     TLorentzVector candidateMomentum(0.0,0.0,0.0,0.0);
+
     for (std::vector<xAOD::TrackParticleContainer::const_iterator>::iterator candItr = itkTrk_itr_candidates.begin();
 	 candItr != itkTrk_itr_candidates.end();
 	 candItr++) {
@@ -753,6 +965,12 @@ EL::StatusCode HiggsAnalysis::execute() {
   }
 
   else if (itkTrk_itr_candidates.size() > m_nTarget) {
+
+    m_moreTargets++;
+    // std::cout << "More than 4 candidates: " << m_moreTargets << std::endl;
+
+    
+    
 
     isValidCandidate = false; //initially
 
@@ -858,7 +1076,6 @@ EL::StatusCode HiggsAnalysis::execute() {
       if (std::find((*combItr).begin(),(*combItr).end(),(*bestOnShellCombination)[1]) == (*combItr).end() )
 	continue;
 
-       
       //it contains the best combination
       double combMass = InvariantMass::TrackInvariantMass(*combItr, m_decayMass);
       if (combMass > maxMass) {
@@ -878,64 +1095,65 @@ EL::StatusCode HiggsAnalysis::execute() {
   }
   
 
-  //isolation cut: sum(pt in dR < 0.1) / pt(hard track)
-  std::vector<std::pair<xAOD::TrackParticleContainer::const_iterator, double> > recoIsolation;
-  for (auto candidateItr = itkTrk_itr_candidates.begin();
-       candidateItr != itkTrk_itr_candidates.end();
-       candidateItr++) {
-    double ptSum = 0;
 
-    for (auto tracks = itkTrack->begin();
-	 tracks != itkTrack->end(); 
-	 tracks++) {
-      
-      //if it's the muon candidate do not consider it
-      if (*candidateItr == tracks)
-	continue;
-
-      if (deltaR((**candidateItr)->phi(), (*tracks)->phi(), (**candidateItr)->eta(), (*tracks)->eta()) < 0.1)
-	ptSum += (*tracks)->pt();
-      
-    }
-    
-    recoIsolation.push_back(std::make_pair(*candidateItr,ptSum/(**candidateItr)->pt()));
-
-  }
+  
+ 
 
   ////////////////////////////////////////////////////////////////////
   // now look into candidates for parent decay and zero charge
   //  int nCount = 0;
-  
+  double maxEta = -1;  
   //cut on intermediate particles
   if (isValidCandidate) {  //!!!!!!!!!!!
     HiggsEventSelector selector(itkTrk_itr_candidates);
-    
-    
+    int result;
     selector.SetRankedPtCut(m_truthPtCut);
-    selector.SetMassCut(m_massCutLow, m_massCutHigh);
-    selector.SetOnShellMassCut(m_onShellMassCutLow, m_onShellMassCutHigh);
-    selector.SetOffShellMassCut(m_offShellMassCutLow, m_offShellMassCutHigh);
-    //selector.SetCenteredMuonCut(0.1, 2.7, 4);
-    selector.SetCenteredOffShellMuonCut(0.0, 2.7);
+    result = selector.Check();
+    if (result != 0 && eventReco.recoCutCode == 0)
+      eventReco.recoCutCode = result + 3;
+    //selector.SetMassCut(m_massCutLow, m_massCutHigh);
+
+
     selector.SetDRCut(0.1);
+    result = selector.Check();
+    if (result != 0 && eventReco.recoCutCode == 0)
+      eventReco.recoCutCode = 9;
+
+    selector.SetCenteredOffShellMuonCut(0.0, 2.7);
+    result = selector.Check();
+    if (result != 0 && eventReco.recoCutCode == 0)
+      eventReco.recoCutCode = 10;
+
+
+    selector.SetOnShellMassCut(m_onShellMassCutLow, m_onShellMassCutHigh);
+    result = selector.Check();
+    if (result != 0 && eventReco.recoCutCode == 0)
+      eventReco.recoCutCode = 11;
+
+
+    selector.SetOffShellMassCut(m_offShellMassCutLow, m_offShellMassCutHigh);
+    result = selector.Check();
+    if (result != 0 && eventReco.recoCutCode == 0)
+      eventReco.recoCutCode = 12;
+
+    //selector.SetCenteredMuonCut(0.1, 2.7, 4);
+
     //selector.SetIsolationCut(recoIsolation, 100);
     
-    eventReco.recoCutCode = selector.Check();
+    if (maxEta < 2.7)
+      eventReco.recoCutCode27 = eventReco.recoCutCode;
+    else if (maxEta < 3.2)
+      eventReco.recoCutCode32 = eventReco.recoCutCode;
+    else if (maxEta < 4)
+      eventReco.recoCutCode4  = eventReco.recoCutCode; 
     
-    double maxEta = -1;
+
     for (auto itr = itkTrk_itr_candidates.begin();
 	 itr != itkTrk_itr_candidates.end();
 	 itr++) {
       if (TMath::Abs((**itr)->eta()) > maxEta)
 	maxEta = TMath::Abs((**itr)->eta());
     }
-
-    if (maxEta < 2.7)
-      eventReco.recoCutCode27 = eventReco.recoCutCode;
-    else if (maxEta < 3.2)
-      eventReco.recoCutCode32 = eventReco.recoCutCode;
-    else if (maxEta < 4)
-      eventReco.recoCutCode4  = eventReco.recoCutCode;
 
     if (eventReco.recoCutCode == 0)
       isValidCandidate = true;
@@ -947,6 +1165,7 @@ EL::StatusCode HiggsAnalysis::execute() {
     isValidCandidate = isValidCandidate && (TMath::Abs(InvariantMass::TrackInvariantMass(onShell_candidates, m_decayMass) - m_intermediateMass) < m_intermediateMassTolerance); 
     */
   }
+    
 
   if (isValidCandidate /*&& isValidMatching*/) {
     eventReco.SetReco(itkTrk_itr_candidates, recoIsolation);
@@ -975,8 +1194,11 @@ EL::StatusCode HiggsAnalysis::execute() {
   //---------------------
   // FILL PLOTS!!!
   //---------------------
-  eventFeatures.nRecoTracks = numRecoTracks;
-  eventFeatures.nRecoTracks1GeV = numRecoTracks1GeV;
+
+  if (isValidMatching) { //only for thesis plots
+    eventFeatures.nRecoTracks = numRecoTracks;
+    eventFeatures.nRecoTracks1GeV = numRecoTracks1GeV;
+  }
   // eventFeatures.nPixelClusters = pixClustersOrig->size();
   // eventFeatures.nSCTClusters = sctClustersOrig->size();
   // eventFeatures.nSiClusters = pixClustersOrig->size() + sctClustersOrig->size();
@@ -1016,14 +1238,20 @@ EL::StatusCode HiggsAnalysis::execute() {
     eventFeatures.photonDecayR = phoDecayR;
   }
 
+
+  if (isValidMatching) { //only to make the thesis plots
+
   eventFeatures.nTruth = numTruth;
   eventFeatures.nChargedTruth = numChargedTruth;
   eventFeatures.nPrimaryChargedTruth = numPrimaryChargedTruth;
+  eventFeatures.nPrimaryChargedTruth1GeV = numPrimaryChargedTruth1GeV;
   eventFeatures.nNeutralTruth = numNeutralTruth;
 
   eventFeatures.nTruth1GeV = numTruth1GeV;
   eventFeatures.nChargedTruth1GeV = numChargedTruth1GeV;
   eventFeatures.nNeutralTruth1GeV = numNeutralTruth1GeV;
+
+  }
 
   eventFeatures.nIsoTrack = nIsoTrk;
   eventFeatures.nVertex = numVtx;
@@ -1038,8 +1266,12 @@ EL::StatusCode HiggsAnalysis::execute() {
     truHist_all->FillHists((*truItr),1.0);
     if (isSignalTruth) 
       truHist_hard->FillHists((*truItr),1.0);
-    else
+    else {
       truHist_pileup->FillHists((*truItr),1.0);
+      // if ((*truItr)->prodVtx()) {
+      // 	std::cout << "Pileup d0: " << (*truItr)->prodVtx()->perp() << std::endl;
+      // }
+    }
   }
 
   // Fill secondary vertex information
@@ -1052,6 +1284,16 @@ EL::StatusCode HiggsAnalysis::execute() {
   // Fill selected tracks in the histogram
   for (xAOD::TrackParticleContainer::const_iterator itkTrk_itr=itkTrack->begin(); itkTrk_itr!=itkTrack->end(); itkTrk_itr++) {
     trkHist_all -> FillHists((*itkTrk_itr),1.0);
+
+    if (isValidMatching) {
+      if (itkTrk_itr != (*(truth_trackMatched.begin())).second &&
+	  itkTrk_itr != (*(truth_trackMatched.begin()+1)).second &&
+	  itkTrk_itr != (*(truth_trackMatched.begin()+2)).second &&
+	  itkTrk_itr != (*(truth_trackMatched.begin()+3)).second) {
+	trkHist_pileup -> FillHists((*itkTrk_itr),1.0);
+      }
+    }
+
   }
 //  if (mindRMatched<0.02) {
 

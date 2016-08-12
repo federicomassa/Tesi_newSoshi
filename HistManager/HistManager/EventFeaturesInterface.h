@@ -31,6 +31,7 @@ class EventFeatures {
     unsigned int  nTruth;
     unsigned int  nChargedTruth;
     unsigned int  nPrimaryChargedTruth;
+    unsigned int  nPrimaryChargedTruth1GeV;
     unsigned int  nNeutralTruth;
     unsigned int  nTruth1GeV;
     unsigned int  nChargedTruth1GeV;

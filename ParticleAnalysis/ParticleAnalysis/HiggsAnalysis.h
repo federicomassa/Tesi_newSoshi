@@ -45,6 +45,7 @@ public:
   // TH1 *myHist; //!
   xAOD::TEvent *m_event;  //!
   int m_eventCounter;     //!
+  int m_moreTargets;    
 
   TrackHists*       trkHist_all; //!
   TruthHistManager* truHist_all; //!
@@ -55,6 +56,7 @@ public:
   TrackHistManager* trkHist_matched; //!
   TrackHistManager* trkHist_fakeCharge; //!
   TrackHistManager* trkHist_reco; //!
+  TrackHistManager* trkHist_pileup; //!
   ClusterHists*     clusHist_all; //!
   VertexHists*      vtxHist_secondary; //!
   EventHists*       eventHist_all; //!

@@ -33,12 +33,12 @@ void TruthHists::BookHists() {
   /* track parameterization */
   m_pt 			     = declare1D(m_name, "pt", 	 "p_{T} [GeV]", 	200,  0.0,     200.0 ); 
   m_ptVsEta 		     = declare2D(m_name, "ptVsEta", "p_{T} [GeV]", "|#eta|", 200,  0.0,     200.0, 40, 0, 4.0); 
-  m_eta			     = declare1D(m_name, "eta",	 "#eta", 			  80,	 -maxEta,     maxEta    ); 
+  m_eta			     = declare1D(m_name, "eta",	 "#eta", 			  80,	 -maxEta,     maxEta   ); //da togliere per efficienza
   m_eta_wide		     = declare1D(m_name, "eta_wide",	 "#eta", 			  160,	 -8.0,     8.0    ); 
   m_abseta                   = declare1D(m_name, "abseta", "|#eta|",    20,   0.0,     maxEta); 
   m_d0 			     = declare1D(m_name, "d0", 	 "d_{0}",		    120, -0.09,    0.09   ); 
   m_z0 			     = declare1D(m_name, "z0", 	 "z_{0}",		    120, -300.0,   300.0  ); 
-  m_phi			     = declare1D(m_name, "phi",	 "#phi", 			  32,	 -3.2,     3.2    ); 
+  m_phi			     = declare1D(m_name, "phi",	 "#phi", 			  32,	 -3.1415,     3.1415    ); 
 
   m_pdgId		     = declare1D(m_name, "pdgId",	 "pdgId", 			  5001,	 -2500,     2501    ); 
 

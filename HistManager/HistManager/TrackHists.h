@@ -167,6 +167,7 @@ class TrackHists : public ManageHists {
 
     TH1F* m_truthMatchProb; //!
     TH1F* m_matchingDR; //!
+    TH2F* m_truthMatchProbVsMatchingDR; //!
     TH1F* m_truthAbseta; //!
     TH1F* m_truthAbseta_dr001; //!
     TH1F* m_truthAbseta_dr002; //!

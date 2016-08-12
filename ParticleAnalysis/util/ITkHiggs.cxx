@@ -64,7 +64,7 @@ int main( int argc, char* argv[] ) {
   truthPtCut.push_back(20000);
 
   double ptCut = 5000.0; //pt cut of muons produced from Z decay
-  const int hitCut = 9; //track quality, every reco track has got to have >= hitCut total hits
+  const int hitCut = 10; //track quality, every reco track has got to have >= hitCut total hits
   double parentMassTolerance = 20000000; //muons recognized as coming from parent if
                                       //invariant mass is within parentMass
                                       //                          +- tolerance

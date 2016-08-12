@@ -33,7 +33,9 @@ std::vector<xAOD::TrackParticleContainer::const_iterator> HiggsEventSelector::Ch
   }
 
   return *best;
-  
+
+
+ 
 }
 
 std::vector<xAOD::TrackParticleContainer::const_iterator> HiggsEventSelector::ChooseOnShellCombination(const std::pair<std::vector<xAOD::TrackParticleContainer::const_iterator>, std::vector<xAOD::TrackParticleContainer::const_iterator> >& comb1,
@@ -99,20 +101,21 @@ int HiggsEventSelector::Check() const {
   if (TMath::Abs(totalCharge) > 1E-6)
     std::cout << "HiggsEventSelector::Check(): CHARGE??" << std::endl;
   
-  if (m_isDRCutSet)
-    if (!CheckDRCut())
-      return 1;
-
   if (m_isMassCutSet) 
     if (!CheckMassCut())
-      return 2;
+      return 1;
 
-  //return code: 3 4 5 6 (from high to low pt)
+  //return code: 2 3 4 5 (from high to low pt)
   if (m_isRankedPtCutSet) {
     int checkRankedPtCut = CheckRankedPtCut();
     if (checkRankedPtCut != 0)
       return checkRankedPtCut;
   }
+
+  if (m_isDRCutSet)
+    if (!CheckDRCut())
+      return 6;
+
 
   if (m_isCenteredMuonCutSet)
     if (!CheckCenteredMuonCut())
@@ -228,7 +231,7 @@ int HiggsEventSelector::CheckRankedPtCut() const {
 
   bool checkRanked = true;
 
-  int returnCode[] = {3,4,5,6};
+  int returnCode[] = {2,3,4,5};
 
   std::vector<double> pt;
   for (auto itr = candidate.begin();
@@ -460,7 +463,12 @@ void HiggsEventSelector::SetCenteredMuonCut(const double& etaCutLow, const doubl
 }
 
 void HiggsEventSelector::SetCenteredOffShellMuonCut(const double& etaCutLow, const double& etaCutHigh) {
-  Assert("In HiggsEventSelector::SetCenteredOffShellMuonCut(...): onShellMassCut and/or offShellMassCut not set", m_isOnShellMassCutSet && m_isOffShellMassCutSet);
+  if (!m_isOnShellMassCutSet)
+    SetOnShellMassCut(0,100000000);
+
+  if (!m_isOffShellMassCutSet)
+    SetOffShellMassCut(0,100000000);
+
   
   m_isCenteredOffShellMuonCutSet = true;
   m_centeredOffShellMuonCutEtaLow = etaCutLow;

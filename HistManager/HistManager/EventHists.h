@@ -53,6 +53,7 @@ class EventHists : public ManageHists {
     TH1F* m_nTruth; //!
     TH1F* m_nChargedTruth; //!
     TH1F* m_nPrimaryChargedTruth; //!
+    TH1F* m_nPrimaryChargedTruth1GeV; //!
     TH1F* m_nNeutralTruth; //!
     TH1F* m_nTruth1GeV; //!
     TH1F* m_nChargedTruth1GeV; //!
