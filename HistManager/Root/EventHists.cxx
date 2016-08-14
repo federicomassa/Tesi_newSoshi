@@ -82,7 +82,14 @@ void EventHists::BookHists() {
   m_truthMass                        = declare1D(m_name, "truthMass", "Truth parent mass [GeV]", 300,0.0,300.0);
   m_truthMassWithPhotons             = declare1D(m_name, "truthMassWithPhotons", "Truth parent mass [GeV]", 200,0,200);
   m_nPrimaryPhotons                  = declare1D(m_name, "nPrimaryPhotons", "n primary photons in event", 10, 0, 10);
-  m_truthEta                         = declare1D(m_name, "truthEta", "Truth parent #eta", 200, -10.0,10.0);
+  m_truthEta                         = declare1D(m_name, "truthEta", "Truth parent #eta", 100, 0,10.0);
+  m_truthPhi                         = declare1D(m_name, "truthPhi", "Truth parent #eta", 100, 0,10.0);
+
+  m_truthPtWithPhotons               = declare1D(m_name, "truthPtWithPhotons", "Truth parent #eta", 300, 0,300.0);
+  m_truthEtaWithPhotons              = declare1D(m_name, "truthEtaWithPhotons", "Truth parent #eta", 100, 0,10.0);
+  m_truthPhiWithPhotons              = declare1D(m_name, "truthPhiWithPhotons", "Truth parent #eta", 100, -3.1416,3.1416);
+
+
   m_visibleTruthMass                 = declare1D(m_name, "visibleTruthMass", "Truth parent mass [GeV]", 300,0.0,300.0);
   m_truthOutsideDetector             = declare1D(m_name, "truthOutsideDetector", "# hard truth outside detector", 10, 0.0, 10.0);
   m_truthNCenteredMuons              = declare1D(m_name, "truthNCenteredMuons", "N muons within 2.7", 5, 0.0, 5.0);
@@ -93,7 +100,7 @@ void EventHists::BookHists() {
   m_truthMaxEta                      = declare1D(m_name, "truthMaxEta", "product max |#eta|", 100, 0.0, 10.0);
   m_truthMinEta                      = declare1D(m_name, "truthMinEta", "product min |#eta|", 100, 0.0, 10.0);
   m_truthCharge                      = declare1D(m_name, "truthCharge", "Truth parent charge", 20,-10.0,10.0);
-  m_truthSmallestDR                  = declare1D(m_name, "truthSmallestDR", "minimum #Delta R", 100, 0.0, 20.0);
+  m_truthSmallestDR                  = declare1D(m_name, "truthSmallestDR", "minimum #Delta R", 400, 0.0, 20.0);
   m_truthDZ                          = declare1D(m_name, "truthDZ", "#Delta z between products [mm]", 1000, -1000.0, 1000.0);
 
   //pt ranking, 1 is the largest
@@ -121,7 +128,7 @@ void EventHists::BookHists() {
   m_matchedMaxEta                    = declare1D(m_name, "matchedMaxEta", "product max |#eta|", 100, 0.0, 10.0);
   m_matchedMinEta                    = declare1D(m_name, "matchedMinEta", "product min |#eta|", 100, 0.0, 10.0);
   m_matchedCharge                    = declare1D(m_name, "matchedCharge", "Matched parent charge", 20,-10.0,10.0);
-  m_matchedSmallestDR                = declare1D(m_name, "matchedSmallestDR", "minimum #Delta R", 100, 0.0, 20.0);
+  m_matchedSmallestDR                = declare1D(m_name, "matchedSmallestDR", "minimum #Delta R", 400, 0.0, 20.0);
   m_matchedTrueMaxEta                = declare1D(m_name, "matchedTrueMaxEta", "product max |#eta|", 100, 0.0,10.0);
   m_matchedDZ                        = declare1D(m_name, "matchedDZ", "#Delta z between products [mm]", 1000, -1000.0, 1000.0);
 
@@ -131,7 +138,7 @@ void EventHists::BookHists() {
   m_recoMass27                       = declare1D(m_name, "recoMass27", "Reco H mass [GeV]", 300,0.0,300.0);
   m_recoMass32                       = declare1D(m_name, "recoMass32", "Reco H mass [GeV]", 300,0.0,300.0);
   m_recoMass4                        = declare1D(m_name, "recoMass4", "Reco H mass [GeV]", 300,0.0,300.0);
-  m_recoOnShellMass                  = declare1D(m_name, "recoOnShellMass", "Reco on-shell #mu#mu mass [GeV]", 200,0.0,200.0);
+  m_recoOnShellMass                  = declare1D(m_name, "recoOnShellMass", "Reco on-shell #mu#mu mass [GeV]", 200,0.0,400.0);
   m_recoOnShellEta1VsEta2            = declare2D(m_name, "recoOnShellEta1VsEta2", "Reco on-shell #eta_{1}", "Reco on-shell #eta_{2}", 40,-4.0,4.0, 40, -4.0, 4.0);
   m_recoOnVsOffShellMass             = declare2D(m_name, "recoOnVsOffShellMass", "Reco on-shell #mu#mu mass [GeV]","Reco off-shell #mu#mu mass [GeV]", 200,0.0,200.0, 200, 0.0, 200.0);
   m_recoOnShellMass27                = declare1D(m_name, "recoOnShellMass27", "Reco on-shell #mu#mu mass [GeV]", 200,0.0,200.0);
@@ -153,8 +160,8 @@ void EventHists::BookHists() {
 
   m_recoCharge                       = declare1D(m_name, "recoCharge", "Reco parent charge", 20,-10.0,10.0);
   m_recoTruthCharge                  = declare1D(m_name, "recoTruthCharge", "Reco parent truth charge", 20,-10.0,10.0);
-  m_recoSmallestDR                   = declare1D(m_name, "recoSmallestDR", "minimum #Delta R", 100, 0.0, 20.0);
-  m_recoPt                           = declare1D(m_name, "recoPt", "parent Pt [GeV]", 100, 0.0, 20.0);
+  m_recoSmallestDR                   = declare1D(m_name, "recoSmallestDR", "minimum #Delta R", 400, 0.0, 20.0);
+
   m_recoPt1                          = declare1D(m_name, "recoPt1", "Pt [GeV]", 300, 0.0, 150.0);
 
   m_recoPt2                          = declare1D(m_name, "recoPt2", "Pt [GeV]", 300, 0.0, 150.0);
@@ -184,14 +191,19 @@ void EventHists::BookHists() {
 
 
 
-  m_recoCutCode                      = declare1D(m_name, "recoCutCode", "reco cut code", 257, -1.0, 256);
-  m_recoCutCode27                    = declare1D(m_name, "recoCutCode27", "reco cut code", 257, -1.0, 256);
-  m_recoCutCode32                    = declare1D(m_name, "recoCutCode32", "reco cut code", 257, -1.0, 256);
-  m_recoCutCode4                     = declare1D(m_name, "recoCutCode4", "reco cut code", 257, -1.0, 256);
+  m_recoCutCode                      = declare1D(m_name, "recoCutCode", "reco cut code", 51, -1.0, 50);
+  m_recoCutCode27                    = declare1D(m_name, "recoCutCode27", "reco cut code", 51, -1.0, 50);
+  m_recoCutCode32                    = declare1D(m_name, "recoCutCode32", "reco cut code", 51, -1.0, 50);
+  m_recoCutCode4                     = declare1D(m_name, "recoCutCode4", "reco cut code", 51, -1.0, 50);
 
-  m_biasMatchedMass                  = declare1D(m_name, "biasMatchedMass", "Bias parent mass [GeV]", 200,-100,100.0);
-  m_biasRecoMass                     = declare1D(m_name, "biasRecoMass", "Bias parent mass [GeV]", 200,-100,100.0);
-  m_biasMatchedVsRecoMass            = declare1D(m_name, "biasMatchedVsRecoMass", " - Matched parent mass [GeV]", 200,-100,100.0);
+  m_recoPt                           = declare1D(m_name, "recoPt", "4#mu Pt [GeV]", 300, 0.0, 300.0);
+  m_recoEta                          = declare1D(m_name, "recoEta", "4#mu |#eta|", 100, 0.0, 10);
+  m_recoPhi                          = declare1D(m_name, "recoPhi", "4#mu #phi [rad]", 100, -3.1416, 3.1416);
+
+
+  // m_biasMatchedMass                  = declare1D(m_name, "biasMatchedMass", "Bias parent mass [GeV]", 200,-100,100.0);
+  // m_biasRecoMass                     = declare1D(m_name, "biasRecoMass", "Bias parent mass [GeV]", 200,-100,100.0);
+  // m_biasMatchedVsRecoMass            = declare1D(m_name, "biasMatchedVsRecoMass", " - Matched parent mass [GeV]", 200,-100,100.0);
 
 
   //fake charge hists
@@ -233,9 +245,52 @@ void EventHists::BookHists() {
 						       300, 0, 300,
 						       200, 0, 200);
 
+
+  // resolutions
+
+  m_sigRecoMass = declare1D(m_name, "sigRecoMass", "reco - truth", 200, -50,50.0);
+  m_sigRecoMass27 = declare1D(m_name, "sigRecoMass27", "reco - truth", 200, -50,50.0);
+  m_sigRecoMass32 = declare1D(m_name, "sigRecoMass32", "reco - truth", 200, -50,50.0);
+  m_sigRecoMass4 = declare1D(m_name, "sigRecoMass4", "reco - truth", 200, -50,50.0);
+
+  m_sigRecoOnShellMass = declare1D(m_name, "sigRecoOnShellMass", "reco - truth", 200, -50,50.0);
+  m_sigRecoOnShellMass27 = declare1D(m_name, "sigRecoOnShellMass27", "reco - truth", 200, -50,50.0);
+  m_sigRecoOnShellMass32 = declare1D(m_name, "sigRecoOnShellMass32", "reco - truth", 200, -50,50.0);
+  m_sigRecoOnShellMass4 = declare1D(m_name, "sigRecoOnShellMass4", "reco - truth", 200, -50,50.0);
+
+  m_sigRecoOffShellMass = declare1D(m_name, "sigRecoOffShellMass", "reco - truth", 200, -50,50.0);
+  m_sigRecoOffShellMass27 = declare1D(m_name, "sigRecoOffShellMass27", "reco - truth", 200, -50,50.0);
+  m_sigRecoOffShellMass32 = declare1D(m_name, "sigRecoOffShellMass32", "reco - truth", 200, -50,50.0);
+  m_sigRecoOffShellMass4 = declare1D(m_name, "sigRecoOffShellMass4", "reco - truth", 200, -50,50.0);
+
+  m_sigPt = declare1D(m_name, "sigPt", "reco - truth", 200, -50,50.0);
+  m_sigPt27 = declare1D(m_name, "sigPt27", "reco - truth", 200, -50,50.0);
+  m_sigPt32 = declare1D(m_name, "sigPt32", "reco - truth", 200, -50,50.0);
+  m_sigPt4 = declare1D(m_name, "sigPt4", "reco - truth", 200, -50,50.0);
+
+  m_sigEta = declare1D(m_name, "sigEta", "reco - truth", 200, -2,2.0);
+  m_sigEta27 = declare1D(m_name, "sigEta27", "reco - truth", 200, -2,2.0);
+  m_sigEta32 = declare1D(m_name, "sigEta32", "reco - truth", 200, -2,2.0);
+  m_sigEta4 = declare1D(m_name, "sigEta4", "reco - truth", 200, -2,2.0);
+
+  m_sigPhi = declare1D(m_name, "sigPhi", "reco - truth", 200, -0.1,0.1);
+  m_sigPhi27 = declare1D(m_name, "sigPhi27", "reco - truth", 200, -0.1,0.1);
+  m_sigPhi32 = declare1D(m_name, "sigPhi32", "reco - truth", 200, -0.1,0.1);
+  m_sigPhi4 = declare1D(m_name, "sigPhi4", "reco - truth", 200, -0.1,0.1);
+
+
+
+
+
+
+
 } // BookHists
 
 void EventHists::FillHists(EventFeatures &evt, float weight) const {
+
+  double truthOnShellMass, truthOffShellMass;
+
+
   m_pstrk              -> Fill(evt.nPseudoTracks,weight);
   m_primary_pstrk      -> Fill(evt.nPrimaryPseudoTracks,weight);
   m_secondary_pstrk    -> Fill(evt.nSecondaryPseudoTracks,weight);
@@ -309,10 +364,6 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
   m_nPixelClustersAtBLayer_vsMu_wide -> Fill(1.0*evt.nPixelClustersAtBLayer,evt.muValue,weight);
   m_nPixelHitsAtBLayer_vsMu_wide     -> Fill(1.0*evt.nPixelHitsAtBLayer,evt.muValue,weight);
 
-  m_recoCutCode           -> Fill(evt.physicsEvent.recoCutCode, weight);
-  m_recoCutCode27            -> Fill(evt.physicsEvent.recoCutCode27, weight);
-  m_recoCutCode32            -> Fill(evt.physicsEvent.recoCutCode32, weight);
-  m_recoCutCode4            -> Fill(evt.physicsEvent.recoCutCode4, weight);
 
   //physics hists
   if (evt.physicsEvent.isTruthSet()) {
@@ -320,6 +371,17 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
     std::vector<xAOD::TruthParticleContainer::const_iterator> truth_v = evt.physicsEvent.GetTruth();      
 
     m_truthMass                     -> Fill(1.0*evt.physicsEvent.GetTruthMass()/1000.0, weight);
+
+
+    m_recoCutCode           -> Fill(evt.physicsEvent.recoCutCode, weight);
+
+    if (TMath::Abs(evt.physicsEvent.GetTruthWithMaxEta()->eta()) < 2.7)
+      m_recoCutCode27            -> Fill(evt.physicsEvent.recoCutCode27, weight);
+    else if (TMath::Abs(evt.physicsEvent.GetTruthWithMaxEta()->eta()) < 3.2)
+      m_recoCutCode32            -> Fill(evt.physicsEvent.recoCutCode32, weight);
+    else if (TMath::Abs(evt.physicsEvent.GetTruthWithMaxEta()->eta()) < 4.0)
+      m_recoCutCode4            -> Fill(evt.physicsEvent.recoCutCode4, weight);
+    
 
     if (evt.physicsEvent.arePhotonsSet()) {
       m_truthMassWithPhotons        -> Fill(1.0*evt.physicsEvent.GetTruthP4WithPhotons().M()/1000.0, weight);
@@ -414,8 +476,8 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
       m_truthOnShellMass                    -> Fill(tmp.M()/1000.0);
       if (evt.physicsEvent.isTruthVisible)
 	m_visibleTruthOnShellMass                    -> Fill(tmp.M()/1000.0);
-
-
+    
+      truthOnShellMass = tmp.M();
       // if (TMath::Abs(evt.physicsEvent.GetTruthP4WithPhotons().M()/1000.0 - 90) < 10)
       // 	std::cout << "NEL PICCO: ONVSOFF: " << tmp.M()/1000 << '\t';
 	  
@@ -428,7 +490,7 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
       
       m_truthOffShellMass                   -> Fill(tmp.M()/1000.0);
 
-
+      truthOffShellMass = tmp.M();
       // if (TMath::Abs(evt.physicsEvent.GetTruthP4WithPhotons().M()/1000.0 - 90) < 10)
       // 	std::cout << tmp.M()/1000 << std::endl;
       
@@ -462,6 +524,9 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
     const std::vector<std::pair<xAOD::TrackParticleContainer::const_iterator, double> >& isolation = evt.physicsEvent.GetRecoIsolation();
     
     m_recoMass              -> Fill(1.0*evt.physicsEvent.GetRecoMass()/1000.0, weight);
+
+
+
 
     int NCenteredMuons = 0;
     for (auto itr = reco_v.begin();
@@ -516,26 +581,58 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
     ///////////////////
 
 
-    if (TMath::Abs(evt.physicsEvent.GetRecoWithMaxEta()->eta()) < 2.7) {
+    if (TMath::Abs(evt.physicsEvent.GetTruthWithMaxEta()->eta()) < 2.7) {
       m_recoMass27              -> Fill(1.0*evt.physicsEvent.GetRecoMass()/1000.0, weight);
       m_recoOnShellMass27       -> Fill(InvariantMass::TrackInvariantMass(onShell_reco_v, evt.physicsEvent.GetDecayMass())/1000.0,1.0);
       m_recoOnShellEta1VsEta2_27 -> Fill((*(onShell_reco_v[0]))->eta(), (*(onShell_reco_v[1]))->eta(), weight);
       m_recoOffShellMass27      -> Fill(InvariantMass::TrackInvariantMass(offShell_reco_v, evt.physicsEvent.GetDecayMass())/1000.0,1.0);
+
+      m_sigRecoMass27 -> Fill((evt.physicsEvent.GetRecoMass() - evt.physicsEvent.GetTruthP4WithPhotons().M())/1000.0);
+      m_sigRecoOnShellMass27 -> Fill((InvariantMass::TrackInvariantMass(onShell_reco_v, evt.physicsEvent.GetDecayMass()) - truthOnShellMass)/1000.0);
+      m_sigRecoOffShellMass27 -> Fill((InvariantMass::TrackInvariantMass(offShell_reco_v, evt.physicsEvent.GetDecayMass()) - truthOffShellMass)/1000.0);
+      m_sigPt27 -> Fill((evt.physicsEvent.GetRecoP4().Pt() - evt.physicsEvent.GetTruthP4WithPhotons().Pt())/1000.0);
+      m_sigEta27 -> Fill(evt.physicsEvent.GetRecoP4().Eta() - evt.physicsEvent.GetTruthP4WithPhotons().Eta());
+      m_sigPhi27 -> Fill(evt.physicsEvent.GetRecoP4().Phi() - evt.physicsEvent.GetTruthP4WithPhotons().Phi());
+
     }
 
-    else if (TMath::Abs(evt.physicsEvent.GetRecoWithMaxEta()->eta()) < 3.2) {
+    else if (TMath::Abs(evt.physicsEvent.GetTruthWithMaxEta()->eta()) < 3.2) {
       m_recoMass32              -> Fill(1.0*evt.physicsEvent.GetRecoMass()/1000.0, weight);
       m_recoOnShellMass32       -> Fill(InvariantMass::TrackInvariantMass(onShell_reco_v, evt.physicsEvent.GetDecayMass())/1000.0,1.0);
       m_recoOnShellEta1VsEta2_32 -> Fill((*(onShell_reco_v[0]))->eta(), (*(onShell_reco_v[1]))->eta(), weight);
       m_recoOffShellMass32      -> Fill(InvariantMass::TrackInvariantMass(offShell_reco_v, evt.physicsEvent.GetDecayMass())/1000.0,1.0);
+
+      m_sigRecoMass32 -> Fill((evt.physicsEvent.GetRecoMass() - evt.physicsEvent.GetTruthP4WithPhotons().M())/1000.0);
+      m_sigRecoOnShellMass32 -> Fill((InvariantMass::TrackInvariantMass(onShell_reco_v, evt.physicsEvent.GetDecayMass()) - truthOnShellMass)/1000.0);
+      m_sigRecoOffShellMass32 -> Fill((InvariantMass::TrackInvariantMass(offShell_reco_v, evt.physicsEvent.GetDecayMass()) - truthOffShellMass)/1000.0);
+      m_sigPt32 -> Fill((evt.physicsEvent.GetRecoP4().Pt() - evt.physicsEvent.GetTruthP4WithPhotons().Pt())/1000.0);
+      m_sigEta32 -> Fill(evt.physicsEvent.GetRecoP4().Eta() - evt.physicsEvent.GetTruthP4WithPhotons().Eta());
+      m_sigPhi32 -> Fill(evt.physicsEvent.GetRecoP4().Phi() - evt.physicsEvent.GetTruthP4WithPhotons().Phi());
+
     }
-    else if (TMath::Abs(evt.physicsEvent.GetRecoWithMaxEta()->eta()) < 4.0) {
+    else if (TMath::Abs(evt.physicsEvent.GetTruthWithMaxEta()->eta()) < 4.0) {
       m_recoMass4               -> Fill(1.0*evt.physicsEvent.GetRecoMass()/1000.0, weight);
       m_recoOnShellMass4        -> Fill(InvariantMass::TrackInvariantMass(onShell_reco_v, evt.physicsEvent.GetDecayMass())/1000.0,1.0);
       m_recoOnShellEta1VsEta2_4 -> Fill((*(onShell_reco_v[0]))->eta(), (*(onShell_reco_v[1]))->eta(), weight);
       m_recoOffShellMass4       -> Fill(InvariantMass::TrackInvariantMass(offShell_reco_v, evt.physicsEvent.GetDecayMass())/1000.0,1.0);
+
+      m_sigRecoMass4 -> Fill((evt.physicsEvent.GetRecoMass() - evt.physicsEvent.GetTruthP4WithPhotons().M())/1000.0);
+      m_sigRecoOnShellMass4 -> Fill((InvariantMass::TrackInvariantMass(onShell_reco_v, evt.physicsEvent.GetDecayMass()) - truthOnShellMass)/1000.0);
+      m_sigRecoOffShellMass4 -> Fill((InvariantMass::TrackInvariantMass(offShell_reco_v, evt.physicsEvent.GetDecayMass()) - truthOffShellMass)/1000.0);
+      m_sigPt4 -> Fill((evt.physicsEvent.GetRecoP4().Pt() - evt.physicsEvent.GetTruthP4WithPhotons().Pt())/1000.0);
+      m_sigEta4 -> Fill(evt.physicsEvent.GetRecoP4().Eta() - evt.physicsEvent.GetTruthP4WithPhotons().Eta());
+      m_sigPhi4 -> Fill(evt.physicsEvent.GetRecoP4().Phi() - evt.physicsEvent.GetTruthP4WithPhotons().Phi());
+
     }
 
+    
+    m_sigRecoMass -> Fill((evt.physicsEvent.GetRecoMass() - evt.physicsEvent.GetTruthP4WithPhotons().M())/1000.0);
+    m_sigRecoOnShellMass -> Fill((InvariantMass::TrackInvariantMass(onShell_reco_v, evt.physicsEvent.GetDecayMass()) - truthOnShellMass)/1000.0);
+    m_sigRecoOffShellMass -> Fill((InvariantMass::TrackInvariantMass(offShell_reco_v, evt.physicsEvent.GetDecayMass()) - truthOffShellMass)/1000.0);
+    m_sigPt -> Fill((evt.physicsEvent.GetRecoP4().Pt() - evt.physicsEvent.GetTruthP4WithPhotons().Pt())/1000.0);
+    m_sigEta -> Fill(evt.physicsEvent.GetRecoP4().Eta() - evt.physicsEvent.GetTruthP4WithPhotons().Eta());
+    m_sigPhi -> Fill(evt.physicsEvent.GetRecoP4().Phi() - evt.physicsEvent.GetTruthP4WithPhotons().Phi());
+    
     m_recoOnShellMass       -> Fill(InvariantMass::TrackInvariantMass(onShell_reco_v, evt.physicsEvent.GetDecayMass())/1000.0,1.0);
     m_recoOnShellEta1VsEta2 -> Fill((*(onShell_reco_v[0]))->eta(), (*(onShell_reco_v[1]))->eta(), weight);
     m_recoOffShellMass      -> Fill(InvariantMass::TrackInvariantMass(offShell_reco_v, evt.physicsEvent.GetDecayMass())/1000.0,1.0);
@@ -547,6 +644,8 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
     //m_recoTruthCharge       -> Fill(1.0*evt.physicsEvent.GetRecoTruthCharge(), weight);
     m_recoSmallestDR        -> Fill(1.0*evt.physicsEvent.GetRecoSmallestDR(), weight);
     m_recoPt                -> Fill(1.0*evt.physicsEvent.GetRecoP4().Pt()/1000.0, weight);
+    m_recoEta                -> Fill(TMath::Abs(1.0*evt.physicsEvent.GetRecoP4().Eta()), weight);
+    m_recoPhi                -> Fill(1.0*evt.physicsEvent.GetRecoP4().Phi(), weight);
     //m_recoTruthPt           -> Fill(1.0*evt.physicsEvent.GetRecoTruthP4().Pt()/1000.0, weight);
     m_recoMaxPt             -> Fill(1.0*evt.physicsEvent.GetRecoMaxPt()/1000.0, weight);
     if (xAOD::TrackHelper::truthParticle(evt.physicsEvent.GetRecoWithMaxEta()))
@@ -576,17 +675,21 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
   }
 
 
-  if (evt.physicsEvent.isMatchedSet()) {
-    m_biasMatchedMass                      -> Fill(1.0*(evt.physicsEvent.GetMatchedMass()-evt.physicsEvent.GetTruthMass())/1000.0, weight);
-  }
+  // if (evt.physicsEvent.isMatchedSet()) {
+  //   m_biasMatchedMass                      -> Fill(1.0*(evt.physicsEvent.GetMatchedMass()-evt.physicsEvent.GetTruthMass())/1000.0, weight);
+  // }
 
-  if (evt.physicsEvent.isRecoSet()) {
-    m_biasRecoMass              -> Fill(1.0*(evt.physicsEvent.GetRecoMass()-evt.physicsEvent.GetTruthMass())/1000.0, weight);
-  }
+  // if (evt.physicsEvent.isRecoSet()) {
+  //   m_biasRecoMass              -> Fill(1.0*(evt.physicsEvent.GetRecoMass()-evt.physicsEvent.GetTruthMass())/1000.0, weight);
+  // }
 
-  if (evt.physicsEvent.isMatchedSet() && evt.physicsEvent.isRecoSet()) {
-    m_biasMatchedVsRecoMass     -> Fill(1.0*(evt.physicsEvent.GetRecoMass()-evt.physicsEvent.GetMatchedMass())/1000.0, weight);
-  }
+  // if (evt.physicsEvent.isMatchedSet() && evt.physicsEvent.isRecoSet()) {
+  //   m_biasMatchedVsRecoMass     -> Fill(1.0*(evt.physicsEvent.GetRecoMass()-evt.physicsEvent.GetMatchedMass())/1000.0, weight);
+  // }
+
+
+    
+
 
   //fake charge in matched tracks
   if (evt.physicsEvent.isMatchedSet()) {

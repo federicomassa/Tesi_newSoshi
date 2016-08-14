@@ -84,8 +84,16 @@ class EventHists : public ManageHists {
     TH1F* m_nPrimaryPhotons; //!
     TH1F* m_truthOutsideDetector; //!
     TH1F* m_truthNCenteredMuons; //!
+
     TH1F* m_truthPt; //!
     TH1F* m_truthEta; //!
+    TH1F* m_truthPhi; //!
+
+    TH1F* m_truthPtWithPhotons; //!
+    TH1F* m_truthEtaWithPhotons; //!
+    TH1F* m_truthPhiWithPhotons; //!
+
+
     TH1F* m_truthPz; //!
     TH1F* m_truthMaxPt; //!
     TH1F* m_truthMinPt; //!
@@ -130,7 +138,8 @@ class EventHists : public ManageHists {
     TH1F* m_recoCharge; //!
     TH1F* m_recoTruthCharge; //!
     TH1F* m_recoMinDR; //!
-    TH1F* m_recoPt; //!
+
+
     TH1F* m_recoPt1; //!
     TH1F* m_recoPt2; //!
     TH1F* m_recoPt3; //!
@@ -149,14 +158,15 @@ class EventHists : public ManageHists {
     TH1F* m_recoMatchedMaxDR; //!
     TH1F* m_isRecoMatchingRight; //!
 
+    TH1F* m_recoPt; //!
+    TH1F* m_recoEta; //!
+    TH1F* m_recoPhi; //!
+
     TH1F* m_recoCutCode; //!
     TH1F* m_recoCutCode27; //!
     TH1F* m_recoCutCode32; //!
     TH1F* m_recoCutCode4;  //!
 
-    TH1F* m_biasMatchedMass; //!
-    TH1F* m_biasRecoMass; //!
-    TH1F* m_biasMatchedVsRecoMass; //!
 
     //fake charge in matched tracks
     TH2F* m_matchedChargeVsTruthMaxEta; //!
@@ -203,6 +213,40 @@ class EventHists : public ManageHists {
     TH1F* m_recoIsolation; //!
     TH2F* m_recoIsolationVsPt; //!
     TH2F* m_recoSumPtVsPt; //!
+
+
+    // resolutions
+    TH1F* m_sigRecoMass; //!
+    TH1F* m_sigRecoMass27; //!
+    TH1F* m_sigRecoMass32; //!
+    TH1F* m_sigRecoMass4; //!
+
+    TH1F* m_sigRecoOnShellMass; //!    
+    TH1F* m_sigRecoOnShellMass27; //!    
+    TH1F* m_sigRecoOnShellMass32; //!    
+    TH1F* m_sigRecoOnShellMass4; //!
+
+    TH1F* m_sigRecoOffShellMass; //!    
+    TH1F* m_sigRecoOffShellMass27; //!    
+    TH1F* m_sigRecoOffShellMass32; //!    
+    TH1F* m_sigRecoOffShellMass4; //!
+    
+    TH1F* m_sigPt; //!    
+    TH1F* m_sigPt27; //!    
+    TH1F* m_sigPt32; //!    
+    TH1F* m_sigPt4; //!
+
+    TH1F* m_sigEta; //!    
+    TH1F* m_sigEta27; //!    
+    TH1F* m_sigEta32; //!    
+    TH1F* m_sigEta4; //!
+
+    TH1F* m_sigPhi; //!    
+    TH1F* m_sigPhi27; //!    
+    TH1F* m_sigPhi32; //!    
+    TH1F* m_sigPhi4; //!
+
+
 
 };
 

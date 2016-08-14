@@ -491,6 +491,16 @@ EL::StatusCode HiggsAnalysis::execute() {
   }
 
 
+  double maxEta = -1;
+  
+  for (auto itr = genTargetMatched_itr.begin();
+       itr != genTargetMatched_itr.end();
+       itr++) {
+    if (TMath::Abs((**itr)->eta()) > maxEta)
+      maxEta = TMath::Abs((**itr)->eta());
+
+  }
+
   /*  if (TMath::Abs(InvariantMass::TruthInvariantMass(genTargetMatched_itr) - (50000+160000)/2.0) > (160000-50000)/2.0)
     return EL::StatusCode::SUCCESS;
   */
@@ -953,8 +963,14 @@ EL::StatusCode HiggsAnalysis::execute() {
 
     //apply here cuts on set of candidates
         if (TMath::Abs(totalCharge) > 1E-6 || false
-	    /*	TMath::Abs(candidateMomentum.M() - m_parentMass) > m_parentMassTolerance*/)
+	    /*	TMath::Abs(candidateMomentum.M() - m_parentMass) > m_parentMassTolerance*/) {
 	  isValidCandidate = false;
+	  
+	  if (eventReco.recoCutCode == 0)
+	    eventReco.recoCutCode = 5;
+  
+
+	}
 	
   }
 
@@ -1091,7 +1107,12 @@ EL::StatusCode HiggsAnalysis::execute() {
       isValidCandidate = true;
       itkTrk_itr_candidates = best_recoTrk_itr;
     }
-    
+ 
+    else {
+      if (eventReco.recoCutCode == 0)
+	eventReco.recoCutCode = 5;
+    }
+   
   }
   
 
@@ -1102,7 +1123,7 @@ EL::StatusCode HiggsAnalysis::execute() {
   ////////////////////////////////////////////////////////////////////
   // now look into candidates for parent decay and zero charge
   //  int nCount = 0;
-  double maxEta = -1;  
+
   //cut on intermediate particles
   if (isValidCandidate) {  //!!!!!!!!!!!
     HiggsEventSelector selector(itkTrk_itr_candidates);
@@ -1110,50 +1131,37 @@ EL::StatusCode HiggsAnalysis::execute() {
     selector.SetRankedPtCut(m_truthPtCut);
     result = selector.Check();
     if (result != 0 && eventReco.recoCutCode == 0)
-      eventReco.recoCutCode = result + 3;
+      eventReco.recoCutCode = result + 4;
     //selector.SetMassCut(m_massCutLow, m_massCutHigh);
 
 
     selector.SetDRCut(0.1);
     result = selector.Check();
     if (result != 0 && eventReco.recoCutCode == 0)
-      eventReco.recoCutCode = 9;
-
-    selector.SetCenteredOffShellMuonCut(0.0, 2.7);
-    result = selector.Check();
-    if (result != 0 && eventReco.recoCutCode == 0)
       eventReco.recoCutCode = 10;
 
-
-    selector.SetOnShellMassCut(m_onShellMassCutLow, m_onShellMassCutHigh);
+    selector.SetCenteredOffShellMuonCut(0.0, 2.7);
     result = selector.Check();
     if (result != 0 && eventReco.recoCutCode == 0)
       eventReco.recoCutCode = 11;
 
 
-    selector.SetOffShellMassCut(m_offShellMassCutLow, m_offShellMassCutHigh);
+    selector.SetOnShellMassCut(m_onShellMassCutLow, m_onShellMassCutHigh);
     result = selector.Check();
     if (result != 0 && eventReco.recoCutCode == 0)
       eventReco.recoCutCode = 12;
 
+
+    selector.SetOffShellMassCut(m_offShellMassCutLow, m_offShellMassCutHigh);
+    result = selector.Check();
+    if (result != 0 && eventReco.recoCutCode == 0)
+      eventReco.recoCutCode = 13;
+
     //selector.SetCenteredMuonCut(0.1, 2.7, 4);
 
     //selector.SetIsolationCut(recoIsolation, 100);
-    
-    if (maxEta < 2.7)
-      eventReco.recoCutCode27 = eventReco.recoCutCode;
-    else if (maxEta < 3.2)
-      eventReco.recoCutCode32 = eventReco.recoCutCode;
-    else if (maxEta < 4)
-      eventReco.recoCutCode4  = eventReco.recoCutCode; 
-    
 
-    for (auto itr = itkTrk_itr_candidates.begin();
-	 itr != itkTrk_itr_candidates.end();
-	 itr++) {
-      if (TMath::Abs((**itr)->eta()) > maxEta)
-	maxEta = TMath::Abs((**itr)->eta());
-    }
+     
 
     if (eventReco.recoCutCode == 0)
       isValidCandidate = true;
@@ -1165,6 +1173,14 @@ EL::StatusCode HiggsAnalysis::execute() {
     isValidCandidate = isValidCandidate && (TMath::Abs(InvariantMass::TrackInvariantMass(onShell_candidates, m_decayMass) - m_intermediateMass) < m_intermediateMassTolerance); 
     */
   }
+
+  if (maxEta < 2.7)
+    eventReco.recoCutCode27 = eventReco.recoCutCode;
+  else if (maxEta < 3.2)
+    eventReco.recoCutCode32 = eventReco.recoCutCode;
+  else if (maxEta < 4)
+    eventReco.recoCutCode4  = eventReco.recoCutCode; 
+  
     
 
   if (isValidCandidate /*&& isValidMatching*/) {
