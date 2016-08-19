@@ -1,5 +1,6 @@
 #include "Utility/TrackHelper.h"
 #include <TMath.h>
+#include <vector>
 
 // utility function
 const double deltaR(const double& eta1, const double& phi1, const double& eta2, const double& phi2) {
@@ -360,21 +361,41 @@ bool xAOD::TrackHelper :: isFake_TruthMatchProb( const xAOD::TrackParticle* tp )
   return true;    
 } 
 
-bool xAOD::TrackHelper :: isFake( const xAOD::TrackParticle* tp )
+bool xAOD::TrackHelper :: isFake( const xAOD::TrackParticle* tp , const xAOD::TruthParticle* hardTruth)
 {
-  const xAOD::TruthParticle* truth = xAOD::TrackHelper::truthParticle( tp );
 
-  if (truth != NULL)
-    {
-      const double dR = deltaR(truth->eta(), truth->phi(), tp->eta(), tp->phi());
-      if (dR < 0.02 && truth->barcode() != 0) return false;
-      else return true;
+  const xAOD::TruthParticle* truth;
+
+  if (hardTruth)
+    truth = hardTruth;
+  else
+    truth = xAOD::TrackHelper::truthParticle( tp );
+
+  double criticalDR;
+
+  if (truth) {
+    if (TMath::Abs(truth->pt() - 5000) < 0.1)
+      criticalDR = 0.04;
+    else if (TMath::Abs(truth->pt() - 15000) < 0.1)
+      criticalDR = 0.02;
+    else if (TMath::Abs(truth->pt() - 50000) < 0.1)
+      criticalDR = 0.01;
+    else if (TMath::Abs(truth->pt() - 100000) < 0.1)
+      criticalDR = 0.005;
+    else if (hardTruth == 0)
+      criticalDR = 0.02;
+    else {
+      std::cout << "xAOD::TrackHelper::isFake() Check truth Pt??" << std::endl; //our samples are 5, 15, 50, 100 GeV
+    }
   }
-  else //truthParticle not retrieved
-    {
-      //      std::cerr << "In xAOD::TrackHelper::isFake(const xAOD::TrackParticle*) - Null TruthParticle pointer" << std::endl;
-      return true;
-  }
+  else
+    return true;
+  
+  
+  
+  const double dR = deltaR(truth->eta(), truth->phi(), tp->eta(), tp->phi());
+  if (dR < criticalDR && truth->barcode() != 0) return false;
+  else return true;
   
   std::cerr << "In xAOD::TrackHelper::isFake(const xAOD::TrackParticle*) - Should have never shown this message" << std::endl;
   return true;    

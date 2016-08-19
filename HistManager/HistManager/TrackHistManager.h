@@ -7,6 +7,8 @@
 #include <Utility/TrackHelper.h>
 #endif // not __MAKECINT__
 
+#include "xAODTruth/TruthParticle.h"
+
 #include <iostream>
 #include <vector>
 
@@ -20,7 +22,7 @@ class TrackHistManager {
   void Init(EL::Worker* wk);
   void resetBarcodes();
 #ifndef __MAKECINT__
-  void FillHists(const xAOD::TrackParticle* trk, float weight) const;
+  void FillHists(const xAOD::TrackParticle* trk, float weight, const xAOD::TruthParticle* hardTruth = 0) const;
 #endif // not __MAKECINT__
 
 

@@ -17,14 +17,23 @@ void massResolution(const char* higgsFileName) {
   TH1F* onShell27 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoOnShellMass27");
   TH1F* offShell27 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoOffShellMass27");
   TH1F* tot27 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoMass27");
+  TH1F* pt27 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoPt27");
+  TH1F* eta27 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoEta27");
+  TH1F* phi27 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoPhi27");
 
   TH1F* onShell32 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoOnShellMass32");
   TH1F* offShell32 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoOffShellMass32");
   TH1F* tot32 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoMass32");
+  TH1F* pt32 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoPt32");
+  TH1F* eta32 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoEta32");
+  TH1F* phi32 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoPhi32");
 
   TH1F* onShell4 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoOnShellMass4");
   TH1F* offShell4 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoOffShellMass4");
   TH1F* tot4 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoMass4");
+  TH1F* pt4 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoPt4");
+  TH1F* eta4 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoEta4");
+  TH1F* phi4 = (TH1F*) higgsFile->Get("EventHist_all__sigRecoPhi4");
 
 
   gStyle->SetOptStat(0);
@@ -84,7 +93,7 @@ void massResolution(const char* higgsFileName) {
   offShell27->Scale(1/offShell27->GetEntries());
   offShell27->GetYaxis()->SetTitle("Entries (normalized)");
   offShell27->GetXaxis()->SetTitle("Off-shell #mu#mu mass - truth off-shell Z mass [GeV]");
-  offShell27->GetYaxis()->SetRangeUser(0.0,0.18);
+  //  offShell27->GetYaxis()->SetRangeUser(0.0,0.18);
   offShell27->Draw();
 
   offShell32->Scale(1/offShell32->GetEntries());
@@ -143,6 +152,118 @@ void massResolution(const char* higgsFileName) {
   delete c;
   delete leg;
   
+  ///////==================
+
+  plotStyle(pt27, "", 10, "m_{4#mu} [GeV]", "", kBlack, -20, 20); 
+  plotStyle(pt32, "", 10, "m_{4#mu} [GeV]", "", kRed, -20, 20); 
+  plotStyle(pt4, "", 10, "m_{4#mu} [GeV]", "", kBlue, -20, 20); 
+
+
+  c = new TCanvas();
+
+  // pt->SetFillColorAlpha(kRed,0.5);
+  // pt->SetFillStyle(3002);
+  pt27->SetTitle("");
+  pt27->Scale(1/pt27->GetEntries());
+  pt27->GetYaxis()->SetTitle("Entries (normalized)");
+  pt27->GetXaxis()->SetTitle("4#mu p_{T} - truth Higgs p_{T} [GeV]");
+  pt27->GetYaxis()->SetRangeUser(0.0,1.1*pt27->GetMaximum());
+  pt27->Draw();
+
+  pt32->Scale(1/pt32->GetEntries());
+  pt32->Draw("same");
+
+  pt4->Scale(1/pt4->GetEntries());
+  pt4->Draw("same");
+
+
+  leg = new TLegend(0.15,0.85,0.35,0.65);
+  leg->AddEntry(pt27, "|#eta^{#mu}_{max}| < 2.7", "l");
+  leg->AddEntry(pt32, "2.7 < |#eta^{#mu}_{max}| < 3.2", "l");
+  leg->AddEntry(pt4, "3.2 < |#eta^{#mu}_{max}| < 4.0", "l");
+
+  leg->Draw();
+
+  c->Print("sigRecoPt.png","png");
+
+  delete c;
+  delete leg;
+  
+  //////=========
+
+  plotStyle(eta27, "", 10, "m_{4#mu} [GeV]", "", kBlack, -0.4,0.4); 
+  plotStyle(eta32, "", 10, "m_{4#mu} [GeV]", "", kRed, -0.4,0.4); 
+  plotStyle(eta4, "", 10, "m_{4#mu} [GeV]", "", kBlue, -0.4,0.4); 
+
+
+  c = new TCanvas();
+
+  // eta->SetFillColorAlpha(kRed,0.5);
+  // eta->SetFillStyle(3002);
+  eta27->SetTitle("");
+  eta27->Scale(1/eta27->GetEntries());
+  eta27->GetYaxis()->SetTitle("Entries (normalized)");
+  eta27->GetXaxis()->SetTitle("4#mu #eta - truth Higgs #eta");
+  eta27->GetYaxis()->SetRangeUser(0.0,1.1*eta27->GetMaximum());
+  eta27->Draw();
+
+  eta32->Scale(1/eta32->GetEntries());
+  eta32->Draw("same");
+
+  eta4->Scale(1/eta4->GetEntries());
+  eta4->Draw("same");
+
+
+  leg = new TLegend(0.15,0.85,0.35,0.65);
+  leg->AddEntry(eta27, "|#eta^{#mu}_{max}| < 2.7", "l");
+  leg->AddEntry(eta32, "2.7 < |#eta^{#mu}_{max}| < 3.2", "l");
+  leg->AddEntry(eta4, "3.2 < |#eta^{#mu}_{max}| < 4.0", "l");
+
+  leg->Draw();
+
+  c->Print("sigRecoEta.png","png");
+
+  delete c;
+  delete leg;
+
+  /////===========
+
+  plotStyle(phi27, "", 10, "m_{4#mu} [GeV]", "", kBlack, -0.2,0.2); 
+  plotStyle(phi32, "", 10, "m_{4#mu} [GeV]", "", kRed, -0.2,0.2); 
+  plotStyle(phi4, "", 10, "m_{4#mu} [GeV]", "", kBlue, -0.2,0.2); 
+
+
+  c = new TCanvas();
+
+  // phi->SetFillColorAlpha(kRed,0.5);
+  // phi->SetFillStyle(3002);
+  phi27->SetTitle("");
+  phi27->Scale(1/phi27->GetEntries());
+  phi27->GetYaxis()->SetTitle("Entries (normalized)");
+  phi27->GetXaxis()->SetTitle("4#mu #phi - truth Higgs #phi [rad]");
+  phi27->GetYaxis()->SetRangeUser(0.0,1.1*phi27->GetMaximum());
+  phi27->Draw();
+
+  phi32->Scale(1/phi32->GetEntries());
+  phi32->Draw("same");
+
+  phi4->Scale(1/phi4->GetEntries());
+  phi4->Draw("same");
+
+
+  leg = new TLegend(0.15,0.85,0.35,0.65);
+  leg->AddEntry(phi27, "|#eta^{#mu}_{max}| < 2.7", "l");
+  leg->AddEntry(phi32, "2.7 < |#eta^{#mu}_{max}| < 3.2", "l");
+  leg->AddEntry(phi4, "3.2 < |#eta^{#mu}_{max}| < 4.0", "l");
+
+  leg->Draw();
+
+  c->Print("sigRecoPhi.png","png");
+
+  delete c;
+  delete leg;
+
+
 
 
 }

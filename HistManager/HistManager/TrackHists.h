@@ -11,6 +11,8 @@
 #include "xAODTracking/TrackParticle.h"
 #endif // not __MAKECINT__
 
+#include "xAODTruth/TruthParticle.h"
+
 class TrackHists : public ManageHists {
   friend class RunHists;
   friend class RunHistManager;
@@ -21,7 +23,7 @@ class TrackHists : public ManageHists {
 
     void BookHists();
 #ifndef __MAKECINT__
-    void FillHists(const xAOD::TrackParticle* trk, float weight) const;
+    void FillHists(const xAOD::TrackParticle* trk, float weight, const xAOD::TruthParticle* hardTruth = 0) const;
 
 
     //* Determine if the TruthParticle has been used before */
@@ -109,12 +111,16 @@ class TrackHists : public ManageHists {
     TH1F* m_z0Corr2; //!       
 
     /* track parameterization errors */
-    TH1F* m_qoverp_err; //!       
+    TH1F* m_qoverp_err; //!     
+    TH1F* m_qoverpsignif; //!         
     TH1F* m_eta_err; //!        
+    TH1F* m_etasignif; //!       
     TH1F* m_d0_err; //!       
     TH1F* m_d0signif; //!       
     TH1F* m_z0_err; //!       
+    TH1F* m_z0signif; //!       
     TH1F* m_phi_err; //!        
+    TH1F* m_phisignif; //!       
 
     TH1F* m_d0sign; //!       
     TH1F* m_d0signsig; //!       
@@ -133,6 +139,7 @@ class TrackHists : public ManageHists {
     std::vector<TH1F*> m_PixHits; //!
     std::vector<TH1F*> m_SCTHits; //!
     std::vector<TH1F*> m_SiHits; //!
+    std::vector<TH1F*> m_chiSqPerDof2D; //!
 
     TH1F* m_nGangedPix; //! 
     TH1F* m_nGangedPixFF; //! 
@@ -158,6 +165,7 @@ class TrackHists : public ManageHists {
 
     TH1F* m_chiSqPerDof; //!
     TH1F* m_Dof; //!
+    TH2F* m_hitsVsDof; //!
     TH1F* m_nOutliers; //!
     TH1F* m_stdDevChi2OS; //!
     TH1F* m_eProbComb; //!

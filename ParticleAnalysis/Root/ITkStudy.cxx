@@ -68,40 +68,35 @@ EL::StatusCode ITkStudy::histInitialize() {
   // 5th bool is if to fill plots based on hit content on track (need 1st be true)
   
   // recoTracks histograms
-  std::cout << "1" << std::endl;
+
 
   trkHist_all       = new TrackHists("TrackAll"); //every track, no cuts here
-  std::cout << "1" << std::endl;
+
   truHist_all       = new TruthHistManager("all"); //every truth status, no cuts
   truHist_hard      = new TruthHistManager("hard"); //gun particles
   
   truHist_hard      -> Init(wk());
   truHist_all       -> Init(wk());
   trkHist_reco      = new TrackHistManager("reco",true,true,true,true,true); //every track that matches the hs + mindRmatched < 0.1
-  std::cout << "1" << std::endl;
+  trkHist_pileup    = new TrackHistManager("pileup",true,true,true,true,true); //every track except the match
+
   clusHist_all      = new ClusterHists("SiliconAll");
-  std::cout << "1" << std::endl;
+
   vtxHist_secondary = new VertexHists("Vertex");
-  std::cout << "1" << std::endl;
+
   eventHist_all     = new EventHists("all");
   runHist_reco      = new RunHistManager(trkHist_reco, truHist_hard); //runHist reco is between target track and gun truth
-  std::cout << "1" << std::endl;
-
 
   trkHist_all       -> Init(wk());
-  std::cout << "1" << std::endl;
-
-  std::cout << "1" << std::endl;
-
-  std::cout << "1" << std::endl;
   trkHist_reco      -> Init(wk());
-  std::cout << "1" << std::endl;
+  trkHist_pileup    -> Init(wk());
+
   clusHist_all      -> Init(wk());
   vtxHist_secondary -> Init(wk());
   eventHist_all     -> Init(wk());
   runHist_reco      -> Init(wk());
 
-  std::cout << "1" << std::endl;
+
   return EL::StatusCode::SUCCESS;
 }
 
@@ -156,6 +151,7 @@ EL::StatusCode ITkStudy::execute() {
   // Reset barcode map in histogram class
   //---------------------------
   trkHist_reco->resetBarcodes();
+  trkHist_pileup->resetBarcodes();
 
   //---------------------------
   // Event information
@@ -232,6 +228,8 @@ EL::StatusCode ITkStudy::execute() {
   int numTruth = 0;
   int numChargedTruth = 0;
   int numPrimaryChargedTruth = 0;
+  int numSecondaryChargedTruth = 0;
+  int numSecondaryChargedTruth1GeV = 0;
   int numNeutralTruth = 0;
   int numTruth1GeV = 0;
   int numChargedTruth1GeV = 0;
@@ -263,7 +261,13 @@ EL::StatusCode ITkStudy::execute() {
       if (TMath::Abs((*truthPart_itr)->charge())==1) { 
 	numChargedTruth++;
 	if ((*truthPart_itr)->barcode() < 200000)
-	  numPrimaryChargedTruth++; 
+	  numPrimaryChargedTruth++;
+	else {
+	  numSecondaryChargedTruth++;
+	  if ((*truthPart_itr)->pt() > 1000)
+	    numSecondaryChargedTruth1GeV++;
+	  
+	}
       } //only primary (not interaction)
       if (TMath::Abs((*truthPart_itr)->charge())==0) { numNeutralTruth++; }
 
@@ -337,6 +341,7 @@ EL::StatusCode ITkStudy::execute() {
     for (xAOD::TruthParticleContainer::const_iterator genPrt_itr=truthPartsOrig->begin(); genPrt_itr!=truthPartsOrig->end(); genPrt_itr++) {
       if((*genPrt_itr)->barcode() <= 10e3 || (*genPrt_itr)->barcode() >= 200e3) { continue; }
       if ((*genPrt_itr)->status()!=1) { continue; }
+      if ((*genPrt_itr)->charge()==0) { continue; }
       if ((*genPrt_itr)->pdgId()==22) { continue; }
       float dR = deltaR((*genPrt_itr)->phi(),(*recoTrk_itr)->phi(),(*genPrt_itr)->eta(),(*recoTrk_itr)->eta());
       if (dR<mindR) { genMatched_itr = genPrt_itr; mindR = dR; }
@@ -433,6 +438,7 @@ EL::StatusCode ITkStudy::execute() {
   eventFeatures.nTruth = numTruth;
   eventFeatures.nChargedTruth = numChargedTruth;
   eventFeatures.nPrimaryChargedTruth = numPrimaryChargedTruth;
+
   eventFeatures.nNeutralTruth = numNeutralTruth;
 
   eventFeatures.nTruth1GeV = numTruth1GeV;
@@ -443,13 +449,19 @@ EL::StatusCode ITkStudy::execute() {
   eventFeatures.nVertex = numVtx;
   
 
-  eventHist_all->FillHists( eventFeatures, 1.0 ); 
+  const xAOD::TruthParticle* hardTruth = 0;
 
   for (xAOD::TruthParticleContainer::const_iterator truItr=truthPriParts->begin(); truItr!=truthPriParts->end(); truItr++) {
     truHist_all->FillHists((*truItr),1.0);
     
     if (TMath::Abs((*truItr)->pdgId())==m_idTarget && TMath::Abs((*truItr)->pt()-m_EnergyTarget)<0.1) {
+      hardTruth = *truItr;
       truHist_hard->FillHists( (*truItr), 1.0 );
+      if (TMath::Abs((*truItr)->eta()) < 4.0) {
+	eventFeatures.nSecondaryChargedTruth = numSecondaryChargedTruth;
+	eventFeatures.nSecondaryChargedTruth1GeV = numSecondaryChargedTruth1GeV;
+      }
+	
     }
   }
 
@@ -469,13 +481,19 @@ EL::StatusCode ITkStudy::execute() {
     float mindR = (*itkTrk_itr)->auxdata<float>("matchedDR");
     if (mindR<mindRMatched) { itkTrk_itr_matched = itkTrk_itr; mindRMatched = mindR; }
   }
+
+  for (xAOD::TrackParticleContainer::const_iterator itkTrk_itr=itkTrack->begin(); itkTrk_itr!=itkTrack->end(); itkTrk_itr++) {
+    if (itkTrk_itr != itkTrk_itr_matched)
+      trkHist_pileup->FillHists((*itkTrk_itr), 1.0);
+  }
+
 //  if (mindRMatched<0.02) {
 
   uint8_t getInt(0);
   if (mindRMatched<0.1 && 
-      (*itkTrk_itr_matched)->pt() > m_trkHist_reco_ptCut &&
-      xAOD::TrackHelper::numberOfSiHits(*itkTrk_itr_matched) >= m_trkHist_reco_hitsCut) {
-    trkHist_reco->FillHists( (*itkTrk_itr_matched), 1.0 );
+      (*itkTrk_itr_matched)->pt() > m_trkHist_reco_ptCut /*&&
+							   xAOD::TrackHelper::numberOfSiHits(*itkTrk_itr_matched) >= m_trkHist_reco_hitsCut*/) {
+    trkHist_reco->FillHists( (*itkTrk_itr_matched), 1.0, hardTruth );
   }
 
 
@@ -493,6 +511,8 @@ EL::StatusCode ITkStudy::execute() {
   for( ; sctCluster_itr != sctCluster_end; ++sctCluster_itr ) {
     clusHist_all -> FillHists( (*sctCluster_itr), 1.0 );
   }
+
+  eventHist_all->FillHists( eventFeatures, 1.0 ); 
 
   //---------------------
   // CLEAN UP

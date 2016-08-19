@@ -49,6 +49,9 @@ void EventHists::BookHists() {
   m_nChargedTruth     = declare1D(m_name, "nChargedTruth",     "N ChargedTruth in Event",  200, 0, 200);
   m_nPrimaryChargedTruth     = declare1D(m_name, "nPrimaryChargedTruth",     "N Primary Charged Truth in Event",  100, 0, 100);
   m_nPrimaryChargedTruth1GeV = declare1D(m_name, "nPrimaryChargedTruth1GeV",     "N Primary Charged Truth in Event with p_{T} > 1 GeV",  100, -0, 100);
+  m_nSecondaryChargedTruth     = declare1D(m_name, "nSecondaryChargedTruth",     "N Secondary Charged Truth in Event",  100, 0, 100);
+  m_nSecondaryChargedTruth1GeV = declare1D(m_name, "nSecondaryChargedTruth1GeV",     "N Secondary Charged Truth in Event with p_{T} > 1 GeV",  100, -0, 100);
+
   m_nNeutralTruth     = declare1D(m_name, "nNeutralTruth",     "N NeutralTruth in Event",  100, -0.5, 99.5);
   m_nTruth1GeV        = declare1D(m_name, "nTruth1GeV",        "N Truth (p_{T}>1GeV) in Event",  100, -0.5, 99.5);
   m_nChargedTruth1GeV = declare1D(m_name, "nChargedTruth1GeV", "N ChargedTruth (p_{T}>1GeV) in Event",  100, 0, 100);
@@ -83,7 +86,7 @@ void EventHists::BookHists() {
   m_truthMassWithPhotons             = declare1D(m_name, "truthMassWithPhotons", "Truth parent mass [GeV]", 200,0,200);
   m_nPrimaryPhotons                  = declare1D(m_name, "nPrimaryPhotons", "n primary photons in event", 10, 0, 10);
   m_truthEta                         = declare1D(m_name, "truthEta", "Truth parent #eta", 100, 0,10.0);
-  m_truthPhi                         = declare1D(m_name, "truthPhi", "Truth parent #eta", 100, 0,10.0);
+  m_truthPhi                         = declare1D(m_name, "truthPhi", "Truth parent #eta", 100, -3.1416,3.1416);
 
   m_truthPtWithPhotons               = declare1D(m_name, "truthPtWithPhotons", "Truth parent #eta", 300, 0,300.0);
   m_truthEtaWithPhotons              = declare1D(m_name, "truthEtaWithPhotons", "Truth parent #eta", 100, 0,10.0);
@@ -93,7 +96,7 @@ void EventHists::BookHists() {
   m_visibleTruthMass                 = declare1D(m_name, "visibleTruthMass", "Truth parent mass [GeV]", 300,0.0,300.0);
   m_truthOutsideDetector             = declare1D(m_name, "truthOutsideDetector", "# hard truth outside detector", 10, 0.0, 10.0);
   m_truthNCenteredMuons              = declare1D(m_name, "truthNCenteredMuons", "N muons within 2.7", 5, 0.0, 5.0);
-  m_truthPt                          = declare1D(m_name, "truthPt", "Truth parent pt [GeV]", 1000,0.0,400.0);
+  m_truthPt                          = declare1D(m_name, "truthPt", "Truth parent pt [GeV]", 300,0.0,300.0);
   m_truthPz                          = declare1D(m_name, "truthPz", "Truth parent pz [GeV]", 400,-2000.0,2000.0);
   m_truthMaxPt                       = declare1D(m_name, "truthMaxPt", "product max Pt [GeV]", 100, 0.0, 300.0);
   m_truthMinPt                       = declare1D(m_name, "truthMinPt", "product min Pt [GeV]", 100, 0.0, 300.0);
@@ -184,6 +187,7 @@ void EventHists::BookHists() {
   //reco matching
   m_recoMatchedMaxDR                 = declare1D(m_name, "recoMatchedMaxDR", "max dR in reco matching", 2000, 0.0, 20.0);
   m_isRecoMatchingRight              = declare1D(m_name, "isRecoMatchingRight", "", 5, 0.0, 5.0);
+  m_isRecoSetOutsideAcceptance       = declare1D(m_name, "isRecoSetOutsideAcceptance", "", 2, 0.0, 2.0);
 
   m_recoIsolation                    = declare1D(m_name, "recoMaxIsolation", "isolation", 100, 0, 5);
   m_recoIsolationVsPt                = declare2D(m_name, "recoIsolationVsPt", "isolation", "track p_{T}", 100, 0, 5, 200, 0, 200);
@@ -263,20 +267,20 @@ void EventHists::BookHists() {
   m_sigRecoOffShellMass32 = declare1D(m_name, "sigRecoOffShellMass32", "reco - truth", 200, -50,50.0);
   m_sigRecoOffShellMass4 = declare1D(m_name, "sigRecoOffShellMass4", "reco - truth", 200, -50,50.0);
 
-  m_sigPt = declare1D(m_name, "sigPt", "reco - truth", 200, -50,50.0);
-  m_sigPt27 = declare1D(m_name, "sigPt27", "reco - truth", 200, -50,50.0);
-  m_sigPt32 = declare1D(m_name, "sigPt32", "reco - truth", 200, -50,50.0);
-  m_sigPt4 = declare1D(m_name, "sigPt4", "reco - truth", 200, -50,50.0);
+  m_sigPt = declare1D(m_name, "sigRecoPt", "reco - truth", 200, -50,50.0);
+  m_sigPt27 = declare1D(m_name, "sigRecoPt27", "reco - truth", 200, -50,50.0);
+  m_sigPt32 = declare1D(m_name, "sigRecoPt32", "reco - truth", 200, -50,50.0);
+  m_sigPt4 = declare1D(m_name, "sigRecoPt4", "reco - truth", 200, -50,50.0);
 
-  m_sigEta = declare1D(m_name, "sigEta", "reco - truth", 200, -2,2.0);
-  m_sigEta27 = declare1D(m_name, "sigEta27", "reco - truth", 200, -2,2.0);
-  m_sigEta32 = declare1D(m_name, "sigEta32", "reco - truth", 200, -2,2.0);
-  m_sigEta4 = declare1D(m_name, "sigEta4", "reco - truth", 200, -2,2.0);
+  m_sigEta = declare1D(m_name, "sigRecoEta", "reco - truth", 200, -2,2.0);
+  m_sigEta27 = declare1D(m_name, "sigRecoEta27", "reco - truth", 200, -2,2.0);
+  m_sigEta32 = declare1D(m_name, "sigRecoEta32", "reco - truth", 200, -2,2.0);
+  m_sigEta4 = declare1D(m_name, "sigRecoEta4", "reco - truth", 200, -2,2.0);
 
-  m_sigPhi = declare1D(m_name, "sigPhi", "reco - truth", 200, -0.1,0.1);
-  m_sigPhi27 = declare1D(m_name, "sigPhi27", "reco - truth", 200, -0.1,0.1);
-  m_sigPhi32 = declare1D(m_name, "sigPhi32", "reco - truth", 200, -0.1,0.1);
-  m_sigPhi4 = declare1D(m_name, "sigPhi4", "reco - truth", 200, -0.1,0.1);
+  m_sigPhi = declare1D(m_name, "sigRecoPhi", "reco - truth", 100, -0.2,0.2);
+  m_sigPhi27 = declare1D(m_name, "sigRecoPhi27", "reco - truth", 100, -0.2,0.2);
+  m_sigPhi32 = declare1D(m_name, "sigRecoPhi32", "reco - truth", 100, -0.2,0.2);
+  m_sigPhi4 = declare1D(m_name, "sigRecoPhi4", "reco - truth", 100, -0.2,0.2);
 
 
 
@@ -336,6 +340,9 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
   m_nChargedTruth -> Fill(1.0*evt.nChargedTruth,weight);
   m_nPrimaryChargedTruth -> Fill(1.0*evt.nPrimaryChargedTruth,weight);
   m_nPrimaryChargedTruth1GeV -> Fill(1.0*evt.nPrimaryChargedTruth1GeV,weight);
+  m_nSecondaryChargedTruth -> Fill(1.0*evt.nSecondaryChargedTruth,weight);
+  m_nSecondaryChargedTruth1GeV -> Fill(1.0*evt.nSecondaryChargedTruth1GeV,weight);
+
   m_nNeutralTruth -> Fill(1.0*evt.nNeutralTruth,weight);
   m_nTruth1GeV        -> Fill(1.0*evt.nTruth1GeV,weight);
   m_nChargedTruth1GeV -> Fill(1.0*evt.nChargedTruth1GeV,weight);
@@ -402,11 +409,21 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
 
     
     m_truthNCenteredMuons -> Fill(NCenteredMuons, weight);
-
+    
     
     m_truthOutsideDetector          -> Fill(1.0*evt.physicsEvent.GetTruthOutsideDetector(), weight);
+
     m_truthPt                       -> Fill(1.0*evt.physicsEvent.GetTruthP4().Pt()/1000.0, weight);
     m_truthEta                      -> Fill(evt.physicsEvent.GetTruthP4().Eta(), weight);
+    m_truthPhi            -> Fill(1.0*evt.physicsEvent.GetTruthP4().Phi(), weight);
+
+
+    if (evt.physicsEvent.isRecoSet()) {
+      m_truthPtWithPhotons            -> Fill(1.0*evt.physicsEvent.GetTruthP4WithPhotons().Pt()/1000.0, weight);
+      m_truthEtaWithPhotons            -> Fill(TMath::Abs(1.0*evt.physicsEvent.GetTruthP4WithPhotons().Eta()), weight);
+      m_truthPhiWithPhotons  -> Fill(1.0*evt.physicsEvent.GetTruthP4WithPhotons().Phi());
+    }
+
     m_truthPz                       -> Fill(1.0*evt.physicsEvent.GetTruthP4().Pz()/1000.0, weight);
     m_truthMaxPt                    -> Fill(1.0*evt.physicsEvent.GetTruthMaxPt()/1000.0, weight);
     m_truthMaxEta                   -> Fill(TMath::Abs(1.0*evt.physicsEvent.GetTruthWithMaxEta()->eta()), weight);
@@ -526,7 +543,10 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
     m_recoMass              -> Fill(1.0*evt.physicsEvent.GetRecoMass()/1000.0, weight);
 
 
-
+    if (!evt.physicsEvent.isMatchedSet())
+      m_isRecoSetOutsideAcceptance -> Fill(1);
+    else
+      m_isRecoSetOutsideAcceptance -> Fill(0);
 
     int NCenteredMuons = 0;
     for (auto itr = reco_v.begin();
@@ -758,8 +778,17 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
 	  nFakeChargeTracks++;
 
 	if (xAOD::TrackHelper::truthParticle(*((*itr).second))) {
-	  if (TMath::Abs((*((*itr).first))->eta() - xAOD::TrackHelper::truthParticle(*((*itr).second))->eta()) < 1E-6)
+	  if (TMath::Abs((*((*itr).first))->eta() - xAOD::TrackHelper::truthParticle(*((*itr).second))->eta()) < 1E-10)
+	  
 	    isRecoMatchingRight++;
+	  else {
+	    std::cout << "reco link not corresponding!" << std::endl;
+	    std::cout << "Pdg id: " << xAOD::TrackHelper::truthParticle(*((*itr).second))->pdgId() << std::endl;
+	    std::cout << "Eta: " << (*((*itr).first))->eta() << '\t' << xAOD::TrackHelper::truthParticle(*((*itr).second))->eta() << std::endl;
+	    std::cout << "Phi: " << (*((*itr).first))->phi() << '\t' << xAOD::TrackHelper::truthParticle(*((*itr).second))->phi() << std::endl;
+	    std::cout << "Prod vtx: " << xAOD::TrackHelper::truthParticle(*((*itr).second))->prodVtx()->z() << '\t' << xAOD::TrackHelper::truthParticle(*((*itr).second))->prodVtx()->perp() << std::endl;
+	    std::cout << "Pt: " << xAOD::TrackHelper::truthParticle(*((*itr).second))->pt() << std::endl;
+	  }
 	}
 	else {isTruthParticle = false; break;}
 	  
@@ -767,6 +796,8 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
 
       }
       
+  
+
       m_NFakeChargeRecoTracks -> Fill(nFakeChargeTracks,weight);
       m_NFakeChargeRecoVsDR   -> Fill(nFakeChargeTracks, evt.physicsEvent.GetRecoMatchedMaxDR(), weight);
 
@@ -775,7 +806,7 @@ void EventHists::FillHists(EventFeatures &evt, float weight) const {
       else
 	m_isRecoMatchingRight -> Fill(-1.0, weight);
 
-    }
+  }
 
 }
 

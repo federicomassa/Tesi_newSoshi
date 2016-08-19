@@ -22,6 +22,7 @@ class GaussFitter {
   double m_mean;
   double m_amplitude;
   double m_sigma;
+  double m_nSigma;
 
   TFitResultPtr m_fitResult;
   int m_fitStatus;
@@ -31,7 +32,7 @@ class GaussFitter {
   static const double m_defaultThreshold;
 
  public:
-  GaussFitter(TH1F*, const Verbosity& verbosity = Verbosity::ERROR);
+  GaussFitter(TH1F*, const Verbosity& verbosity = Verbosity::ERROR, const double nSigma = 3);
   TF1* Fit();
   void SetThreshold(double);
   TF1* DrawFitFunction() const;
@@ -43,7 +44,7 @@ class GaussFitter {
   Double_t GetMeanError() const;
   Double_t GetAmplitudeError() const;
   Double_t GetSigmaError() const;
-  
+  Double_t GetReducedChiSquare() const;
 };
 
 #endif //GAUS_FITTER_H

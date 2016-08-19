@@ -56,7 +56,7 @@ namespace xAOD {
     bool isSecondary( const xAOD::TruthParticle* );
 	
     ///@brief  Check if the truth particle is a combinatorial fake or has no truth associated to it, uses fake definition dR(track/truth) > 0.02
-    bool isFake( const xAOD::TrackParticle*      );
+    bool isFake( const xAOD::TrackParticle*, const xAOD::TruthParticle* hardTruth = 0      );
   
     ///@brief  Check if the truth particle is a combinatorial fake or has no truth associated to it, uses TruthMatchProbability
     bool isFake_TruthMatchProb( const xAOD::TrackParticle*);

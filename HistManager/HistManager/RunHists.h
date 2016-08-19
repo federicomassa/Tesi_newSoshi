@@ -71,6 +71,8 @@ class RunHists : public ManageHists {
   TGraphErrors* m_SCTHits; //!
   TGraphErrors* m_SiHits; //!
 
+  TGraphErrors* m_chiSqPerDof; //!
+
 };
 
 #endif // end HistManager_RunHists_h

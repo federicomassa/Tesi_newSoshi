@@ -46,6 +46,7 @@ public:
   TruthHistManager* truHist_all; //!
   TruthHistManager* truHist_hard; //!
   TrackHistManager* trkHist_reco; //!
+  TrackHistManager* trkHist_pileup; //!
   ClusterHists*     clusHist_all; //!
   VertexHists*      vtxHist_secondary; //!
   EventHists*       eventHist_all; //!

@@ -48,11 +48,11 @@ void TrackHists::BookHists() {
   m_truthZ0       = declare1D(m_name, "truthZ0",       "Truth z_{0} [mm]",  100, -200.0,  200.0); 
 
   m_biasPt  = declare1D(m_name, "biasPt",  "#sigma(p_{T}) [MeV]",        100, -8000.0,8000.0); 
-  m_biasQPt = declare1D(m_name, "biasQPt", "p_{T}^{truth} x #sigma(q/p_{T})", 100,    -0.2,   0.2); 
+  m_biasQPt = declare1D(m_name, "biasQPt", "p_{T}^{truth} x #sigma(q/p_{T})", 500,    -1,   1); 
   m_biasEta = declare1D(m_name, "biasEta", "#sigma(#eta)", 			         100,   -2e-3,  2e-3); 
-  m_biasPhi = declare1D(m_name, "biasPhi", "#sigma(#phi)", 			         100,	  -1.0e-3,  1.0e-3); 
+  m_biasPhi = declare1D(m_name, "biasPhi", "#sigma(#phi)", 			         200,	  -2.0e-3,  2.0e-3); 
   m_biasD0  = declare1D(m_name, "biasD0",  "#sigma(d_{0}) [mm]",         100,    -0.2,   0.2); 
-  m_biasZ0  = declare1D(m_name, "biasZ0",  "#sigma(z_{0}) [mm]",         100,    -0.8,   0.8); 
+  m_biasZ0  = declare1D(m_name, "biasZ0",  "#sigma(z_{0}) [mm]",         640,    -3.2,   3.2); 
 
   for (int i = 0; i < m_etaVectorSize; i++) {
 
@@ -96,11 +96,14 @@ void TrackHists::BookHists() {
     const std::string SCTHitsName = "SCTHits_bin";
     const std::string SiHitsName = "SiHits_bin";
 
+    const std::string ChiSqName = "chiSqPerDof_bin";
+
     const std::string PixHitsTitle = "Number of Pixel hits( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
     const std::string SCTHitsTitle = "Number of SCT hits( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
     const std::string SiHitsTitle = "Number of Si hits( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
+    const std::string ChiSqTitle = "#chi^{2}/DOF ( " + etaLimitDown + " < |#eta| < " + etaLimitUp + ")";
 
-    m_biasPt_abseta.push_back(declare1D(m_name, (PtName + count).c_str(),  (PtTitle + PtUnits).c_str(), 200,-16000.0,16000.0));
+    m_biasPt_abseta.push_back(declare1D(m_name, (PtName + count).c_str(),  (PtTitle + PtUnits).c_str(), 250,-20000.0,20000.0));
     m_biasQPt_abseta.push_back(declare1D(m_name, (QPtName + count).c_str(),  (QPtTitle).c_str(), 200,-0.4,0.4));
     m_biasEta_abseta.push_back(declare1D(m_name, (EtaName + count).c_str(),  (EtaTitle).c_str(), 100,-0.01,0.01));
     m_biasPhi_abseta.push_back(declare1D(m_name, (PhiName + count).c_str(),  (PhiTitle).c_str(), 200,-5e-3,5e-3));
@@ -125,6 +128,8 @@ void TrackHists::BookHists() {
     m_SCTHits.push_back(declare1D(m_name, (SCTHitsName + count).c_str(),  (SCTHitsTitle).c_str(), 50,-0.5,49.5));
     m_SiHits.push_back(declare1D(m_name, (SiHitsName + count).c_str(),  (SiHitsTitle).c_str(), 50,-0.5,49.5));
 
+    m_chiSqPerDof2D.push_back(declare1D(m_name, (ChiSqName + count).c_str(),  (ChiSqTitle).c_str(), 50,0,5));
+
   }
 
   /* track parameterization */
@@ -145,11 +150,15 @@ void TrackHists::BookHists() {
 
   /* track parameterization errors */
   m_qoverp_err = declare1D(m_name, "qoverp_err", "#sigma #frac{q}{p} [GeV]", 200, 0.0,2e-6); 
+  m_qoverpsignif = declare1D(m_name, "qoverpsignif", "qoverp significance", 100, -5,5); 
   m_eta_err    = declare1D(m_name, "eta_err",    "#sigma #eta",              100, 0.0, 0.1); 
+  m_etasignif    = declare1D(m_name, "etasignif",    "#eta significance",              100, -5.0, 5); 
   m_d0_err     = declare1D(m_name, "d0_err",     "#sigma d_{0}",             100, 0.0, 0.04); 
   m_d0signif   = declare1D(m_name, "d0signif",   "d_{0} Significance",       100,-5.0, 5.0); 
   m_z0_err     = declare1D(m_name, "z0_err",     "#sigma z_{0}",             100, 0.0, 0.4); 
-  m_phi_err    = declare1D(m_name, "phi_err",    "#sigma #phi",              100,-3.5, 3.5); 
+  m_z0signif     = declare1D(m_name, "z0signif",     "z_{0} significance",             100, -5, 5); 
+  m_phi_err    = declare1D(m_name, "phi_err",    "#sigma #phi",              100,-3.5, 3.5);
+  m_phisignif    = declare1D(m_name, "phisignif",    "#sigma #phi",              100,-5, 5); 
 
   m_d0sign      = declare1D(m_name, "d0sign",      "signed IP [mm]",         100,   -10.0,   15.0); 
   m_d0signsig   = declare1D(m_name, "d0signsig",   "signed IP significance", 150,   -10.0,   20.0); 
@@ -157,13 +166,13 @@ void TrackHists::BookHists() {
   m_d0signsigN  = declare1D(m_name, "d0signsigN",  "signed IP significance", 150,   -10.0,   20.0); 
 
   /* track properties */
-  m_nPixHits = declare1D(m_name, "nPixHits", "N Pixel Hits",   16, -0.5, 15.5); 
-  m_nSCTHits = declare1D(m_name, "nSCTHits", "N SCT Hits",	   25, -0.5, 24.5); 
-  m_nSiHits  = declare1D(m_name, "nSiHits",  "N Silicon Hits", 30, -0.5, 29.5);
+  m_nPixHits = declare1D(m_name, "nPixHits", "N Pixel Hits",   40, 0, 40); 
+  m_nSCTHits = declare1D(m_name, "nSCTHits", "N SCT Hits",	   40, 0,40); 
+  m_nSiHits  = declare1D(m_name, "nSiHits",  "N Silicon Hits", 40, 0, 40);
 
-  m_eta_nPixHits = declare2D(m_name, "eta_nPixHits", "|#eta|", "N Pixel Hits",   20, 0, 4.0, 25, -0.5, 24.5); 
-  m_eta_nSCTHits = declare2D(m_name, "eta_nSCTHits", "|#eta|", "N SCT Hits",	   20, 0, 4.0, 20, -0.5, 19.5); 
-  m_eta_nSiHits  = declare2D(m_name, "eta_nSiHits",  "|#eta|", "N Silicon Hits", 20, 0, 4.0, 30, -0.5, 29.5);
+  m_eta_nPixHits = declare2D(m_name, "eta_nPixHits", "|#eta|", "N Pixel Hits",   20, 0, 4.0, 25, 0, 25); 
+  m_eta_nSCTHits = declare2D(m_name, "eta_nSCTHits", "|#eta|", "N SCT Hits",	   20, 0, 4.0, 20, 0, 20); 
+  m_eta_nSiHits  = declare2D(m_name, "eta_nSiHits",  "|#eta|", "N Silicon Hits", 20, 0, 4.0, 30, 0, 30);
 
   m_nGangedPix         = declare1D(m_name, "nGangedPix",         m_label + "N Pixel Ganged Hits",     8, -0.5,  7.5); 
   m_nGangedPixFF       = declare1D(m_name, "nGangedPixFF",       m_label + "N Pixel Ganged FF Hits",  6, -0.5,  5.5); 
@@ -172,7 +181,7 @@ void TrackHists::BookHists() {
   m_nPixSplitHits      = declare1D(m_name, "nPixSplitHits",      m_label + "N Pixel Split Hits",      8, -0.5,  7.5); 
   m_nPixSpoiltHits     = declare1D(m_name, "nPixSpoiltHits",     m_label + "N Pixel Spoilt Hits",     8, -0.5,  7.5); 
   m_nPixOutliers       = declare1D(m_name, "nPixOutliers",       m_label + "N Pixel Outliers",        8, -0.5,  7.5); 
-  m_nPixHoles          = declare1D(m_name, "nPixHoles",          m_label + "N Pixel Holes",           8, -0.5,  7.5); 
+  m_nPixHoles          = declare1D(m_name, "nPixHoles",          m_label + "N Pixel Holes",           8, 0,  8); 
   m_nPixelDeadSensors  = declare1D(m_name, "nPixelDeadSensors",  m_label + "N Pixel Dead Sensors",    8, -0.5,  7.5); 
   m_nSCTSharedHits     = declare1D(m_name, "nSCTSharedHits",     m_label + "N SCT Shared Hits",      11, -0.5, 10.5); 
   m_nSCTSpoiltHits     = declare1D(m_name, "nSCTSpoiltHits",     m_label + "N SCT Spoilt Hits",      11, -0.5, 10.5); 
@@ -189,6 +198,7 @@ void TrackHists::BookHists() {
 
   m_chiSqPerDof  = declare1D(m_name, "chiSqPerDof",  m_label + "#chi^{2}/DOF", 120,  0.0, 12.0);
   m_Dof          = declare1D(m_name, "Dof",          m_label + "DOF", 100, 0,100);
+  m_hitsVsDof    = declare2D(m_name, "hitsVsDof",    m_label + "nSiHits",  "DOF", 40, 0,40, 40,0,40);
   m_nOutliers    = declare1D(m_name, "nOutliers",    m_label + "N Outliers",    20, -0.5, 19.5);
   m_stdDevChi2OS = declare1D(m_name, "stdDevChi2OS", m_label + "100x Std. Dev. #chi^{2} from surface", 100, 0.0, 500.0);
 
@@ -247,7 +257,7 @@ void TrackHists::BookHists() {
 
 } // BookHists
 
-void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
+void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight, const xAOD::TruthParticle* hardTruth) const {
 
   if(m_usedBarcodes.size() > 100) { 
     std::cout << "WARNING::TrackHists " << m_name << " has " << m_usedBarcodes.size() 
@@ -322,9 +332,9 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
   m_qoverp_err -> Fill(sqrt(covTrk(4,4)),weight); 
   m_eta_err    -> Fill(sqrt(covTrk(3,3)),weight);  // really theta - FIXME
   m_d0_err     -> Fill(d0err,weight);
-  m_d0signif   -> Fill(d0signif,weight);
   m_z0_err     -> Fill(sqrt(covTrk(1,1)),weight); 
   m_phi_err    -> Fill(sqrt(covTrk(2,2)),weight); 
+
 
   //vx, vy, vz
   //parameterX, parameterY, parameterZ
@@ -352,6 +362,7 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
   m_eta_nPixHits -> Fill(TMath::Abs(trk->eta()),1.0*nPixHits);
   m_eta_nSCTHits -> Fill(TMath::Abs(trk->eta()),1.0*nSCTHits); 
   m_eta_nSiHits  -> Fill(TMath::Abs(trk->eta()),1.0*nSiHits);
+
 
   trk->summaryValue(getInt,xAOD::numberOfGangedPixels);       m_nGangedPix        -> Fill(getInt,weight);
   trk->summaryValue(getInt,xAOD::numberOfGangedFlaggedFakes); m_nGangedPixFF      -> Fill(getInt,weight);
@@ -390,6 +401,7 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
   PrintMessage("Chisq/dof Properties...");
   m_chiSqPerDof -> Fill(xAOD::TrackHelper::chiSqPerDoF(trk),weight);
   m_Dof         -> Fill(trk->numberDoF(), weight);
+  m_hitsVsDof   -> Fill(xAOD::TrackHelper::numberOfSiHits(trk), trk->numberDoF());
 
   trk->summaryValue(getInt,xAOD::numberOfOutliersOnTrack);   m_nOutliers    -> Fill(getInt,weight);
   trk->summaryValue(getInt,xAOD::standardDeviationOfChi2OS); m_stdDevChi2OS -> Fill(getInt,weight);
@@ -403,150 +415,177 @@ void TrackHists::FillHists(const xAOD::TrackParticle* trk, float weight) const {
   // Efficiency and fake study
   //===========================
   PrintMessage("Efficiency Properties...");
-  const xAOD::TruthParticle *truthParticle = xAOD::TrackHelper::truthParticle(trk);
+  const xAOD::TruthParticle *truthParticle;
 
-  if (truthParticle) {
+  if (hardTruth)
+    truthParticle = hardTruth;
+  else
+    truthParticle = xAOD::TrackHelper::truthParticle(trk);
 
-    m_pdgId -> Fill(truthParticle->pdgId(),weight);
-
-    if (truthParticle->hasProdVtx()) {
-      m_prodR -> Fill(truthParticle->prodVtx()->perp(),weight);
-      m_prodZ -> Fill(truthParticle->prodVtx()->z(),weight);
-    }
-
-    float truthd0 = 0.0;
-    if (truthParticle->isAvailable<float>("d0")) {
-      truthd0 = truthParticle->auxdata<float>("d0");
-    }
-    // else if(truthParticle->hasProdVtx()) {
-    //   const double p = TMath::Sqrt(TMath::Power(truthParticle->px(),2) +
-    // 				   TMath::Power(truthParticle->py(),2) +
-    // 				   TMath::Power(truthParticle->pz(),2));
-
-    //   /*truthd0 = (truthParticle->prodVtx()->x()*truthParticle->py() - 
-    // 	truthParticle->prodVtx()->y()*truthParticle->px())/p; */ //TODO: check same definition in ParticleAnalysis
-      
-    //   truthd0 = TMath::Sign(truthParticle->prodVtx()->perp(),
-    // 			    truthParticle->prodVtx()->x()*truthParticle->py() - 
-    // 			    truthParticle->prodVtx()->y()*truthParticle->px());
-      
-    //   if (p > 1E-10)
-    // 	truthd0 = (truthParticle->prodVtx()->x()*truthParticle->py() - 
-    // 		   truthParticle->prodVtx()->y()*truthParticle->px())/p;
-    
-    float truthz0 = 0.0;
-    if (truthParticle->isAvailable<float>("z0")) {
-      truthz0 = truthParticle->auxdata<float>("z0");
-    }
-    else if(truthParticle->hasProdVtx()) {
-      truthz0 = truthParticle->prodVtx()->z();
-    }
-
-    m_z0_truthz0    -> Fill(trk->z0(), trk->z0() - truthz0);
-    m_d0_truthd0    -> Fill(trk->d0(), trk->d0() - truthd0);
-
-    PrintMessage("Truth Properties...");
-    m_truthPt       -> Fill(truthParticle->pt()*1e-3,weight);
-    m_truthPtnarrow -> Fill(truthParticle->pt()*1e-3,weight);
-    m_truthEta      -> Fill(truthParticle->eta(),weight);
-    m_truthAbseta   -> Fill(TMath::Abs(truthParticle->eta()),weight);
-    m_truthPhi      -> Fill(truthParticle->phi(),weight);
-    m_truthD0       -> Fill(truthd0,weight);
-    m_truthZ0       -> Fill(truthz0,weight);
-    
-    float sigPt  = trk->pt()-truthParticle->pt();
-    float sigQPt = (trk->charge()/trk->pt()-truthParticle->charge()/truthParticle->pt())*truthParticle->pt();
-    float sigEta = trk->eta()-truthParticle->eta();
-    float sigPhi = TVector2::Phi_mpi_pi(trk->phi()-truthParticle->phi());
-    float sigD0  = trk->d0()-truthd0;
-    float sigZ0  = trk->z0()-truthz0;
-
-    PrintMessage("Bias Properties...");
-    m_biasPt  -> Fill(sigPt,weight);
-    m_biasQPt -> Fill(sigQPt,weight);
-    m_biasEta -> Fill(sigEta,weight);
-    m_biasPhi -> Fill(sigPhi,weight);
-    m_biasD0  -> Fill(sigD0,weight);
-    m_biasZ0  -> Fill(sigZ0,weight);
-    
-    //Bin number of X_vs_eta plots in which this track will fall into
-    const int etaBinId = TMath::FloorNint(TMath::Abs(truthParticle->eta())/m_etaMax * double(m_etaVectorSize));
-
-    if (etaBinId < m_etaVectorSize && etaBinId >= 0) { //TODO: check
-      Assert("TrackHists::FillHists()\tetaBinId out of bounds", etaBinId < m_etaVectorSize && etaBinId >= 0);
-      m_biasPt_abseta[etaBinId]  -> Fill(sigPt,  weight);
-      m_biasQPt_abseta[etaBinId] -> Fill(sigQPt, weight);
-      m_biasEta_abseta[etaBinId] -> Fill(sigEta/TMath::Abs(truthParticle->eta()), weight); //TODO: sigmaEta/Eta
-      m_biasPhi_abseta[etaBinId] -> Fill(sigPhi, weight);
-      m_biasD0_abseta[etaBinId]  -> Fill(sigD0,  weight);
-      m_biasZ0_abseta[etaBinId]  -> Fill(sigZ0,  weight);
-
-      m_PixHits[etaBinId]        -> Fill(nPixHits, weight);
-      m_SCTHits[etaBinId]        -> Fill(nSCTHits, weight);
-      m_SiHits[etaBinId]         -> Fill(nSiHits, weight);
-
-      if (truthParticle->eta() < 0) {
-	m_biasPt_negeta[etaBinId]  -> Fill(sigPt,  weight);
-	m_biasQPt_negeta[etaBinId]  -> Fill(sigQPt,  weight);
-	m_biasEta_negeta[etaBinId]  -> Fill(sigEta,  weight);
-	m_biasPhi_negeta[etaBinId]  -> Fill(sigPhi,  weight);
-	m_biasD0_negeta[etaBinId]  -> Fill(sigD0,  weight);
-	m_biasZ0_negeta[etaBinId]  -> Fill(sigZ0,  weight);
-      }
-      else {
-	m_biasPt_poseta[etaBinId]  -> Fill(sigPt,  weight);
-	m_biasQPt_poseta[etaBinId]  -> Fill(sigQPt,  weight);
-	m_biasEta_poseta[etaBinId]  -> Fill(sigEta,  weight);
-	m_biasPhi_poseta[etaBinId]  -> Fill(sigPhi,  weight);
-	m_biasD0_poseta[etaBinId]  -> Fill(sigD0,  weight);
-	m_biasZ0_poseta[etaBinId]  -> Fill(sigZ0,  weight);      
-      }
-    }
-
-    if (trk->isAvailable<float>("matchedDR")) {
-      bool passCut = false;
-      
-      float mindR = trk->auxdata<float>("matchedDR");
-      float prob = xAOD::TrackHelper::truthMatchProb(trk);
-      m_truthMatchProb -> Fill(prob,weight);
-      m_truthMatchProbVsMatchingDR->Fill(prob,mindR);
-
-      PrintMessage("Before passCut...");
-      //  passCut=true;
-      //    if (nSiHits>8) { passCut=true; }
-      //    if (nSiHits>9) { passCut=true; }
-      if (nSiHits>10) { passCut=true; }
-      
-      if (passCut) {
-	if (prob>0.95) { // !!!!!!!!! TODO: check !!!!!!!!!!!!!!
-	  m_matchingDR -> Fill(mindR,weight);
-	  if (mindR<0.01) { m_truthAbseta_dr001 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.02) { m_truthAbseta_dr002 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.03) { m_truthAbseta_dr003 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.04) { m_truthAbseta_dr004 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.05) { m_truthAbseta_dr005 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.06) { m_truthAbseta_dr006 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.07) { m_truthAbseta_dr007 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.08) { m_truthAbseta_dr008 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	  if (mindR<0.09) { m_truthAbseta_dr009 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
-	}
-      }
-    }
-  }
-
-  else {
+  if (truthParticle == NULL) {
     std::cout << "TrackHists::FillHists()\t No truth particle retrieved, not filling this track" << std::endl;
+    return;
   }
-  // Cluster study
-  // m_IBLCharge           -> Fill(trk->auxdata<float>("IBLCharge"),weight); 
-  // m_IBLHitSize          -> Fill(trk->auxdata<int>("IBLHitSize"),weight); 
-  // m_IBLHitSizeZ         -> Fill(trk->auxdata<int>("IBLHitSizeZ"),weight); 
-  // m_IBLHitSizePhi       -> Fill(trk->auxdata<int>("IBLHitSizePhi"),weight); 
-  // m_IBLlocalPhi         -> Fill(trk->auxdata<float>("IBLlocalPhi"),weight);
-  // m_IBLlocalTheta       -> Fill(trk->auxdata<float>("IBLlocalTheta"),weight);
-  // m_IBLlocalPhi_sizePhi -> Fill(trk->auxdata<float>("IBLlocalPhi"),trk->auxdata<int>("IBLHitSizePhi"),weight);
-  // m_IBLlocalTheta_sizeZ -> Fill(trk->auxdata<float>("IBLlocalTheta"),trk->auxdata<int>("IBLHitSizeZ"),weight);
+  
+  
+  
 
+  m_pdgId -> Fill(truthParticle->pdgId(),weight);
+  
+  if (truthParticle->hasProdVtx()) {
+    m_prodR -> Fill(truthParticle->prodVtx()->perp(),weight);
+    m_prodZ -> Fill(truthParticle->prodVtx()->z(),weight);
+  }
+  
+  float truthd0 = 0.0;
+  if (truthParticle->isAvailable<float>("d0")) {
+    truthd0 = truthParticle->auxdata<float>("d0");
+  }
+  // else if(truthParticle->hasProdVtx()) {
+  //   const double p = TMath::Sqrt(TMath::Power(truthParticle->px(),2) +
+  // 				   TMath::Power(truthParticle->py(),2) +
+  // 				   TMath::Power(truthParticle->pz(),2));
+  
+  //   /*truthd0 = (truthParticle->prodVtx()->x()*truthParticle->py() - 
+  // 	truthParticle->prodVtx()->y()*truthParticle->px())/p; */ //TODO: check same definition in ParticleAnalysis
+  
+  //   truthd0 = TMath::Sign(truthParticle->prodVtx()->perp(),
+  // 			    truthParticle->prodVtx()->x()*truthParticle->py() - 
+  // 			    truthParticle->prodVtx()->y()*truthParticle->px());
+  
+  //   if (p > 1E-10)
+  // 	truthd0 = (truthParticle->prodVtx()->x()*truthParticle->py() - 
+  // 		   truthParticle->prodVtx()->y()*truthParticle->px())/p;
+  
+  float truthz0 = 0.0;
+  if (truthParticle->isAvailable<float>("z0")) {
+    truthz0 = truthParticle->auxdata<float>("z0");
+  }
+  else if(truthParticle->hasProdVtx()) {
+    truthz0 = truthParticle->prodVtx()->z();
+  }
+  
+  m_z0_truthz0    -> Fill(trk->z0(), trk->z0() - truthz0);
+  m_d0_truthd0    -> Fill(trk->d0(), trk->d0() - truthd0);
+  
+  PrintMessage("Truth Properties...");
+  
+  m_truthPt       -> Fill(truthParticle->pt()*1e-3,weight);
+  m_truthPtnarrow -> Fill(truthParticle->pt()*1e-3,weight);
+  m_truthEta      -> Fill(truthParticle->eta(),weight);
+  m_truthAbseta   -> Fill(TMath::Abs(truthParticle->eta()),weight);
+  m_truthPhi      -> Fill(truthParticle->phi(),weight);
+  m_truthD0       -> Fill(truthd0,weight);
+  m_truthZ0       -> Fill(truthz0,weight);
+  
+  double sigPt, sigQPt, sigEta, sigPhi, sigD0, sigZ0;
+  
+  
+  sigPt  = trk->pt()-truthParticle->pt();
+  sigQPt = (trk->charge()/trk->pt()-truthParticle->charge()/truthParticle->pt())*truthParticle->pt();
+  sigEta = trk->eta()-truthParticle->eta();
+  sigPhi = TVector2::Phi_mpi_pi(trk->phi()-truthParticle->phi());
+  sigD0  = trk->d0()-truthd0;
+  sigZ0  = trk->z0()-truthz0;
+  
+  
+  m_d0signif   -> Fill(d0signif,weight);
+  m_qoverpsignif -> Fill((trk->charge()/trk->pt()/TMath::CosH(trk->eta())-truthParticle->charge()/truthParticle->pt()/TMath::CosH(truthParticle->eta()))/sqrt(covTrk(4,4)),weight);
+  m_etasignif -> Fill(sigEta/sqrt(covTrk(3,3))/TMath::CosH(trk->eta()),weight);
+  m_phisignif -> Fill(sigPhi/sqrt(covTrk(2,2)),weight);
+  m_z0signif -> Fill(sigQPt/sqrt(covTrk(1,1)),weight);
+  
+  
+  PrintMessage("Bias Properties...");
+  m_biasPt  -> Fill(sigPt,weight);
+  m_biasQPt -> Fill(sigQPt,weight);
+  m_biasEta -> Fill(sigEta,weight);
+  m_biasPhi -> Fill(sigPhi,weight);
+  m_biasD0  -> Fill(sigD0,weight);
+  m_biasZ0  -> Fill(sigZ0,weight);
+  
+  //Bin number of X_vs_eta plots in which this track will fall into
+  int etaBinId;
+  
+  
+  
+  
+  etaBinId = TMath::FloorNint(TMath::Abs(truthParticle->eta())/m_etaMax * double(m_etaVectorSize));
+  
+  if (etaBinId < m_etaVectorSize && etaBinId >= 0) { //TODO: check
+    Assert("TrackHists::FillHists()\tetaBinId out of bounds", etaBinId < m_etaVectorSize && etaBinId >= 0);
+    m_biasPt_abseta[etaBinId]  -> Fill(sigPt,  weight);
+    m_biasQPt_abseta[etaBinId] -> Fill(sigQPt, weight);
+    m_biasEta_abseta[etaBinId] -> Fill(sigEta/TMath::Abs(truthParticle->eta()), weight); //TODO: sigmaEta/Eta
+    m_biasPhi_abseta[etaBinId] -> Fill(sigPhi, weight);
+    m_biasD0_abseta[etaBinId]  -> Fill(sigD0,  weight);
+    m_biasZ0_abseta[etaBinId]  -> Fill(sigZ0,  weight);
+    
+    m_PixHits[etaBinId]        -> Fill(nPixHits, weight);
+    m_SCTHits[etaBinId]        -> Fill(nSCTHits, weight);
+    m_SiHits[etaBinId]         -> Fill(nSiHits, weight);
+    
+    m_chiSqPerDof2D[etaBinId]  -> Fill(xAOD::TrackHelper::chiSqPerDoF(trk));
+    
+    if (truthParticle->eta() < 0) {
+      m_biasPt_negeta[etaBinId]  -> Fill(sigPt,  weight);
+      m_biasQPt_negeta[etaBinId]  -> Fill(sigQPt,  weight);
+      m_biasEta_negeta[etaBinId]  -> Fill(sigEta,  weight);
+      m_biasPhi_negeta[etaBinId]  -> Fill(sigPhi,  weight);
+      m_biasD0_negeta[etaBinId]  -> Fill(sigD0,  weight);
+      m_biasZ0_negeta[etaBinId]  -> Fill(sigZ0,  weight);
+    }
+    else {
+      m_biasPt_poseta[etaBinId]  -> Fill(sigPt,  weight);
+      m_biasQPt_poseta[etaBinId]  -> Fill(sigQPt,  weight);
+      m_biasEta_poseta[etaBinId]  -> Fill(sigEta,  weight);
+      m_biasPhi_poseta[etaBinId]  -> Fill(sigPhi,  weight);
+      m_biasD0_poseta[etaBinId]  -> Fill(sigD0,  weight);
+      m_biasZ0_poseta[etaBinId]  -> Fill(sigZ0,  weight);      
+    }
+  }
+  
+  if (trk->isAvailable<float>("matchedDR")) {
+    bool passCut = true;
+    
+    float mindR = trk->auxdata<float>("matchedDR");
+    float prob = xAOD::TrackHelper::truthMatchProb(trk);
+    m_truthMatchProb -> Fill(prob,weight);
+    m_truthMatchProbVsMatchingDR->Fill(prob,mindR);
+    
+    PrintMessage("Before passCut...");
+    //  passCut=true;
+    //    if (nSiHits>8) { passCut=true; }
+    //    if (nSiHits>9) { passCut=true; }
+    if (nSiHits>0) { passCut=true; }
+    
+    if (passCut) {
+      if (prob>0.) { // !!!!!!!!! TODO: check !!!!!!!!!!!!!!
+	m_matchingDR -> Fill(mindR,weight);
+	if (mindR<0.01) { m_truthAbseta_dr001 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	if (mindR<0.02) { m_truthAbseta_dr002 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	if (mindR<0.03) { m_truthAbseta_dr003 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	if (mindR<0.04) { m_truthAbseta_dr004 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	if (mindR<0.05) { m_truthAbseta_dr005 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	if (mindR<0.06) { m_truthAbseta_dr006 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	if (mindR<0.07) { m_truthAbseta_dr007 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	if (mindR<0.08) { m_truthAbseta_dr008 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+	if (mindR<0.09) { m_truthAbseta_dr009 -> Fill(TMath::Abs(truthParticle->eta()),weight); }
+      }
+    }
+  }
+  
+  
+    // Cluster study
+    // m_IBLCharge           -> Fill(trk->auxdata<float>("IBLCharge"),weight); 
+    // m_IBLHitSize          -> Fill(trk->auxdata<int>("IBLHitSize"),weight); 
+    // m_IBLHitSizeZ         -> Fill(trk->auxdata<int>("IBLHitSizeZ"),weight); 
+    // m_IBLHitSizePhi       -> Fill(trk->auxdata<int>("IBLHitSizePhi"),weight); 
+    // m_IBLlocalPhi         -> Fill(trk->auxdata<float>("IBLlocalPhi"),weight);
+    // m_IBLlocalTheta       -> Fill(trk->auxdata<float>("IBLlocalTheta"),weight);
+    // m_IBLlocalPhi_sizePhi -> Fill(trk->auxdata<float>("IBLlocalPhi"),trk->auxdata<int>("IBLHitSizePhi"),weight);
+    // m_IBLlocalTheta_sizeZ -> Fill(trk->auxdata<float>("IBLlocalTheta"),trk->auxdata<int>("IBLHitSizeZ"),weight);
+  
   // m_IBLbiasedResidualX    -> Fill(trk->auxdata<float>("IBLbiasedResidualX"),weight);
   // m_IBLbiasedResidualY    -> Fill(trk->auxdata<float>("IBLbiasedResidualY"),weight);
   // m_IBLunbiasedResidualX  -> Fill(trk->auxdata<float>("IBLunbiasedResidualX"),weight);

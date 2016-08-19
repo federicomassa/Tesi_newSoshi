@@ -69,6 +69,8 @@ void RunHists::BookHists() {
   m_SCTHits        = declareGraphErrors(m_name, "SCTHits", "|#eta|", "<SCTHits>");
   m_SiHits        = declareGraphErrors(m_name, "SiHits", "|#eta|", "<SiHits>");
 
+  m_chiSqPerDof   = declareGraphErrors(m_name, "chiSqPerDof", "|#eta|", "<#chi^{2}/DOF>");
+
 
   m_eff_abseta     = declareGraphErrors(m_name, "eff_abseta", "|#eta|", "Efficiency"); 
   m_eff_phi        = declareGraphErrors(m_name, "eff_phi", "#phi", "Efficiency"); 
@@ -406,6 +408,14 @@ void RunHists::FillHists(float weight) const {
 
     m_SiHits->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetMean());
     m_SiHits->SetPointError(index,m_etaInterval/2.0,(*itr)->GetMeanError());
+
+  }
+
+  for (std::vector<TH1F*>::const_iterator itr = m_trackHist->m_chiSqPerDof2D.begin(); itr != m_trackHist->m_chiSqPerDof2D.end(); itr++) {
+    int index = itr - m_trackHist->m_chiSqPerDof2D.begin();
+
+    m_chiSqPerDof->SetPoint(index, m_etaInterval/2.0 + m_etaInterval*double(index), (*itr)->GetMean());
+    m_chiSqPerDof->SetPointError(index,m_etaInterval/2.0,(*itr)->GetMeanError());
 
   }
 

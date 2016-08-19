@@ -115,52 +115,52 @@ void TrackHistManager::resetBarcodes() {
 
 } // BookHists
 
-void TrackHistManager::FillHists(const xAOD::TrackParticle* trk, float weight) const {
+void TrackHistManager::FillHists(const xAOD::TrackParticle* trk, float weight, const xAOD::TruthParticle* hardTruth) const {
 
   const xAOD::TruthParticle* truth = xAOD::TrackHelper::truthParticle(trk);
 
-  m_all->FillHists( trk,weight);
-  if( m_doFake && xAOD::TrackHelper::isFake( trk ) ){
-    m_fake->FillHists( trk,weight);
+  m_all->FillHists( trk,weight, hardTruth);
+  if( m_doFake && xAOD::TrackHelper::isFake( trk, hardTruth ) ){
+    m_fake->FillHists( trk,weight, hardTruth);
   }
   else if (m_doFake && !xAOD::TrackHelper::isFake( trk ) ) {
-    m_true->FillHists( trk,weight);
+    m_true->FillHists( trk,weight, hardTruth);
   }
   else if (m_doFake && truth) {
     if ( TMath::Abs(trk->charge() - truth->charge()) > 1E-6)
-      m_fakeCharge -> FillHists(trk,weight);
+      m_fakeCharge -> FillHists(trk,weight, hardTruth);
   }
   else if( m_doPrimary && xAOD::TrackHelper::isPrimary( trk ) ){
     if( !m_primary->hasBeenUsed( trk ) ){
-      m_primary->FillHists( trk,weight);
+      m_primary->FillHists( trk,weight, hardTruth);
       if(m_splitOnHits) {
         uint8_t getInt(0);   // for accessing summary information
         //has a b-layer hit?
         trk->summaryValue( getInt, xAOD::numberOfBLayerHits );
         if( getInt > 0 ) { 
-          m_primary_bhit     ->FillHists( trk,weight);
+          m_primary_bhit     ->FillHists( trk,weight, hardTruth);
           // has a shared b-layer hit
           trk->summaryValue( getInt, xAOD::numberOfBLayerSharedHits);
-          if( getInt > 0 ) { m_primary_bhitShare->FillHists( trk,weight); }
+          if( getInt > 0 ) { m_primary_bhitShare->FillHists( trk,weight, hardTruth); }
           // has a split b-layer hit          
           trk->summaryValue( getInt, xAOD::numberOfBLayerSplitHits);
-          if( getInt > 0 ) { m_primary_bhitSplit->FillHists( trk,weight); }
+          if( getInt > 0 ) { m_primary_bhitSplit->FillHists( trk,weight, hardTruth); }
         }
         // is b-layer hit merged? Need to go to cluster and count!!
         // already done above for all hits on track!
 	if (trk->isAvailable<std::vector<int>>("pixClustPriPartContent"))
 	  if( (trk->auxdata< std::vector<int> >( "pixClusPriPartContent" )).at(0) > 1 ) {
-          m_primary_bhitMerge->FillHists( trk,weight);
+          m_primary_bhitMerge->FillHists( trk,weight, hardTruth);
         }
       } // splitonhits
     } else if(m_doDups) {
-      m_primary_dup->FillHists( trk,weight);
+      m_primary_dup->FillHists( trk,weight, hardTruth);
     } 
   } else if( m_doSecondary && xAOD::TrackHelper::isSecondary( trk ) ){
     if( !m_secondary->hasBeenUsed( trk ) ){
-      m_secondary->FillHists( trk,weight);
+      m_secondary->FillHists( trk,weight, hardTruth);
     } else if(m_doDups) {
-      m_secondary_dup->FillHists( trk,weight);
+      m_secondary_dup->FillHists( trk,weight, hardTruth);
     }
   }
 

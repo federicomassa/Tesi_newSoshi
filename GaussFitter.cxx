@@ -13,7 +13,7 @@ const unsigned int GaussFitter::m_maxIterationNumber = 1000;
 const double GaussFitter::m_minThreshold = 1e-6;
 const double GaussFitter::m_defaultThreshold = 0.0001;
 
-GaussFitter::GaussFitter(TH1F* h, const Verbosity& verbosity_level) :
+GaussFitter::GaussFitter(TH1F* h, const Verbosity& verbosity_level, const double nSigma) :
   m_fitHist(h),
   m_verbosityLevel(verbosity_level)
 {
@@ -29,6 +29,7 @@ GaussFitter::GaussFitter(TH1F* h, const Verbosity& verbosity_level) :
   m_mean = -1E9;
   m_amplitude = -1E9;
   m_sigma = -1E9;
+  m_nSigma = nSigma;
 }
 
 TF1* GaussFitter::Fit() {
@@ -66,7 +67,7 @@ TF1* GaussFitter::Fit() {
     }
   }
   
-  m_fitFunc -> SetRange(m_mean - 3*m_sigma, m_mean + 3*m_sigma);
+  m_fitFunc -> SetRange(m_mean - m_nSigma*m_sigma, m_mean + m_nSigma*m_sigma);
 
   if (m_iterationNumber >= 2) {
     if (m_amplitude > 0)
@@ -77,6 +78,7 @@ TF1* GaussFitter::Fit() {
     m_fitFunc -> SetParameter(1, m_mean);
     m_fitFunc -> SetParameter(2, m_sigma);
   }
+
 
   m_fitResult = m_fitHist -> Fit(m_fitFunc, "RSNQ");
   m_fitStatus = m_fitResult;
@@ -258,3 +260,14 @@ Double_t GaussFitter::GetSigmaError() const {
 }
 
 
+double GaussFitter::GetReducedChiSquare() const {
+
+  if (m_fitFunc) {
+    return m_fitFunc->GetChisquare()/m_fitFunc->GetNDF();
+  }
+
+  else {
+    PrintMessage("GaussFitter::GetChiSquare()\tWARNING\tFitting function is null", Verbosity::WARNING, m_verbosityLevel);
+  }
+
+}

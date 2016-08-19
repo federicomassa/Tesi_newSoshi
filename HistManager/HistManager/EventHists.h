@@ -53,6 +53,8 @@ class EventHists : public ManageHists {
     TH1F* m_nTruth; //!
     TH1F* m_nChargedTruth; //!
     TH1F* m_nPrimaryChargedTruth; //!
+    TH1F* m_nSecondaryChargedTruth; //!
+    TH1F* m_nSecondaryChargedTruth1GeV; //!
     TH1F* m_nPrimaryChargedTruth1GeV; //!
     TH1F* m_nNeutralTruth; //!
     TH1F* m_nTruth1GeV; //!
@@ -157,6 +159,8 @@ class EventHists : public ManageHists {
     //reco matching
     TH1F* m_recoMatchedMaxDR; //!
     TH1F* m_isRecoMatchingRight; //!
+
+    TH1F* m_isRecoSetOutsideAcceptance; //!
 
     TH1F* m_recoPt; //!
     TH1F* m_recoEta; //!
